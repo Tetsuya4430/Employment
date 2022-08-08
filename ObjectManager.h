@@ -21,5 +21,6 @@ public:
 private:
 	//オブジェクトリスト
 	std::vector<std::shared_ptr<Object3d>> objects_;
+
 };
 

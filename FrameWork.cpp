@@ -57,6 +57,7 @@ void FrameWork::Initialize()
 	//3Dオブジェクトの静的初期化
 	Object3d::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
+
 	//FBXローダーの初期化処理
 	FbxLoader::GetInstance()->Initialize(dxCommon->GetDev());
 

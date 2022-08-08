@@ -23,11 +23,12 @@ void DirectXCommon::Initialize(WinApp* winApp)
 
 #ifdef _DEBUG
 	//デバッグレイヤーをオンに
-	ID3D12Debug* debugController;
+	ID3D12Debug1* debugController;
 
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
 	{
 		debugController->EnableDebugLayer();
+		//debugController->SetEnableGPUBasedValidation(TRUE);
 	}
 #endif
 
@@ -319,6 +320,18 @@ void DirectXCommon::PostDraw()
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 
 #pragma endregion
+
+#ifdef _DEBUG
+
+	ID3D12InfoQueue* infoQueue;
+	if (SUCCEEDED(dev->QueryInterface(IID_PPV_ARGS(&infoQueue))))
+	{
+		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
+		//infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
+		//infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
+	}
+
+#endif
 
 	//---コマンドのフラッシュ---//(ここまで貯めたコマンドを実行し描画する)
 #pragma region コマンドの実行

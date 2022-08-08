@@ -6,6 +6,7 @@
 #include "FbxLoader.h"
 #include "Fbx3d.h"
 #include "FrameWork.h"
+#include "Controller.h"
 
 GameScene::GameScene()
 {
@@ -16,6 +17,7 @@ GameScene::~GameScene()
 	delete(object1);
 	delete(model1);
 	delete(postEffect);
+	delete(player);
 }
 
 void GameScene::Initialize()
@@ -33,36 +35,50 @@ void GameScene::Initialize()
 	//OBJからモデルデータを読み込む
 	model_1 = Model::LoadFromObj("triangle_mat");
 	model_2 = Model::LoadFromObj("Box");
+	model_Bullet = Model::LoadFromObj("Bullet");
+	model_Enemy = Model::LoadFromObj("Enemy");
 
-	//オブジェクトマネージャー生成
-	objectManager_1 = std::make_unique<ObjectManager>();
-	objectManager_2 = std::make_unique<ObjectManager>();
-	objectManager_3 = std::make_unique<ObjectManager>();
+	////オブジェクトマネージャー生成
+	//objectManager_1 = std::make_unique<ObjectManager>();
+	//objectManager_2 = std::make_unique<ObjectManager>();
+	//objectManager_3 = std::make_unique<ObjectManager>();
+	//objectManager_4 = std::make_unique<ObjectManager>();
 
-	//オブジェクトマネージャー生成->3Dオブジェクト生成->オブジェクトの参照カウントを増加
-	std::shared_ptr<Object3d> object_1 = Object3d::Create(model_1, camera);
-	std::weak_ptr<Object3d> ObjectWp_1 = objectManager_1->AddObject(object_1);
-	object3d_1 = ObjectWp_1.lock();
+	////オブジェクトマネージャー生成->3Dオブジェクト生成->オブジェクトの参照カウントを増加
+	//std::shared_ptr<Object3d> object_1 = Object3d::Create(model_1, camera);
+	//std::weak_ptr<Object3d> ObjectWp_1 = objectManager_1->AddObject(object_1);
+	//Empty = ObjectWp_1.lock();
 
-	std::shared_ptr<Object3d> object_2 = Object3d::Create(model_2, camera);
-	std::weak_ptr<Object3d> ObjectWp_2 = objectManager_2->AddObject(object_2);
-	BulletObj = ObjectWp_2.lock();
+	//std::shared_ptr<Object3d> object_2 = Object3d::Create(model_Bullet, camera);
+	//std::weak_ptr<Object3d> ObjectWp_2 = objectManager_2->AddObject(object_2);
+	//BulletObj = ObjectWp_2.lock();
 
-	std::shared_ptr<Object3d> object_3 = Object3d::Create(model_2, camera);
-	std::weak_ptr<Object3d> ObjectWp_3 = objectManager_3->AddObject(object_3);
-	Player = ObjectWp_3.lock();
+	//std::shared_ptr<Object3d> object_3 = Object3d::Create(model_2, camera);
+	//std::weak_ptr<Object3d> ObjectWp_3 = objectManager_3->AddObject(object_3);
+	//player = ObjectWp_3.lock();
 
+	//std::shared_ptr<Object3d> object_4 = Object3d::Create(model_Enemy, camera);
+	//std::weak_ptr<Object3d> ObjectWp_4 = objectManager_4->AddObject(object_4);
+	//Enemy = ObjectWp_4.lock();
+
+	//3Dオブジェクト生成
+	player = Object3d::Create(model_2, camera);
 
 	//3Dオブジェクトの位置と拡大率を指定
 	
-		object3d_1->SetScale({ 20.0f, 20.0f, 20.0f });
+		/*Empty->SetScale({ 20.0f, 20.0f, 20.0f });
 
 		BulletObj->SetPosition({ 0, 0, 0 });
 		BulletObj->SetScale({ 0.5f, 0.5f, 0.5f });
 	
-		Player->SetPosition({ 0, 0, 0 });
-		Player->SetScale({ 1.0f, 1.0f, 1.0f });
+		player->SetPosition({ 0, 0, 0 });
+		player->SetScale({ 1.0f, 1.0f, 1.0f });
+
+		Enemy->SetPosition({ 0, 30, 20 });
+		Enemy->SetScale({ 1.0f, 1.0f, 1.0f });*/
 	
+		//プレイヤーの初期化
+		//player = player::Create(model_1, camera);
 
 		//デバイスをセット
 		Fbx3d::SetDevice(dxCommon->GetDev());
@@ -79,9 +95,7 @@ void GameScene::Initialize()
 		object1->Initialize();
 		object1->SetModel(model1);
 
-		//player->Initialize();
-
-		
+		object1->SetPosition({ 100.0f, 0.0f, 0.0f });
 
 		//カメラ注視点をセット
 		camera->SetTarget({ 0, 20, 0 });
@@ -112,11 +126,22 @@ void GameScene::Update()
 	//X座標、Y座標、縮尺を指定して表示
 	DebugText::GetInstance()->Print("Debug Text = 0", 0, 50, 2.0f);
 
-	//プレイヤーの座標を取得
-	DirectX::XMFLOAT3 PlayerPos = Player->GetPosition();
+	////プレイヤーの座標を取得
+	//DirectX::XMFLOAT3 PlayerPos = player->GetPosition();
 
-	//弾のサイズを取得
-	DirectX::XMFLOAT3 BulletPos = BulletObj->GetPosition();
+	////プレイヤーの座標を取得
+	//DirectX::XMFLOAT3 EnemyPos = Enemy->GetPosition();
+
+	//DirectX::XMFLOAT3 EnemyPos_2 = {EnemyPos.x + 10.0f, EnemyPos.y - 10.0f , EnemyPos.z + 10.0f };
+
+
+	////弾のサイズを取得
+	//DirectX::XMFLOAT3 BulletPos = BulletObj->GetPosition();
+
+	//DirectX::XMFLOAT3 BulletPos_2 = { BulletPos.x + 5.0f, BulletPos.y - 5.0f , BulletPos.z + 5.0f };
+
+	////プレイヤーのローテーション取得
+	//DirectX::XMFLOAT3 PlayerRot = player->GetRotation();
 
 	if (Input::GetInstance()->TriggerKey(DIK_RETURN))
 	{
@@ -124,69 +149,125 @@ void GameScene::Update()
 		SceneManager::GetInstance()->ChangeScene("TITLE");
 	}
 
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && BulletFlag == 0)
-	{
-		BulletFlag = 1;
-	}
+	//if (Input::GetInstance()->TriggerKey(DIK_SPACE) && BulletFlag == 0)
+	//{
+	//	BulletFlag = 1;
+	//}
 
-	if (Input::GetInstance()->TriggerKey(DIK_A))
-	{
-		Audio::GetInstance()->PlayWave("Alarm01.wav");
-	}
+	//if (Input::GetInstance()->TriggerKey(DIK_A))
+	//{
+	//	Audio::GetInstance()->PlayWave("Alarm01.wav");
+	//}
 
-	//座標操作
-	if (Input::GetInstance()->PushKey(DIK_UP) || Input::GetInstance()->PushKey(DIK_DOWN) || Input::GetInstance()->PushKey(DIK_RIGHT) || Input::GetInstance()->PushKey(DIK_LEFT))
-	{
-			if (Input::GetInstance()->PushKey(DIK_DOWN))
-			{
-				PlayerPos.y -= MoveVec;
-				Player->SetPosition(PlayerPos);
-			}
+	////座標操作
+	//if (Input::GetInstance()->PushKey(DIK_UP) || Input::GetInstance()->PushKey(DIK_DOWN) || Input::GetInstance()->PushKey(DIK_RIGHT) || Input::GetInstance()->PushKey(DIK_LEFT))
+	//{
+	//		if (Input::GetInstance()->PushKey(DIK_DOWN))
+	//		{
+	//			MoveFlag = 1;
+	//			PlayerPos.y -= MoveVec;
+	//			player->SetPosition(PlayerPos);
+	//		}
 
-			if (Input::GetInstance()->PushKey(DIK_UP))
-			{
-				PlayerPos.y += MoveVec;
-				Player->SetPosition(PlayerPos);
-			}
+	//		if (Input::GetInstance()->PushKey(DIK_UP))
+	//		{
+	//			MoveFlag = 1;
+	//			PlayerPos.y += MoveVec;
+	//			player->SetPosition(PlayerPos);
+	//		}
 
-			if (Input::GetInstance()->PushKey(DIK_LEFT))
-			{
-				PlayerPos.x -= MoveVec;
-				Player->SetPosition(PlayerPos);
-			}
+	//		if (Input::GetInstance()->PushKey(DIK_LEFT))
+	//		{
+	//			MoveFlag = 1;
+	//			PlayerPos.x -= MoveVec;
+	//			player->SetPosition(PlayerPos);
+	//			if (PlayerRot.z <= 10.0f)
+	//			{
+	//				PlayerRot.z += 1.0f;
+	//				player->SetRotation(PlayerRot);
+	//			}
+	//		}
 
-			if (Input::GetInstance()->PushKey(DIK_RIGHT))
-			{
-				PlayerPos.x += MoveVec;
-				Player->SetPosition(PlayerPos);
-			}
-	}
+	//		if (Input::GetInstance()->PushKey(DIK_RIGHT))
+	//		{
+	//			MoveFlag = 1;
+	//			PlayerPos.x += MoveVec;
+	//			player->SetPosition(PlayerPos);
+	//			if (PlayerRot.z >= -10.0f)
+	//			{
+	//				PlayerRot.z -= 1.0f;
+	//				player->SetRotation(PlayerRot);
+	//			}
+	//		}
+	//}
+	//else
+	//{
+	//	MoveFlag = 0;
+	//}
 
-	if (BulletFlag == 0)
-	{
-		BulletObj->SetPosition(PlayerPos);
-	}
+	////プレイヤーが傾いている且つ移動していない時は角度を戻す
+	//if (MoveFlag  == 0)
+	//{
+	//	if (PlayerRot.z > 0)
+	//	{
+	//		PlayerRot.z -= 1.0f;
+	//		player->SetRotation(PlayerRot);
+	//	}
+	//}
+
+	//if (MoveFlag == 0)
+	//{
+	//	if (PlayerRot.z < 0)
+	//	{
+	//		PlayerRot.z += 1.0f;
+	//		player->SetRotation(PlayerRot);
+	//	}
+	//}
+
+	////コントローラー移動
 
 
-	if (BulletFlag == 1)
-	{
-		BulletPos.z += 1.0f;
 
-		BulletObj->SetPosition(BulletPos);
-	}
+	//if (BulletFlag == 0)
+	//{
+	//	BulletObj->SetPosition(PlayerPos);
+	//}
 
-	if (BulletPos.z >= 30)
-	{
-		BulletFlag = 0;
-		BulletPos.z = 0;
-		BulletObj->SetPosition(BulletPos);
-	}
+
+	//if (BulletFlag == 1)
+	//{
+	//	BulletPos.z += 1.0f;
+
+	//	BulletObj->SetPosition(BulletPos);
+	//}
+
+	//if (BulletPos.z >= 30)
+	//{
+	//	BulletFlag = 0;
+	//	BulletPos.z = 0;
+	//	BulletObj->SetPosition(BulletPos);
+	//}
+
+	////弾と敵の当たり判定
+	//if (EnemyPos.x < BulletPos.x && EnemyPos_2.x > BulletPos.x)
+	//{
+	//	if (EnemyPos.y > BulletPos.y && EnemyPos_2.y < BulletPos.y)
+	//	{
+	//		if (EnemyPos.z)
+	//		{
+
+	//		}
+	//	}
+	//}
 
 
 	//3Dオブジェクトの更新
-	objectManager_1->Update();
+	/*objectManager_1->Update();
 	objectManager_2->Update();
 	objectManager_3->Update();
+	objectManager_4->Update();*/
+
+	player->Update();
 
 	//FBXオブジェクトの更新
 	object1->Update();
@@ -219,24 +300,25 @@ void GameScene::Draw()
 	////スプライト描画
 	sprite->Draw();
 
-
-	//ポストエフェクト描画
-	//postEffect->Draw();
-
 	//3Dオブジェクトの描画前処理
 	Object3d::PreDraw();
 
-	////3Dオブジェクトの描画
+	//敵の描画
 	//objectManager_1->Draw();
 
 	//弾の描画
-	if (BulletFlag == 1)
-	{
-		objectManager_2->Draw();
-	}
+	//if (BulletFlag == 1)
+	//{
+	//	objectManager_2->Draw();
+	//}
 
-	//プレイヤーの描画
-	objectManager_3->Draw();
+	////プレイヤーの描画
+	//objectManager_3->Draw();
+
+	////プレイヤーの描画
+	//objectManager_4->Draw();
+
+	player->Draw();
 
 	//FBXオブジェクトの描画
 	object1->Draw(cmdList);
@@ -244,12 +326,6 @@ void GameScene::Draw()
 	//3Dオブジェクトの描画後処理
 	Object3d::PostDraw();
 
-
-	//////スプライトの共通コマンド
-	//SpriteCommon::GetInstance()->PreDraw();
-
-	//////スプライト描画
-	//sprite->Draw();
 }
 
 

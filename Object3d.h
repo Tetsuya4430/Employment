@@ -14,7 +14,7 @@
 /// </summary>
 class Object3d
 {
-private: // エイリアス
+protected: // エイリアス
 	// Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	// DirectX::を省略
@@ -67,7 +67,7 @@ public: // 静的メンバ関数
 	/// 3Dオブジェクト生成
 	/// </summary>
 	/// <returns></returns>
-	static std::shared_ptr<Object3d>Create(Model* model, Camera* camera);
+	static Object3d* Create(Model* model, Camera* camera);
 
 	/// <summary>
 	/// 視点座標の取得
@@ -147,11 +147,12 @@ private:// 静的メンバ関数
 	//static void UpdateViewMatrix();
 
 public: // メンバ関数
-	bool Initialize();
+	virtual bool Initialize();
+
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update();
+	virtual void Update();
 
 	/// <summary>
 	/// 描画
@@ -169,6 +170,18 @@ public: // メンバ関数
 	/// </summary>
 	/// <param name="position">座標</param>
 	void SetPosition(XMFLOAT3 position) { this->position_ = position; }
+
+	/// <summary>
+	/// 座標の取得
+	/// </summary>
+	/// <returns>座標</returns>
+	const XMFLOAT3& GetRotation() { return rotation_; }
+
+	/// <summary>
+	/// 座標の設定
+	/// </summary>
+	/// <param name="position">座標</param>
+	void SetRotation(XMFLOAT3 rotation) { this->rotation_ = rotation; }
 
 	void SetScale(XMFLOAT3 scale) { this->scale_ = scale; }
 

@@ -71,7 +71,7 @@ void Object3d::PostDraw()
 	//Object3d::cmdList = nullptr;
 }
 
-std::shared_ptr<Object3d> Object3d::Create(Model* model, Camera* camera)
+Object3d * Object3d::Create(Model* model, Camera* camera)
 {
 	// 3Dオブジェクトのインスタンスを生成
 	Object3d* object3d = new Object3d();
@@ -86,15 +86,21 @@ std::shared_ptr<Object3d> Object3d::Create(Model* model, Camera* camera)
 		return nullptr;
 	}
 
-	object3d->SetModel(model);
-	object3d->SetCamera(camera);
+	if (model)
+	{
+		object3d->SetModel(model);
+	}
 
+	if (camera)
+	{
+		object3d->SetCamera(camera);
+	}
 	//スケールをリセット
 	/*float scale_val = 20;
 	object3d->scale = { scale_val, scale_val , scale_val };*/
 
-	//シェアドポインタを生成してreturn
-	return std::shared_ptr<Object3d>(object3d);
+	////シェアドポインタを生成してreturn
+	return object3d;
 }
 
 //void Object3d::SetEye(XMFLOAT3 eye)

@@ -6,6 +6,7 @@ void ObjectManager::Update()
 	{
 		object->Update();
 	}
+
 }
 
 void ObjectManager::Draw()
@@ -14,6 +15,7 @@ void ObjectManager::Draw()
 	{
 		object->Draw();
 	}
+
 }
 
 std::weak_ptr<Object3d> ObjectManager::AddObject(std::shared_ptr<Object3d> object)
