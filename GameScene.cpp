@@ -8,6 +8,8 @@
 #include "FrameWork.h"
 #include "Controller.h"
 
+#include "Player.h"
+
 GameScene::GameScene()
 {
 }
@@ -18,6 +20,7 @@ GameScene::~GameScene()
 	delete(model1);
 	delete(postEffect);
 	delete(player);
+	delete(P);
 }
 
 void GameScene::Initialize()
@@ -63,6 +66,8 @@ void GameScene::Initialize()
 
 	//3Dオブジェクト生成
 	player = Object3d::Create(model_2, camera);
+
+	P = Player::Create(model_2, camera);
 
 	//3Dオブジェクトの位置と拡大率を指定
 	
@@ -269,6 +274,8 @@ void GameScene::Update()
 
 	player->Update();
 
+	P->Update();
+
 	//FBXオブジェクトの更新
 	object1->Update();
 	
@@ -318,7 +325,9 @@ void GameScene::Draw()
 	////プレイヤーの描画
 	//objectManager_4->Draw();
 
-	player->Draw();
+	//player->Draw();
+
+	P->Draw();
 
 	//FBXオブジェクトの描画
 	object1->Draw(cmdList);

@@ -8,6 +8,7 @@
 #include "PostEffect.h"
 #include "Controller.h"
 
+class Player;
 /// <summary>
 /// ゲームプレイシーン
 /// </summary>
@@ -67,6 +68,8 @@ private:
 	Object3d* BulletObj = nullptr;
 	Object3d* player = nullptr;
 	Object3d* Enemy = nullptr;
+
+	Player* P = nullptr;
 
 	float MoveVec = 1.0f;
 
