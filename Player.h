@@ -7,6 +7,8 @@
 #include <d3d12.h>
 #include <DirectXMath.h>
 #include <d3dx12.h>
+#include"Input.h"
+
 class Player 
 {
 private: // エイリアス
@@ -104,5 +106,7 @@ private: // 静的メンバ変数
 	XMMATRIX matWorld_;
 	// 親オブジェクト
 	Player* parent_ = nullptr;
+
+	Input* input = nullptr;
 };
 

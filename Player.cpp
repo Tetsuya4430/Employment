@@ -121,6 +121,29 @@ void Player::Update()
 	constMap->mat = matWorld_ * matViewProjection;	// s—ñ‚Ì‡¬
 	constBuffB0_->Unmap(0, nullptr);
 
+	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
+	{
+		if (Input::GetInstance()->PushKey(DIK_D))
+		{
+			position_.x += 0.5f;
+		}
+
+		if (Input::GetInstance()->PushKey(DIK_A))
+		{
+			position_.x -= 0.5f;
+		}
+
+		if (Input::GetInstance()->PushKey(DIK_W))
+		{
+			position_.y += 0.5f;
+		}
+
+		if (Input::GetInstance()->PushKey(DIK_S))
+		{
+			position_.y -= 0.5f;
+		}
+	}
+
 }
 
 bool Player::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
