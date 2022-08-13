@@ -122,15 +122,29 @@ void Player::Update()
 	constBuffB0_->Unmap(0, nullptr);
 
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
-	{
+	{ 
+		MoveFlag = 1;
 		if (Input::GetInstance()->PushKey(DIK_D))
 		{
 			position_.x += 0.5f;
+			if (RotlimR < rotation_.z)
+			{
+				rotation_.z -= 0.3f;
+			}
 		}
 
 		if (Input::GetInstance()->PushKey(DIK_A))
 		{
-			position_.x -= 0.5f;
+			MoveFlag = 1;
+			if (Input::GetInstance()->PushKey(DIK_A))
+			{
+				position_.x -= 0.5f;
+				if (RotlimL > rotation_.z)
+				{
+					rotation_.z += 0.3f;
+				}
+			}
+
 		}
 
 		if (Input::GetInstance()->PushKey(DIK_W))
@@ -141,6 +155,25 @@ void Player::Update()
 		if (Input::GetInstance()->PushKey(DIK_S))
 		{
 			position_.y -= 0.5f;
+		}
+	}
+
+	else
+	{
+		MoveFlag = 0;
+	}
+
+	//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
+	if (MoveFlag == 0)
+	{
+		if (rotation_.z > 0)
+		{
+			rotation_.z -= 0.5f;
+		}
+
+		if (rotation_.z < 0)
+		{
+			rotation_.z += 0.5f;
 		}
 	}
 

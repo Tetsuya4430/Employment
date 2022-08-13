@@ -108,5 +108,12 @@ private: // 静的メンバ変数
 	Player* parent_ = nullptr;
 
 	Input* input = nullptr;
+
+	//プレイヤー回転限度
+	float RotlimR = -15.0f;
+	float RotlimL = 15.0f;
+
+	//プレイヤーの移動フラグ
+	int MoveFlag = 0;
 };
 
