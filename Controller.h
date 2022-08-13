@@ -33,8 +33,6 @@ enum ButtonState
 	ButtonStateMax,
 };
 
-class Controller
-{
 	//コントローラの初期化処理
 	bool InitInput();
 
@@ -52,5 +50,4 @@ class Controller
 
 	//ボタンの押した瞬間の判定
 	bool IsButtonDown(ButtonKind button);
-};
 #endif

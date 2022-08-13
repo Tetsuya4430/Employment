@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Input.h"
+#include "Controller.h"
 #include <d3dcompiler.h>
 #include <fstream>
 #include <sstream>
@@ -55,6 +56,8 @@ bool Player::Initialize()
 	// nullptrチェック
 	assert(device);
 
+	InitInput();
+
 	HRESULT result;
 	// 定数バッファの生成
 	result = device->CreateCommittedResource(
@@ -66,6 +69,13 @@ bool Player::Initialize()
 		IID_PPV_ARGS(&constBuffB0_));
 
     return true;
+}
+
+bool Player::Finalize()
+{
+	ReleaseInput();
+
+	return true;
 }
 
 void Player::Draw()
@@ -121,6 +131,9 @@ void Player::Update()
 	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
 	constBuffB0_->Unmap(0, nullptr);
 
+	//更新処理
+
+	//プレイヤーの移動
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 	{ 
 		MoveFlag = 1;
@@ -177,6 +190,46 @@ void Player::Update()
 		}
 	}
 
+	//if (IsButtonPush(ButtonKind::RightButton))
+	//{
+	//	assert(0);
+	//}
+
+	if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))
+	{
+		MoveFlag = 1;
+		if (IsButtonPush(ButtonKind::RightButton))
+		{
+			position_.x += 0.5f;
+			if (RotlimR < rotation_.z)
+			{
+				rotation_.z -= 0.3f;
+			}
+		}
+
+		if (IsButtonPush(ButtonKind::LeftButton))
+		{
+			MoveFlag = 1;
+				position_.x -= 0.5f;
+				if (RotlimL > rotation_.z)
+				{
+					rotation_.z += 0.3f;
+				}
+		}
+
+		if (IsButtonPush(ButtonKind::UpButton))
+		{
+			position_.y += 0.5f;
+		}
+
+		if (IsButtonPush(ButtonKind::DownButton))
+		{
+			position_.y -= 0.5f;
+		}
+	}
+
+	//コントローラーの押下情報更新
+	UpdateInput();
 }
 
 bool Player::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)

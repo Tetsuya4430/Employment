@@ -9,6 +9,7 @@
 #include <d3dx12.h>
 #include"Input.h"
 
+
 class Player 
 {
 private: // エイリアス
@@ -44,6 +45,11 @@ public:
 	/// <returns></returns>
 	bool Initialize();
 
+	/// <summary>
+	/// 終了処理
+	/// </summary>
+	/// <returns></returns>
+	bool Finalize();
 
 	/// <summary>
 	/// 描画

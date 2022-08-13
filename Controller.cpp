@@ -166,7 +166,7 @@ BOOL CALLBACK DeviceFindCallBack(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 	return DIENUM_CONTINUE;
 }
 
-bool Controller::InitInput()
+bool InitInput()
 {
 	// インターフェース作成
 	if (CreateInputInterface() == false)
@@ -191,7 +191,7 @@ bool Controller::InitInput()
 	return true;
 }
 
-void Controller::ReleaseInput()
+void ReleaseInput()
 {
 	// デバイスの解放
 	if (g_GamePadDevice != nullptr)
@@ -210,12 +210,12 @@ void Controller::ReleaseInput()
 	}
 }
 
-void  Controller::UpdateInput()
+void UpdateInput()
 {
 	UpdateGamePad();
 }
 
-bool Controller::IsButtonPush(ButtonKind button)
+bool IsButtonPush(ButtonKind button)
 {
 	if (g_ButtonStates[button] == ButtonState::ButtonStatePush)
 	{
@@ -225,7 +225,7 @@ bool Controller::IsButtonPush(ButtonKind button)
 	return false;
 }
 
-bool Controller::IsButtonUp(ButtonKind button)
+bool IsButtonUp(ButtonKind button)
 {
 	if (g_ButtonStates[button] == ButtonState::ButtonStateUp)
 	{
@@ -235,7 +235,7 @@ bool Controller::IsButtonUp(ButtonKind button)
 	return false;
 }
 
-bool Controller::IsButtonDown(ButtonKind button)
+bool IsButtonDown(ButtonKind button)
 {
 	if (g_ButtonStates[button] == ButtonState::ButtonStateDown)
 	{
