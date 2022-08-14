@@ -9,6 +9,7 @@
 #include "Controller.h"
 
 class Player;
+class Bullet;
 /// <summary>
 /// ゲームプレイシーン
 /// </summary>
@@ -70,6 +71,7 @@ private:
 	Object3d* Enemy = nullptr;
 
 	Player* P = nullptr;
+	Bullet* B = nullptr;
 
 	float MoveVec = 1.0f;
 

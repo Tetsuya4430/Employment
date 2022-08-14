@@ -4,6 +4,7 @@
 #include "DirectXCommon.h"
 #include "Object3d.h"
 #include "Player.h"
+#include "Bullet.h"
 #include "FbxLoader.h"
 #include "Sprite.h"
 #include "DebugText.h"

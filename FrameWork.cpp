@@ -60,6 +60,9 @@ void FrameWork::Initialize()
 	//プレイヤーの静的初期化
 	Player::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
+	//弾オブジェクトの静的初期化
+	Bullet::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
+
 	//FBXローダーの初期化処理
 	FbxLoader::GetInstance()->Initialize(dxCommon->GetDev());
 

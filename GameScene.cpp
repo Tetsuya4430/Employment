@@ -69,6 +69,8 @@ void GameScene::Initialize()
 
 	P = Player::Create(model_2, camera);
 
+	B = Bullet::Create(model_Bullet, camera);
+
 	//3Dオブジェクトの位置と拡大率を指定
 	
 		/*Empty->SetScale({ 20.0f, 20.0f, 20.0f });
@@ -276,6 +278,8 @@ void GameScene::Update()
 
 	P->Update();
 
+	B->Update();
+
 	//FBXオブジェクトの更新
 	object1->Update();
 	
@@ -327,7 +331,8 @@ void GameScene::Draw()
 
 	//player->Draw();
 
-	P->Draw();
+	//P->Draw();
+	B->Draw();
 
 	//FBXオブジェクトの描画
 	object1->Draw(cmdList);

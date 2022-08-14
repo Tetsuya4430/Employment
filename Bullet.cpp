@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Bullet.h"
 #include "Input.h"
 #include "Controller.h"
 #include <d3dcompiler.h>
@@ -15,15 +15,15 @@ using namespace std;
 /// <summary>
 /// 静的メンバ変数の実体
 /// </summary>
-ID3D12Device* Player::device = nullptr;
-ID3D12GraphicsCommandList* Player::cmdList = nullptr;
-ComPtr<ID3D12RootSignature> Player::rootsignature;
-ComPtr<ID3D12PipelineState> Player::pipelinestate;
+ID3D12Device* Bullet::device = nullptr;
+ID3D12GraphicsCommandList* Bullet::cmdList = nullptr;
+ComPtr<ID3D12RootSignature> Bullet::rootsignature;
+ComPtr<ID3D12PipelineState> Bullet::pipelinestate;
 
-Player* Player::Create(Model* model, Camera* camera)
-{
+Bullet* Bullet::Create(Model* model, Camera* camera)
+{    
     //3Dオブジェクトのインスタンスを生成
-    Player* instance = new Player();
+    Bullet* instance = new Bullet();
     if (instance == nullptr)
     {
         return nullptr;
@@ -51,195 +51,95 @@ Player* Player::Create(Model* model, Camera* camera)
     return instance;
 }
 
-bool Player::Initialize()
+bool Bullet::Initialize()
 {
-	// nullptrチェック
-	assert(device);
+    // nullptrチェック
+    assert(device);
 
-	//コントローラー初期化
-	InitInput();
+    //コントローラー初期化
+    InitInput();
 
-	HRESULT result;
-	// 定数バッファの生成
-	result = device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
-		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB0) + 0xff) & ~0xff),
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&constBuffB0_));
+    HRESULT result;
+    // 定数バッファの生成
+    result = device->CreateCommittedResource(
+        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
+        D3D12_HEAP_FLAG_NONE,
+        &CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB0) + 0xff) & ~0xff),
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&constBuffB0_));
 
     return true;
 }
 
-bool Player::Finalize()
+bool Bullet::Finalize()
 {
-	ReleaseInput();
+    ReleaseInput();
 
-	return true;
+    return true;
 }
 
-void Player::Draw()
+void Bullet::Draw()
 {
-	// nullptrチェック
-	assert(device);
-	assert(Player::cmdList);
+    // nullptrチェック
+    assert(device);
+    assert(Bullet::cmdList);
 
-	//モデルの紐づけがない場合は描画しない
-	if (model_ == nullptr)
-	{
-		return;
-	}
+    //モデルの紐づけがない場合は描画しない
+    if (model_ == nullptr)
+    {
+        return;
+    }
 
 
-	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0_->GetGPUVirtualAddress());
+    cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0_->GetGPUVirtualAddress());
 
-	model_->Draw(cmdList, 1);
+    model_->Draw(cmdList, 1);
 }
 
-void Player::Update()
+void Bullet::Update()
 {
-	HRESULT result;
-	XMMATRIX matScale, matRot, matTrans;
+    HRESULT result;
+    XMMATRIX matScale, matRot, matTrans;
 
-	// スケール、回転、平行移動行列の計算
-	matScale = XMMatrixScaling(scale_.x, scale_.y, scale_.z);
-	matRot = XMMatrixIdentity();
-	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation_.z));
-	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation_.x));
-	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation_.y));
-	matTrans = XMMatrixTranslation(position_.x, position_.y, position_.z);
+    // スケール、回転、平行移動行列の計算
+    matScale = XMMatrixScaling(scale_.x, scale_.y, scale_.z);
+    matRot = XMMatrixIdentity();
+    matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation_.z));
+    matRot *= XMMatrixRotationX(XMConvertToRadians(rotation_.x));
+    matRot *= XMMatrixRotationY(XMConvertToRadians(rotation_.y));
+    matTrans = XMMatrixTranslation(position_.x, position_.y, position_.z);
 
-	// ワールド行列の合成
-	matWorld_ = XMMatrixIdentity(); // 変形をリセット
-	matWorld_ *= matScale; // ワールド行列にスケーリングを反映
-	matWorld_ *= matRot; // ワールド行列に回転を反映
-	matWorld_ *= matTrans; // ワールド行列に平行移動を反映
+    // ワールド行列の合成
+    matWorld_ = XMMatrixIdentity(); // 変形をリセット
+    matWorld_ *= matScale; // ワールド行列にスケーリングを反映
+    matWorld_ *= matRot; // ワールド行列に回転を反映
+    matWorld_ *= matTrans; // ワールド行列に平行移動を反映
 
-	// 親オブジェクトがあれば
-	if (parent_ != nullptr) {
-		// 親オブジェクトのワールド行列を掛ける
-		matWorld_ *= parent_->matWorld_;
-	}
+    // 親オブジェクトがあれば
+    if (parent_ != nullptr) {
+        // 親オブジェクトのワールド行列を掛ける
+        matWorld_ *= parent_->matWorld_;
+    }
 
-	const XMMATRIX& matViewProjection = camera_->GetmatViewProjection();
+    const XMMATRIX& matViewProjection = camera_->GetmatViewProjection();
 
-	// 定数バッファへデータ転送B0
-	ConstBufferDataB0* constMap = nullptr;
-	result = constBuffB0_->Map(0, nullptr, (void**)&constMap);
-	//constMap->color = color;
-	//constMap->mat = matWorld_ * matView * matProjection;	// 行列の合成
-	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
-	constBuffB0_->Unmap(0, nullptr);
-
-	//更新処理
-
-	//プレイヤーの移動
-	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
-	{ 
-		MoveFlag = 1;
-		if (Input::GetInstance()->PushKey(DIK_D))
-		{
-			position_.x += 0.5f;
-			if (RotlimR < rotation_.z)
-			{
-				rotation_.z -= 0.3f;
-			}
-		}
-
-		if (Input::GetInstance()->PushKey(DIK_A))
-		{
-			MoveFlag = 1;
-			if (Input::GetInstance()->PushKey(DIK_A))
-			{
-				position_.x -= 0.5f;
-				if (RotlimL > rotation_.z)
-				{
-					rotation_.z += 0.3f;
-				}
-			}
-
-		}
-
-		if (Input::GetInstance()->PushKey(DIK_W))
-		{
-			position_.y += 0.5f;
-		}
-
-		if (Input::GetInstance()->PushKey(DIK_S))
-		{
-			position_.y -= 0.5f;
-		}
-	}
-
-	else
-	{
-		MoveFlag = 0;
-	}
-
-	//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
-	if (MoveFlag == 0)
-	{
-		if (rotation_.z > 0)
-		{
-			rotation_.z -= 0.5f;
-		}
-
-		if (rotation_.z < 0)
-		{
-			rotation_.z += 0.5f;
-		}
-	}
-
-
-	if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))
-	{
-		MoveFlag = 1;
-		if (IsButtonPush(ButtonKind::RightButton))
-		{
-			position_.x += 0.5f;
-			if (RotlimR < rotation_.z)
-			{
-				rotation_.z -= 0.3f;
-			}
-		}
-
-		if (IsButtonPush(ButtonKind::LeftButton))
-		{
-			MoveFlag = 1;
-				position_.x -= 0.5f;
-				if (RotlimL > rotation_.z)
-				{
-					rotation_.z += 0.3f;
-				}
-		}
-
-		if (IsButtonPush(ButtonKind::UpButton))
-		{
-			position_.y += 0.5f;
-		}
-
-		if (IsButtonPush(ButtonKind::DownButton))
-		{
-			position_.y -= 0.5f;
-		}
-	}
-
-	else
-	{
-		MoveFlag = 0;
-	}
-
-	//コントローラーの押下情報更新
-	UpdateInput();
+    // 定数バッファへデータ転送B0
+    ConstBufferDataB0* constMap = nullptr;
+    result = constBuffB0_->Map(0, nullptr, (void**)&constMap);
+    //constMap->color = color;
+    //constMap->mat = matWorld_ * matView * matProjection;	// 行列の合成
+    constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
+    constBuffB0_->Unmap(0, nullptr);
 }
 
-bool Player::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
-{// nullptrチェック
+bool Bullet::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
+{
+    // nullptrチェック
     assert(device);
 
-	Player::device = device;
-	Player::cmdList = cmdList;
+    Bullet::device = device;
+    Bullet::cmdList = cmdList;
 
     Model::SetDevice(device);
 
@@ -256,7 +156,7 @@ bool Player::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* c
     return true;
 }
 
-bool Player::InitializeGraphicsPipeline()
+bool Bullet::InitializeGraphicsPipeline()
 {
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
