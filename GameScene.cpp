@@ -9,6 +9,7 @@
 #include "Controller.h"
 
 #include "Player.h"
+#include "Bullet.h"
 
 GameScene::GameScene()
 {
@@ -69,7 +70,7 @@ void GameScene::Initialize()
 
 	P = Player::Create(model_2, camera);
 
-	B = Bullet::Create(model_Bullet, camera);
+	//B = Bullet::Create(model_Bullet, camera);
 
 	//3Dオブジェクトの位置と拡大率を指定
 	
@@ -278,14 +279,16 @@ void GameScene::Update()
 
 	P->Update();
 
+	//bullet->position_B = P->position_;
+
 	Attack();
 
 	if (bullet)
 	{
-		bullet->Update();
+		bullet->Update(P->position_);
 	}
 
-	B->Update();
+	//B->Update();
 
 	//FBXオブジェクトの更新
 	object1->Update();
@@ -356,10 +359,10 @@ void GameScene::Draw()
 
 void GameScene::Attack()
 {
-	if (Input::GetInstance()->PushKey(DIK_R))
+	if (Input::GetInstance()->TriggerKey(DIK_R))
 	{
 		Bullet* newBullet = new Bullet();
-		newBullet = Bullet::Create(model_Bullet, camera);
+		newBullet = Bullet::Create(model_Bullet, camera, P->position_);
 
 		//弾を登録
 		bullet = newBullet;

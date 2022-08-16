@@ -34,15 +34,18 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static Bullet* Create(Model* model, Camera* camera);
+	static Bullet* Create(Model* model, Camera* camera, XMFLOAT3 pos);
 
 public:
+
+	//インスタンス
+	static Bullet* GetInstance();
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
 	/// <returns></returns>
-	bool Initialize();
+	bool Initialize(XMFLOAT3 pos);
 
 	/// <summary>
 	/// 終了処理
@@ -58,7 +61,7 @@ public:
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update();
+	void Update(XMFLOAT3 pos);
 
 	/// <summary>
 /// 静的初期化
@@ -105,13 +108,16 @@ private: // メンバ変数
 	XMFLOAT3 scale_ = { 1,1,1 };
 	// X,Y,Z軸回りのローカル回転角
 	XMFLOAT3 rotation_ = { 0,0,0 };
-	// ローカル座標
-	XMFLOAT3 position_B = { 0,0,0 };
 	// ローカルワールド変換行列
 	XMMATRIX matWorld_;
 	// 親オブジェクト
 	Bullet* parent_ = nullptr;
 
 	Input* input = nullptr;
+
+
+	public:
+		// ローカル座標
+		XMFLOAT3 position_B = { 0,0,0 };
 };
 

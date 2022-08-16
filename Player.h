@@ -40,6 +40,9 @@ public:
 
 public:
 
+	//インスタンス
+	static Player* GetInstance();
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -97,7 +100,7 @@ private: // 静的メンバ変数
 	/// <returns>成否</returns>
 	static bool InitializeGraphicsPipeline();
 
-	protected: // メンバ変数
+	private: // メンバ変数
 //3Dモデル(借りてくる)
 	Model* model_ = nullptr;
 	//カメラ
@@ -108,8 +111,6 @@ private: // 静的メンバ変数
 	XMFLOAT3 scale_ = { 1,1,1 };
 	// X,Y,Z軸回りのローカル回転角
 	XMFLOAT3 rotation_ = { 0,0,0 };
-	// ローカル座標
-	XMFLOAT3 position_ = { 0,0,0 };
 	// ローカルワールド変換行列
 	XMMATRIX matWorld_;
 	// 親オブジェクト
@@ -118,8 +119,9 @@ private: // 静的メンバ変数
 	Input* input = nullptr;
 
 	//弾
-	Bullet* bullet = nullptr;
+	Bullet* bullet = Bullet::GetInstance();
 
+	Model* model_Bullet = nullptr;
 	
 
 	//プレイヤー回転限度
@@ -128,5 +130,9 @@ private: // 静的メンバ変数
 
 	//プレイヤーの移動フラグ
 	int MoveFlag = 0;
+
+	public:
+		// ローカル座標
+		XMFLOAT3 position_ = { 0,0,0 };
 };
 

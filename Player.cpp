@@ -52,6 +52,13 @@ Player* Player::Create(Model* model, Camera* camera)
     return instance;
 }
 
+Player* Player::GetInstance()
+{
+	static Player instance;
+
+	return &instance;
+}
+
 bool Player::Initialize()
 {
 	// nullptrチェック
@@ -231,13 +238,8 @@ void Player::Update()
 		MoveFlag = 0;
 	}
 
-	
 
-	//弾更新
-	if (bullet)
-	{
-		bullet->Update();
-	}
+
 
 	//コントローラーの押下情報更新
 	UpdateInput();

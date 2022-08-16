@@ -20,7 +20,7 @@ ID3D12GraphicsCommandList* Bullet::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Bullet::rootsignature;
 ComPtr<ID3D12PipelineState> Bullet::pipelinestate;
 
-Bullet* Bullet::Create(Model* model, Camera* camera)
+Bullet* Bullet::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 {    
     //3Dオブジェクトのインスタンスを生成
     Bullet* instance = new Bullet();
@@ -30,7 +30,7 @@ Bullet* Bullet::Create(Model* model, Camera* camera)
     }
 
     //初期化
-    if (!instance->Initialize())
+    if (!instance->Initialize(pos))
     {
         delete instance;
         assert(0);
@@ -51,13 +51,22 @@ Bullet* Bullet::Create(Model* model, Camera* camera)
     return instance;
 }
 
-bool Bullet::Initialize()
+Bullet* Bullet::GetInstance()
+{
+	static Bullet instance;
+
+	return &instance;
+}
+
+bool Bullet::Initialize(XMFLOAT3 pos)
 {
     // nullptrチェック
     assert(device);
 
     //コントローラー初期化
     InitInput();
+
+	position_B = pos;
 
     HRESULT result;
     // 定数バッファの生成
@@ -97,7 +106,7 @@ void Bullet::Draw()
     model_->Draw(cmdList, 1);
 }
 
-void Bullet::Update()
+void Bullet::Update(XMFLOAT3 pos)
 {
     HRESULT result;
     XMMATRIX matScale, matRot, matTrans;
@@ -133,33 +142,36 @@ void Bullet::Update()
     constBuffB0_->Unmap(0, nullptr);
 
 
+	//position_B = pos;
 	//更新処理
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 	{
 		if (Input::GetInstance()->PushKey(DIK_D))
 		{
-			position_B.x += 0.5f;
+			//position_B.x += 0.5f;
 		}
 
 		if (Input::GetInstance()->PushKey(DIK_A))
 		{
 			if (Input::GetInstance()->PushKey(DIK_A))
 			{
-				position_B.x -= 0.5f;
+				//position_B.x -= 0.5f;
 			}
 
 		}
 
 		if (Input::GetInstance()->PushKey(DIK_W))
 		{
-			position_B.y += 0.5f;
+			//position_B.y += 0.5f;
 		}
 
 		if (Input::GetInstance()->PushKey(DIK_S))
 		{
-			position_B.y -= 0.5f;
+			//position_B.y -= 0.5f;
 		}
 	}
+
+	//position_B = position_C;
 }
 
 bool Bullet::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
