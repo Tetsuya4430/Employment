@@ -108,7 +108,7 @@ void Bullet::Update()
     matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation_.z));
     matRot *= XMMatrixRotationX(XMConvertToRadians(rotation_.x));
     matRot *= XMMatrixRotationY(XMConvertToRadians(rotation_.y));
-    matTrans = XMMatrixTranslation(position_.x, position_.y, position_.z);
+    matTrans = XMMatrixTranslation(position_B.x, position_B.y, position_B.z);
 
     // ワールド行列の合成
     matWorld_ = XMMatrixIdentity(); // 変形をリセット
@@ -131,6 +131,35 @@ void Bullet::Update()
     //constMap->mat = matWorld_ * matView * matProjection;	// 行列の合成
     constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
     constBuffB0_->Unmap(0, nullptr);
+
+
+	//更新処理
+	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
+	{
+		if (Input::GetInstance()->PushKey(DIK_D))
+		{
+			position_B.x += 0.5f;
+		}
+
+		if (Input::GetInstance()->PushKey(DIK_A))
+		{
+			if (Input::GetInstance()->PushKey(DIK_A))
+			{
+				position_B.x -= 0.5f;
+			}
+
+		}
+
+		if (Input::GetInstance()->PushKey(DIK_W))
+		{
+			position_B.y += 0.5f;
+		}
+
+		if (Input::GetInstance()->PushKey(DIK_S))
+		{
+			position_B.y -= 0.5f;
+		}
+	}
 }
 
 bool Bullet::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)

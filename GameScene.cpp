@@ -278,6 +278,13 @@ void GameScene::Update()
 
 	P->Update();
 
+	Attack();
+
+	if (bullet)
+	{
+		bullet->Update();
+	}
+
 	B->Update();
 
 	//FBXオブジェクトの更新
@@ -331,8 +338,13 @@ void GameScene::Draw()
 
 	//player->Draw();
 
-	//P->Draw();
-	B->Draw();
+	P->Draw();
+	if (bullet)
+	{
+		bullet->Draw();
+	}
+
+	//B->Draw();
 
 	//FBXオブジェクトの描画
 	object1->Draw(cmdList);
@@ -340,6 +352,18 @@ void GameScene::Draw()
 	//3Dオブジェクトの描画後処理
 	Object3d::PostDraw();
 
+}
+
+void GameScene::Attack()
+{
+	if (Input::GetInstance()->PushKey(DIK_R))
+	{
+		Bullet* newBullet = new Bullet();
+		newBullet = Bullet::Create(model_Bullet, camera);
+
+		//弾を登録
+		bullet = newBullet;
+	}
 }
 
 

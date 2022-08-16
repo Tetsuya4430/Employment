@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Input.h"
+#include "Bullet.h"
 #include "Controller.h"
 #include <d3dcompiler.h>
 #include <fstream>
@@ -230,6 +231,14 @@ void Player::Update()
 		MoveFlag = 0;
 	}
 
+	
+
+	//弾更新
+	if (bullet)
+	{
+		bullet->Update();
+	}
+
 	//コントローラーの押下情報更新
 	UpdateInput();
 }
@@ -255,6 +264,8 @@ bool Player::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* c
 
     return true;
 }
+
+
 
 bool Player::InitializeGraphicsPipeline()
 {

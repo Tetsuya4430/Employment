@@ -4,6 +4,7 @@
 #include "Object3d.h"
 #include "Fbx3d.h"
 #include "Input.h"
+#include "Bullet.h"
 #include "ObjectManager.h"
 #include "PostEffect.h"
 #include "Controller.h"
@@ -34,6 +35,10 @@ public:
 	//•`‰æ
 	void Draw() override;
 
+
+	//ƒvƒŒƒCƒ„[‚ÌUŒ‚
+	void Attack();
+
 private:
 	//’è”
 	const int MAX_Object = 10;
@@ -53,6 +58,9 @@ private:
 
 	Camera* camera = nullptr;
 	PostEffect* postEffect = nullptr;
+
+	//’e
+	Bullet* bullet = nullptr;
 
 
 	/*std::shared_ptr<Object3d> Empty;

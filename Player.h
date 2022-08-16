@@ -1,6 +1,7 @@
 #pragma once
 #include "Model.h"
 #include "Camera.h"
+#include "Bullet.h"
 
 #include <Windows.h>
 #include <wrl.h>
@@ -72,6 +73,7 @@ public:
 	static bool StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height);
 
 
+
 	/// <summary>
 	/// setter
 	/// </summary>
@@ -95,7 +97,7 @@ private: // 静的メンバ変数
 	/// <returns>成否</returns>
 	static bool InitializeGraphicsPipeline();
 
-	private: // メンバ変数
+	protected: // メンバ変数
 //3Dモデル(借りてくる)
 	Model* model_ = nullptr;
 	//カメラ
@@ -114,6 +116,11 @@ private: // 静的メンバ変数
 	Player* parent_ = nullptr;
 
 	Input* input = nullptr;
+
+	//弾
+	Bullet* bullet = nullptr;
+
+	
 
 	//プレイヤー回転限度
 	float RotlimR = -15.0f;
