@@ -283,10 +283,16 @@ void GameScene::Update()
 
 	Attack();
 
-	if (bullet)
+	//’eXV
+	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
 		bullet->Update(P->position_);
 	}
+
+	/*if (bullets)
+	{
+		bullet->Update(P->position_);
+	}*/
 
 	//B->Update();
 
@@ -342,10 +348,16 @@ void GameScene::Draw()
 	//player->Draw();
 
 	P->Draw();
-	if (bullet)
+
+	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
 		bullet->Draw();
 	}
+
+	/*if (bullets)
+	{
+		bullet->Draw();
+	}*/
 
 	//B->Draw();
 
@@ -361,11 +373,12 @@ void GameScene::Attack()
 {
 	if (Input::GetInstance()->TriggerKey(DIK_R))
 	{
-		Bullet* newBullet = new Bullet();
+		//’e‚ğ¶¬‚µ‰Šú‰»
+		std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
 		newBullet = Bullet::Create(model_Bullet, camera, P->position_);
-
+		
 		//’e‚ğ“o˜^
-		bullet = newBullet;
+		bullets.push_back(std::move(newBullet));
 	}
 }
 

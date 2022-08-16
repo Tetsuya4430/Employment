@@ -9,6 +9,8 @@
 #include "PostEffect.h"
 #include "Controller.h"
 
+#include <list>
+
 class Player;
 class Bullet;
 
@@ -71,7 +73,7 @@ private:
 	PostEffect* postEffect = nullptr;
 
 	//’e
-	Bullet* bullet = nullptr;
+	std::list<std::unique_ptr<Bullet>> bullets;
 
 
 	/*std::shared_ptr<Object3d> Empty;

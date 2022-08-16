@@ -20,7 +20,7 @@ ID3D12GraphicsCommandList* Bullet::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Bullet::rootsignature;
 ComPtr<ID3D12PipelineState> Bullet::pipelinestate;
 
-Bullet* Bullet::Create(Model* model, Camera* camera, XMFLOAT3 pos)
+std::unique_ptr<Bullet> Bullet::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 {    
     //3Dオブジェクトのインスタンスを生成
     Bullet* instance = new Bullet();
@@ -48,7 +48,7 @@ Bullet* Bullet::Create(Model* model, Camera* camera, XMFLOAT3 pos)
         instance->SetCamera(camera);
     }
 
-    return instance;
+    return std::unique_ptr<Bullet>(instance);
 }
 
 Bullet* Bullet::GetInstance()

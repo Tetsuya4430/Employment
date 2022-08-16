@@ -34,7 +34,7 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static Bullet* Create(Model* model, Camera* camera, XMFLOAT3 pos);
+	static std::unique_ptr<Bullet>Create(Model* model, Camera* camera, XMFLOAT3 pos);
 
 public:
 
