@@ -5,6 +5,7 @@
 #include "Fbx3d.h"
 #include "Input.h"
 #include "Bullet.h"
+#include "Enemy.h"
 #include "ObjectManager.h"
 #include "PostEffect.h"
 #include "Controller.h"
@@ -13,6 +14,7 @@
 
 class Player;
 class Bullet;
+class Enemy;
 
 /// <summary>
 /// ゲームプレイシーン
@@ -93,6 +95,7 @@ private:
 
 	Player* P = nullptr;
 	Bullet* B = nullptr;
+	//Enemy* E = nullptr;
 
 	float MoveVec = 1.0f;
 

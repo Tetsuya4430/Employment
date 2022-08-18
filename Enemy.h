@@ -9,7 +9,7 @@
 #include <d3dx12.h>
 #include"Input.h"
 
-class Bullet
+class Enemy
 {
 private: // エイリアス
 // Microsoft::WRL::を省略
@@ -34,12 +34,12 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static std::unique_ptr<Bullet>Create(Model* model, Camera* camera, XMFLOAT3 pos);
+	static std::unique_ptr<Enemy>Create(Model* model, Camera* camera, XMFLOAT3 pos);
 
 public:
 
 	//インスタンス
-	static Bullet* GetInstance();
+	static Enemy* GetInstance();
 
 	/// <summary>
 	/// 初期化
@@ -111,16 +111,16 @@ private: // メンバ変数
 	// ローカルワールド変換行列
 	XMMATRIX matWorld_;
 	// 親オブジェクト
-	Bullet* parent_ = nullptr;
+	Enemy* parent_ = nullptr;
 
 	Input* input = nullptr;
 
 	//速度
-	float Speed = 5.0f;
+	float Speed;
 
 
-	public:
-		// ローカル座標
-		XMFLOAT3 position_B = { 0,0,0 };
+public:
+	// ローカル座標
+	XMFLOAT3 position_B = { 0,0,0 };
 };
 

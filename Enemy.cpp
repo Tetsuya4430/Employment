@@ -1,4 +1,4 @@
-#include "Bullet.h"
+#include "Enemy.h"
 #include "Input.h"
 #include "Controller.h"
 #include <d3dcompiler.h>
@@ -15,163 +15,163 @@ using namespace std;
 /// <summary>
 /// 静的メンバ変数の実体
 /// </summary>
-ID3D12Device* Bullet::device = nullptr;
-ID3D12GraphicsCommandList* Bullet::cmdList = nullptr;
-ComPtr<ID3D12RootSignature> Bullet::rootsignature;
-ComPtr<ID3D12PipelineState> Bullet::pipelinestate;
+ID3D12Device* Enemy::device = nullptr;
+ID3D12GraphicsCommandList* Enemy::cmdList = nullptr;
+ComPtr<ID3D12RootSignature> Enemy::rootsignature;
+ComPtr<ID3D12PipelineState> Enemy::pipelinestate;
 
-std::unique_ptr<Bullet> Bullet::Create(Model* model, Camera* camera, XMFLOAT3 pos)
-{    
-    //3Dオブジェクトのインスタンスを生成
-    Bullet* instance = new Bullet();
-    if (instance == nullptr)
-    {
-        return nullptr;
-    }
+std::unique_ptr<Enemy> Enemy::Create(Model* model, Camera* camera, XMFLOAT3 pos)
+{
+	//3Dオブジェクトのインスタンスを生成
+	Enemy* instance = new Enemy();
+	if (instance == nullptr)
+	{
+		return nullptr;
+	}
 
-    //初期化
-    if (!instance->Initialize(pos))
-    {
-        delete instance;
-        assert(0);
-    }
+	//初期化
+	if (!instance->Initialize(pos))
+	{
+		delete instance;
+		assert(0);
+	}
 
-    //モデルのセット
-    if (model)
-    {
-        instance->SetModel(model);
-    }
+	//モデルのセット
+	if (model)
+	{
+		instance->SetModel(model);
+	}
 
-    //カメラのセット
-    if (camera)
-    {
-        instance->SetCamera(camera);
-    }
+	//カメラのセット
+	if (camera)
+	{
+		instance->SetCamera(camera);
+	}
 
-    return std::unique_ptr<Bullet>(instance);
+	return std::unique_ptr<Enemy>(instance);
 }
 
-Bullet* Bullet::GetInstance()
+Enemy* Enemy::GetInstance()
 {
-	static Bullet instance;
+	static Enemy instance;
 
 	return &instance;
 }
 
-bool Bullet::Initialize(XMFLOAT3 pos)
+bool Enemy::Initialize(XMFLOAT3 pos)
 {
-    // nullptrチェック
-    assert(device);
+	// nullptrチェック
+	assert(device);
 
-    //コントローラー初期化
-    InitInput();
+	//コントローラー初期化
+	InitInput();
 
-	position_B = pos;
+	////初期位置
+	//position_B = pos;
 
-    HRESULT result;
-    // 定数バッファの生成
-    result = device->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
-        D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB0) + 0xff) & ~0xff),
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&constBuffB0_));
+	HRESULT result;
+	// 定数バッファの生成
+	result = device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB0) + 0xff) & ~0xff),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&constBuffB0_));
 
-    return true;
+	return true;
 }
 
-bool Bullet::Finalize()
+bool Enemy::Finalize()
 {
-    ReleaseInput();
+	ReleaseInput();
 
-    return true;
+	return true;
 }
 
-void Bullet::Draw()
+void Enemy::Draw()
 {
-    // nullptrチェック
-    assert(device);
-    assert(Bullet::cmdList);
+	// nullptrチェック
+	assert(device);
+	assert(Enemy::cmdList);
 
-    //モデルの紐づけがない場合は描画しない
-    if (model_ == nullptr)
-    {
-        return;
-    }
+	//モデルの紐づけがない場合は描画しない
+	if (model_ == nullptr)
+	{
+		return;
+	}
 
 
-    cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0_->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0_->GetGPUVirtualAddress());
 
-    model_->Draw(cmdList, 1);
+	model_->Draw(cmdList, 1);
 }
 
-void Bullet::Update(XMFLOAT3 pos)
+void Enemy::Update(XMFLOAT3 pos)
 {
-    HRESULT result;
-    XMMATRIX matScale, matRot, matTrans;
+	HRESULT result;
+	XMMATRIX matScale, matRot, matTrans;
 
-    // スケール、回転、平行移動行列の計算
-    matScale = XMMatrixScaling(scale_.x, scale_.y, scale_.z);
-    matRot = XMMatrixIdentity();
-    matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation_.z));
-    matRot *= XMMatrixRotationX(XMConvertToRadians(rotation_.x));
-    matRot *= XMMatrixRotationY(XMConvertToRadians(rotation_.y));
-    matTrans = XMMatrixTranslation(position_B.x, position_B.y, position_B.z);
+	// スケール、回転、平行移動行列の計算
+	matScale = XMMatrixScaling(scale_.x, scale_.y, scale_.z);
+	matRot = XMMatrixIdentity();
+	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation_.z));
+	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation_.x));
+	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation_.y));
+	matTrans = XMMatrixTranslation(position_B.x, position_B.y, position_B.z);
 
-    // ワールド行列の合成
-    matWorld_ = XMMatrixIdentity(); // 変形をリセット
-    matWorld_ *= matScale; // ワールド行列にスケーリングを反映
-    matWorld_ *= matRot; // ワールド行列に回転を反映
-    matWorld_ *= matTrans; // ワールド行列に平行移動を反映
+	// ワールド行列の合成
+	matWorld_ = XMMatrixIdentity(); // 変形をリセット
+	matWorld_ *= matScale; // ワールド行列にスケーリングを反映
+	matWorld_ *= matRot; // ワールド行列に回転を反映
+	matWorld_ *= matTrans; // ワールド行列に平行移動を反映
 
-    // 親オブジェクトがあれば
-    if (parent_ != nullptr) {
-        // 親オブジェクトのワールド行列を掛ける
-        matWorld_ *= parent_->matWorld_;
-    }
+	// 親オブジェクトがあれば
+	if (parent_ != nullptr) {
+		// 親オブジェクトのワールド行列を掛ける
+		matWorld_ *= parent_->matWorld_;
+	}
 
-    const XMMATRIX& matViewProjection = camera_->GetmatViewProjection();
+	const XMMATRIX& matViewProjection = camera_->GetmatViewProjection();
 
-    // 定数バッファへデータ転送B0
-    ConstBufferDataB0* constMap = nullptr;
-    result = constBuffB0_->Map(0, nullptr, (void**)&constMap);
-    //constMap->color = color;
-    //constMap->mat = matWorld_ * matView * matProjection;	// 行列の合成
-    constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
-    constBuffB0_->Unmap(0, nullptr);
+	// 定数バッファへデータ転送B0
+	ConstBufferDataB0* constMap = nullptr;
+	result = constBuffB0_->Map(0, nullptr, (void**)&constMap);
+	//constMap->color = color;
+	//constMap->mat = matWorld_ * matView * matProjection;	// 行列の合成
+	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
+	constBuffB0_->Unmap(0, nullptr);
 
 
 
 	//更新処理
-	position_B.z += Speed;
 
 }
 
-bool Bullet::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
+bool Enemy::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
 {
-    // nullptrチェック
-    assert(device);
+	// nullptrチェック
+	assert(device);
 
-    Bullet::device = device;
-    Bullet::cmdList = cmdList;
+	Enemy::device = device;
+	Enemy::cmdList = cmdList;
 
-    Model::SetDevice(device);
+	Model::SetDevice(device);
 
-    // カメラ初期化
-    Camera::InitializeCamera(window_width, window_height);
+	// カメラ初期化
+	Camera::InitializeCamera(window_width, window_height);
 
-    // パイプライン初期化
-    InitializeGraphicsPipeline();
+	// パイプライン初期化
+	InitializeGraphicsPipeline();
 
-    // テクスチャ読み込み
-    //LoadTexture();
+	// テクスチャ読み込み
+	//LoadTexture();
 
 
-    return true;
+	return true;
 }
 
-bool Bullet::InitializeGraphicsPipeline()
+bool Enemy::InitializeGraphicsPipeline()
 {
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト

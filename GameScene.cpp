@@ -10,6 +10,7 @@
 
 #include "Player.h"
 #include "Bullet.h"
+#include "Enemy.h"
 
 GameScene::GameScene()
 {
@@ -87,6 +88,8 @@ void GameScene::Initialize()
 	
 		//プレイヤーの初期化
 		//player = player::Create(model_1, camera);
+
+	
 
 		//デバイスをセット
 		Fbx3d::SetDevice(dxCommon->GetDev());
