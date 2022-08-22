@@ -118,10 +118,6 @@ private: // 静的メンバ変数
 
 	Input* input = nullptr;
 
-	////弾
-	//Bullet* bullet = Bullet::GetInstance();
-
-	//Model* model_Bullet = nullptr;
 	
 
 	//プレイヤー回転限度

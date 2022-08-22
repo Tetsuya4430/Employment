@@ -77,6 +77,7 @@ private:
 	//íe
 	std::list<std::unique_ptr<Bullet>> bullets;
 
+	
 
 	/*std::shared_ptr<Object3d> Empty;
 	std::shared_ptr<Object3d> BulletObj;
@@ -91,11 +92,13 @@ private:
 	Object3d* Empty = nullptr;
 	Object3d* BulletObj = nullptr;
 	Object3d* player = nullptr;
-	Object3d* Enemy = nullptr;
+	//Object3d* Enemy = nullptr;
 
 	Player* P = nullptr;
 	Bullet* B = nullptr;
-	//Enemy* E = nullptr;
+	Enemy* E = nullptr;
+
+	//ìGÇÃç¿ïW
 
 	float MoveVec = 1.0f;
 

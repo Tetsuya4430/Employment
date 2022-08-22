@@ -23,6 +23,7 @@ GameScene::~GameScene()
 	delete(postEffect);
 	delete(player);
 	delete(P);
+	delete(E);
 }
 
 void GameScene::Initialize()
@@ -50,8 +51,9 @@ void GameScene::Initialize()
 
 	P = Player::Create(model_2, camera);
 
-	
+	E = Enemy::Create(model_Enemy, camera);
 
+	
 	
 
 		//デバイスをセット
@@ -118,6 +120,7 @@ void GameScene::Update()
 
 	P->Update();
 
+	E->Update();
 
 	Attack();
 
@@ -126,6 +129,8 @@ void GameScene::Update()
 	{
 		bullet->Update(P->position_);
 	}
+
+	
 
 	/*if (bullets)
 	{
@@ -171,6 +176,10 @@ void GameScene::Draw()
 
 
 	P->Draw();
+
+	E->Draw();
+
+
 
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{

@@ -34,7 +34,7 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static std::unique_ptr<Enemy>Create(Model* model, Camera* camera, XMFLOAT3 pos);
+	static Enemy* Create(Model* model, Camera* camera);
 
 public:
 
@@ -45,7 +45,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <returns></returns>
-	bool Initialize(XMFLOAT3 pos);
+	bool Initialize();
 
 	/// <summary>
 	/// 終了処理
@@ -61,7 +61,7 @@ public:
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update(XMFLOAT3 pos);
+	void Update();
 
 	/// <summary>
 /// 静的初期化
@@ -72,6 +72,7 @@ public:
 /// <param name="window_height">画面高さ</param>
 /// <returns>成否</returns>
 	static bool StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height);
+
 
 
 	/// <summary>
@@ -115,12 +116,8 @@ private: // メンバ変数
 
 	Input* input = nullptr;
 
-	//速度
-	float Speed;
-
-
 public:
 	// ローカル座標
-	XMFLOAT3 position_B = { 0,0,0 };
+	XMFLOAT3 position_ = { 0,10,10 };
 };
 

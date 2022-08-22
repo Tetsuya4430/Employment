@@ -1,5 +1,6 @@
 #include "Enemy.h"
 #include "Input.h"
+#include "Bullet.h"
 #include "Controller.h"
 #include <d3dcompiler.h>
 #include <fstream>
@@ -20,7 +21,7 @@ ID3D12GraphicsCommandList* Enemy::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Enemy::rootsignature;
 ComPtr<ID3D12PipelineState> Enemy::pipelinestate;
 
-std::unique_ptr<Enemy> Enemy::Create(Model* model, Camera* camera, XMFLOAT3 pos)
+Enemy* Enemy::Create(Model* model, Camera* camera)
 {
 	//3Dオブジェクトのインスタンスを生成
 	Enemy* instance = new Enemy();
@@ -30,7 +31,7 @@ std::unique_ptr<Enemy> Enemy::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 	}
 
 	//初期化
-	if (!instance->Initialize(pos))
+	if (!instance->Initialize())
 	{
 		delete instance;
 		assert(0);
@@ -48,7 +49,7 @@ std::unique_ptr<Enemy> Enemy::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 		instance->SetCamera(camera);
 	}
 
-	return std::unique_ptr<Enemy>(instance);
+	return instance;
 }
 
 Enemy* Enemy::GetInstance()
@@ -58,16 +59,10 @@ Enemy* Enemy::GetInstance()
 	return &instance;
 }
 
-bool Enemy::Initialize(XMFLOAT3 pos)
+bool Enemy::Initialize()
 {
 	// nullptrチェック
 	assert(device);
-
-	//コントローラー初期化
-	InitInput();
-
-	////初期位置
-	//position_B = pos;
 
 	HRESULT result;
 	// 定数バッファの生成
@@ -107,7 +102,7 @@ void Enemy::Draw()
 	model_->Draw(cmdList, 1);
 }
 
-void Enemy::Update(XMFLOAT3 pos)
+void Enemy::Update()
 {
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
@@ -118,7 +113,7 @@ void Enemy::Update(XMFLOAT3 pos)
 	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation_.z));
 	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation_.x));
 	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation_.y));
-	matTrans = XMMatrixTranslation(position_B.x, position_B.y, position_B.z);
+	matTrans = XMMatrixTranslation(position_.x, position_.y, position_.z);
 
 	// ワールド行列の合成
 	matWorld_ = XMMatrixIdentity(); // 変形をリセット
@@ -142,15 +137,11 @@ void Enemy::Update(XMFLOAT3 pos)
 	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
 	constBuffB0_->Unmap(0, nullptr);
 
-
-
-	//更新処理
-
+	
 }
 
 bool Enemy::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
-{
-	// nullptrチェック
+{// nullptrチェック
 	assert(device);
 
 	Enemy::device = device;
@@ -170,6 +161,8 @@ bool Enemy::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cm
 
 	return true;
 }
+
+
 
 bool Enemy::InitializeGraphicsPipeline()
 {
