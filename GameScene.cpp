@@ -29,7 +29,7 @@ GameScene::~GameScene()
 void GameScene::Initialize()
 { 
 	////スプライト共通テクスチャ読み込み
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/GamePlay.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/BackGround.jpg");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(100, L"Resources/Image/Sana.png");
 
 	//	スプライトの生成
