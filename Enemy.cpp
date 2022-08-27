@@ -144,12 +144,30 @@ void Enemy::Update()
 
 
 	//XVˆ—
-	position.z -= Speed;
 
-	if (position.z <= 0)
+	switch (phase_)
 	{
-		position.z = 100;
+		case Phase::Approach:
+		default:
+
+		//ˆÚ“®
+		position.z -= Speed;
+
+		//‹K’è‚ÌˆÊ’u‚Å—£’E
+		if (position.z <= 30)
+		{
+			phase_ = Phase::Leave;
+		}
+		break;
+
+		case Phase::Leave:
+		//ˆÚ“®
+		position.x -= Speed;
+		position.z -= Speed;
+		break;
 	}
+
+	
 
 }
 

@@ -122,7 +122,10 @@ void GameScene::Update()
 
 	//E->Update();
 
-	enemy->Update();
+	if (enemy)
+	{
+		enemy->Update();
+	}
 
 	Attack();
 
@@ -181,8 +184,10 @@ void GameScene::Draw()
 
 	//E->Draw();
 
-	enemy->Draw();
-
+	if (enemy)
+	{
+		enemy->Draw();
+	}
 
 
 	for (std::unique_ptr<Bullet>& bullet : bullets)

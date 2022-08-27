@@ -28,6 +28,13 @@ public:
 		XMMATRIX mat;	// ３Ｄ変換行列
 	};
 
+	//行動フェーズ
+	enum class Phase
+	{
+		Approach,	//接近
+		Leave,		//離脱
+	};
+
 	/// <summary>
 	/// 3Dオブジェクト生成
 	/// </summary>
@@ -118,7 +125,10 @@ private: // メンバ変数
 	Input* input = nullptr;
 
 	//速度
-	float Speed = 1.0f;
+	float Speed = 0.5f;
+
+	//フェーズ
+	Phase phase_ = Phase::Approach;
 
 
 public:
