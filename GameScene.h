@@ -96,7 +96,9 @@ private:
 
 	Player* P = nullptr;
 	Bullet* B = nullptr;
-	Enemy* E = nullptr;
+	//Enemy* E = nullptr;
+
+	std::unique_ptr<Enemy> enemy;
 
 	//ìGÇÃç¿ïW
 

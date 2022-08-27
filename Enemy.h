@@ -34,7 +34,7 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static Enemy* Create(Model* model, Camera* camera);
+	static std::unique_ptr<Enemy>Create(Model* model, Camera* camera);
 
 public:
 
@@ -74,7 +74,6 @@ public:
 	static bool StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height);
 
 
-
 	/// <summary>
 	/// setter
 	/// </summary>
@@ -109,6 +108,8 @@ private: // メンバ変数
 	XMFLOAT3 scale_ = { 1,1,1 };
 	// X,Y,Z軸回りのローカル回転角
 	XMFLOAT3 rotation_ = { 0,0,0 };
+	//位置
+	XMFLOAT3 position = { 0,0,100 };
 	// ローカルワールド変換行列
 	XMMATRIX matWorld_;
 	// 親オブジェクト
@@ -116,8 +117,12 @@ private: // メンバ変数
 
 	Input* input = nullptr;
 
+	//速度
+	float Speed = 1.0f;
+
+
 public:
 	// ローカル座標
-	XMFLOAT3 position_ = { 0,10,10 };
+	//XMFLOAT3 position_B = { 0,0,0 };
 };
 

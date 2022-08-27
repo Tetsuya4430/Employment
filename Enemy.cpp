@@ -1,6 +1,5 @@
 #include "Enemy.h"
 #include "Input.h"
-#include "Bullet.h"
 #include "Controller.h"
 #include <d3dcompiler.h>
 #include <fstream>
@@ -21,7 +20,7 @@ ID3D12GraphicsCommandList* Enemy::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Enemy::rootsignature;
 ComPtr<ID3D12PipelineState> Enemy::pipelinestate;
 
-Enemy* Enemy::Create(Model* model, Camera* camera)
+std::unique_ptr<Enemy> Enemy::Create(Model* model, Camera* camera)
 {
 	//3Dオブジェクトのインスタンスを生成
 	Enemy* instance = new Enemy();
@@ -49,7 +48,7 @@ Enemy* Enemy::Create(Model* model, Camera* camera)
 		instance->SetCamera(camera);
 	}
 
-	return instance;
+	return std::unique_ptr<Enemy>(instance);
 }
 
 Enemy* Enemy::GetInstance()
@@ -63,6 +62,11 @@ bool Enemy::Initialize()
 {
 	// nullptrチェック
 	assert(device);
+
+	//コントローラー初期化
+	InitInput();
+
+	//position_B = pos;
 
 	HRESULT result;
 	// 定数バッファの生成
@@ -113,7 +117,7 @@ void Enemy::Update()
 	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation_.z));
 	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation_.x));
 	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation_.y));
-	matTrans = XMMatrixTranslation(position_.x, position_.y, position_.z);
+	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
 
 	// ワールド行列の合成
 	matWorld_ = XMMatrixIdentity(); // 変形をリセット
@@ -137,11 +141,21 @@ void Enemy::Update()
 	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
 	constBuffB0_->Unmap(0, nullptr);
 
-	
+
+
+	//更新処理
+	position.z -= Speed;
+
+	if (position.z <= 0)
+	{
+		position.z = 100;
+	}
+
 }
 
 bool Enemy::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
-{// nullptrチェック
+{
+	// nullptrチェック
 	assert(device);
 
 	Enemy::device = device;
@@ -161,8 +175,6 @@ bool Enemy::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cm
 
 	return true;
 }
-
-
 
 bool Enemy::InitializeGraphicsPipeline()
 {
@@ -316,3 +328,4 @@ bool Enemy::InitializeGraphicsPipeline()
 
 	return true;
 }
+

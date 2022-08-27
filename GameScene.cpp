@@ -23,7 +23,6 @@ GameScene::~GameScene()
 	delete(postEffect);
 	delete(player);
 	delete(P);
-	delete(E);
 }
 
 void GameScene::Initialize()
@@ -51,10 +50,11 @@ void GameScene::Initialize()
 
 	P = Player::Create(model_2, camera);
 
-	E = Enemy::Create(model_Enemy, camera);
+	//E = Enemy::Create(model_Enemy, camera);
 
+	enemy = std::make_unique<Enemy>();
 	
-	
+	enemy = Enemy::Create(model_Enemy, camera);
 
 		//デバイスをセット
 		Fbx3d::SetDevice(dxCommon->GetDev());
@@ -120,7 +120,9 @@ void GameScene::Update()
 
 	P->Update();
 
-	E->Update();
+	//E->Update();
+
+	enemy->Update();
 
 	Attack();
 
@@ -177,7 +179,9 @@ void GameScene::Draw()
 
 	P->Draw();
 
-	E->Draw();
+	//E->Draw();
+
+	enemy->Draw();
 
 
 
