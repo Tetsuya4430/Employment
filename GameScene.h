@@ -5,6 +5,7 @@
 #include "Fbx3d.h"
 #include "Input.h"
 #include "Bullet.h"
+#include "EnemyBullet.h"
 #include "Enemy.h"
 #include "ObjectManager.h"
 #include "PostEffect.h"
@@ -14,6 +15,7 @@
 
 class Player;
 class Bullet;
+class EnemyBullet;
 class Enemy;
 
 /// <summary>
@@ -53,6 +55,9 @@ public:
 	//ƒvƒŒƒCƒ„[‚ÌUŒ‚
 	void Attack();
 
+	//“G‚ÌUŒ‚
+	void EnemyAttack();
+
 
 private:
 	//’è”
@@ -77,6 +82,8 @@ private:
 	//’e
 	std::list<std::unique_ptr<Bullet>> bullets;
 
+	//“G‚Ì’e
+	std::list<std::unique_ptr<EnemyBullet>> enemybullets;
 	
 
 	/*std::shared_ptr<Object3d> Empty;
