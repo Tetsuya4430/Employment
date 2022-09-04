@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Bullet.h"
+#include "EnemyBullet.h"
 #include "FbxLoader.h"
 #include "Sprite.h"
 #include "DebugText.h"
