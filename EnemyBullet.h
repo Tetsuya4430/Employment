@@ -72,6 +72,8 @@ public:
 /// <returns>成否</returns>
 	static bool StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height);
 
+	//デスフラグのゲッター
+	bool DeathGetter() const { return DeathFlag; }
 
 	/// <summary>
 	/// setter
@@ -89,6 +91,9 @@ private: // 静的メンバ変数
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト
 	static ComPtr<ID3D12PipelineState> pipelinestate;
+
+	//弾の寿命
+	static const int LifeTimer = 60 * 2;
 
 	/// <summary>
 	/// グラフィックパイプライン生成
@@ -117,6 +122,11 @@ private: // メンバ変数
 	//速度
 	float Speed = 5.0f;
 
+	//弾のデスタイマー
+	int DeathTimer = LifeTimer;
+
+	//弾のデスフラグ
+	bool DeathFlag = false;
 
 public:
 	// ローカル座標

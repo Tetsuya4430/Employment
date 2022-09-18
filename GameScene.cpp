@@ -38,7 +38,7 @@ void GameScene::Initialize()
 	postEffect = PostEffect::Create(100, { 0, 0 }, false, false);
 
 	//OBJからモデルデータを読み込む
-	model_1 = Model::LoadFromObj("triangle_mat");
+	//model_1 = Model::LoadFromObj("triangle_mat");
 	model_2 = Model::LoadFromObj("Box");
 	model_Bullet = Model::LoadFromObj("Bullet");
 	model_Enemy = Model::LoadFromObj("Enemy");
@@ -143,14 +143,19 @@ void GameScene::Update()
 		bullet->Update(enemy->position);
 	}
 
-	
-
-	/*if (bullets)
+	//デスフラグの立った弾の削除
+	//プレイヤー弾
+	bullets.remove_if([](std::unique_ptr<Bullet>&bullet)
 	{
-		bullet->Update(P->position_);
-	}*/
+		return bullet->DeathGetter();
+	});
 
-	//B->Update();
+	//敵弾
+	enemybullets.remove_if([](std::unique_ptr<EnemyBullet>& Enemybullet)
+	{
+			return Enemybullet->DeathGetter();
+	});
+
 
 	//FBXオブジェクトの更新
 	object1->Update();
@@ -232,7 +237,7 @@ void GameScene::Attack()
 
 void GameScene::EnemyAttack()
 {
-	if (Input::GetInstance()->TriggerKey(DIK_R))
+	if (Input::GetInstance()->TriggerKey(DIK_T))
 	{
 		//弾を生成し初期化
 		std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();

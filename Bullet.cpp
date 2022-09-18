@@ -144,6 +144,14 @@ void Bullet::Update(XMFLOAT3 pos)
 
 
 	//XVˆ—
+
+	//ŠÔŒo‰ß‚Å’e‚ğíœ
+	if (--DeathTimer <= 0)
+	{
+		DeathFlag = true;
+	}
+
+	//’e‚ÌˆÚ“®
 	position_B.z += Speed;
 
 }

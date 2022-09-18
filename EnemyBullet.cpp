@@ -144,6 +144,13 @@ void EnemyBullet::Update(XMFLOAT3 pos)
 
 
     //XVˆ—
+
+	//ŠÔŒo‰ß‚Å’e‚ğíœ
+	if (--DeathTimer <= 0)
+	{
+		DeathFlag = true;
+	}
+
     position_B.z -= Speed;
 
 }

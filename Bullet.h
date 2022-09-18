@@ -81,6 +81,9 @@ public:
 
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
+	//デスフラグのゲッター
+	bool DeathGetter() const { return DeathFlag; }
+
 private: // 静的メンバ変数
 // デバイス
 	static ID3D12Device* device;
@@ -90,6 +93,9 @@ private: // 静的メンバ変数
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト
 	static ComPtr<ID3D12PipelineState> pipelinestate;
+
+	//弾の寿命
+	static const int LifeTimer = 60 * 2;
 
 	/// <summary>
 	/// グラフィックパイプライン生成
@@ -117,6 +123,12 @@ private: // メンバ変数
 
 	//速度
 	float Speed = 5.0f;
+
+	//弾のデスタイマー
+	int DeathTimer = LifeTimer;
+
+	//弾のデスフラグ
+	bool DeathFlag = false;
 
 
 	public:
