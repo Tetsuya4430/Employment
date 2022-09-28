@@ -43,7 +43,9 @@ void GameScene::Initialize()
 	model_Bullet = Model::LoadFromObj("Bullet");
 	model_Enemy = Model::LoadFromObj("Enemy");
 
-	
+	//敵の初期化
+	EnemyInit();
+
 
 	//3Dオブジェクト生成
 	player = Object3d::Create(model_2, camera);
@@ -129,7 +131,10 @@ void GameScene::Update()
 
 	Attack();
 
-	EnemyAttack();
+	//EnemyAttack();
+
+	//敵更新
+	EnemyUpdate();
 
 	//弾更新
 	for (std::unique_ptr<Bullet>& bullet : bullets)
@@ -222,6 +227,25 @@ void GameScene::Draw()
 
 }
 
+void GameScene::EnemyInit()
+{
+	//発射タイマーを初期化
+	EnemyBulletTimer = BulletInterval;
+}
+
+void GameScene::EnemyUpdate()
+{
+	EnemyBulletTimer--;
+
+	if (EnemyBulletTimer <= 0)
+	{
+		EnemyAttack();
+
+		//発射タイマーを初期化
+		EnemyBulletTimer = BulletInterval;
+	}
+}
+
 void GameScene::Attack()
 {
 	if (Input::GetInstance()->TriggerKey(DIK_R))
@@ -237,15 +261,15 @@ void GameScene::Attack()
 
 void GameScene::EnemyAttack()
 {
-	if (Input::GetInstance()->TriggerKey(DIK_T))
-	{
+	/*if (Input::GetInstance()->TriggerKey(DIK_T))
+	{*/
 		//弾を生成し初期化
 		std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
 		newBullet = EnemyBullet::Create(model_Bullet, camera, enemy->position);
 
 		//弾を登録
 		enemybullets.push_back(std::move(newBullet));
-	}
+	//}
 }
 
 

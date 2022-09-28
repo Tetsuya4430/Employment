@@ -52,6 +52,12 @@ public:
 	void Draw() override;
 
 
+	//敵の初期化処理
+	void EnemyInit();
+
+	//敵の更新関数
+	void EnemyUpdate();
+
 	//プレイヤーの攻撃
 	void Attack();
 
@@ -114,6 +120,13 @@ private:
 	int BulletFlag = 0;
 
 	int MoveFlag = 0;
+
+	//敵の弾発射タイマー
+	int EnemyBulletTimer = 0;
+
+	public:
+	//弾の発射間隔
+	static const int BulletInterval = 60;
 
 };
 

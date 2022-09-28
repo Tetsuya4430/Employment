@@ -66,6 +66,9 @@ bool Enemy::Initialize()
 	//コントローラー初期化
 	InitInput();
 
+	//接近フェーズ初期化
+	InitApproach();
+
 	//position_B = pos;
 
 	HRESULT result;
@@ -169,6 +172,17 @@ void Enemy::Update()
 
 	
 
+}
+
+void Enemy::InitApproach()
+{
+	////発射タイマーを初期化
+	//BulletTimer = BulletInterval;
+}
+
+void Enemy::UpdateApproach()
+{
+	/*BulletTimer--;*/
 }
 
 bool Enemy::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)

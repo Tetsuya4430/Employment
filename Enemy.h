@@ -70,6 +70,12 @@ public:
 	/// </summary>
 	void Update();
 
+	//接近フェーズ初期化
+	void InitApproach();
+
+	//接近フェーズの更新関数
+	void UpdateApproach();
+
 	/// <summary>
 /// 静的初期化
 /// </summary>
@@ -97,6 +103,10 @@ private: // 静的メンバ変数
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト
 	static ComPtr<ID3D12PipelineState> pipelinestate;
+
+
+	////弾の発射間隔
+	//static const int BulletInterval = 60;
 
 	/// <summary>
 	/// グラフィックパイプライン生成
@@ -127,6 +137,9 @@ private: // メンバ変数
 
 	//フェーズ
 	Phase phase_ = Phase::Approach;
+
+	////発射タイマー
+	//int BulletTimer = 0;
 
 
 public:
