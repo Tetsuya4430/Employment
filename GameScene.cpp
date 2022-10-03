@@ -134,7 +134,10 @@ void GameScene::Update()
 	//EnemyAttack();
 
 	//敵更新
-	EnemyUpdate();
+	if (enemy->DeathFlag == false)
+	{
+		EnemyUpdate();
+	}
 
 	//弾更新
 	for (std::unique_ptr<Bullet>& bullet : bullets)
@@ -161,7 +164,7 @@ void GameScene::Update()
 			return Enemybullet->DeathGetter();
 	});
 
-
+	
 	//FBXオブジェクトの更新
 	object1->Update();
 	
@@ -202,7 +205,7 @@ void GameScene::Draw()
 
 	//E->Draw();
 
-	if (enemy)
+	if (enemy->DeathFlag == false)
 	{
 		enemy->Draw();
 	}
@@ -213,9 +216,28 @@ void GameScene::Draw()
 		bullet->Draw();
 	}
 
+	for (std::unique_ptr<Bullet>& bullet : bullets)
+	{
+		//当たり判定確認
+		if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
+		{
+			bullet->DeathFlag = true;
+			enemy->DeathFlag = true;
+		}
+	}
+
 	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
 	{
 		bullet->Draw();
+	}
+
+	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
+	{
+		//自機と敵の弾当たり判定確認
+		if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
+		{
+			bullet->DeathFlag = true;
+		}
 	}
 	
 
@@ -270,6 +292,21 @@ void GameScene::EnemyAttack()
 		//弾を登録
 		enemybullets.push_back(std::move(newBullet));
 	//}
+}
+
+bool GameScene::CheckCollision(XMFLOAT3 Object1, XMFLOAT3 Object2, float R1, float R2)
+{
+	float Check = sqrtf((Object1.x - Object2.x) * (Object1.x - Object2.x) +/* (Object2.y - Object1.y) * (Object2.y - Object1.y) +*/ (Object1.z - Object2.z) * (Object1.z - Object2.z));
+
+	if (Check <= R1 - R2 || Check <= R2 - R1 || Check < R1 + R2)
+	{
+		return true;
+	}
+
+	else
+	{
+		return false;
+	}
 }
 
 

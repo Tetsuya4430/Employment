@@ -76,6 +76,9 @@ public:
 	//接近フェーズの更新関数
 	void UpdateApproach();
 
+	//衝突検知コールバック関数
+	void OnCollision();
+
 	/// <summary>
 /// 静的初期化
 /// </summary>
@@ -93,6 +96,11 @@ public:
 	void SetModel(Model* model) { model_ = model; }
 
 	void SetCamera(Camera* camera) { camera_ = camera; }
+
+	//getter
+
+	// 座標の取得
+	const XMFLOAT3& GetPosition() { return position; }
 
 private: // 静的メンバ変数
 // デバイス
@@ -148,5 +156,7 @@ public:
 
 	//位置
 	XMFLOAT3 position = { 0,0,100 };
+
+	int DeathFlag = false;
 };
 

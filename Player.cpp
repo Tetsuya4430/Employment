@@ -245,6 +245,10 @@ void Player::Update()
 	UpdateInput();
 }
 
+void Player::OnCollision()
+{
+}
+
 bool Player::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
 {// nullptrチェック
     assert(device);

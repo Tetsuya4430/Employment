@@ -154,7 +154,7 @@ void Enemy::Update()
 		default:
 
 		//ˆÚ“®
-		position.z -= Speed;
+	//	position.z -= Speed;
 
 		//‹K’è‚ÌˆÊ’u‚Å—£’E
 		if (position.z <= 30)
@@ -183,6 +183,10 @@ void Enemy::InitApproach()
 void Enemy::UpdateApproach()
 {
 	/*BulletTimer--;*/
+}
+
+void Enemy::OnCollision()
+{
 }
 
 bool Enemy::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)

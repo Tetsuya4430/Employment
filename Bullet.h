@@ -63,6 +63,10 @@ public:
 	/// </summary>
 	void Update(XMFLOAT3 pos);
 
+
+	//衝突検知コールバック関数
+	void OnCollision();
+
 	/// <summary>
 /// 静的初期化
 /// </summary>
@@ -83,6 +87,9 @@ public:
 
 	//デスフラグのゲッター
 	bool DeathGetter() const { return DeathFlag; }
+
+	// 座標の取得
+	const XMFLOAT3& GetPosition() { return position_B; }
 
 private: // 静的メンバ変数
 // デバイス
@@ -127,12 +134,13 @@ private: // メンバ変数
 	//弾のデスタイマー
 	int DeathTimer = LifeTimer;
 
-	//弾のデスフラグ
-	bool DeathFlag = false;
 
 
 	public:
 		// ローカル座標
 		XMFLOAT3 position_B = { 0,0,0 };
+
+		//弾のデスフラグ
+		bool DeathFlag = false;
 };
 

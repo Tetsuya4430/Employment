@@ -65,6 +65,9 @@ public:
 	/// </summary>
 	void Update();
 
+	//衝突検知コールバック関数
+	void OnCollision();
+
 	/// <summary>
 /// 静的初期化
 /// </summary>
@@ -83,6 +86,16 @@ public:
 	void SetModel(Model* model) { model_ = model; }
 
 	void SetCamera(Camera* camera) { camera_ = camera; }
+
+/// <summary>
+/// getter
+/// </summary>
+
+	// 座標の取得
+	const XMFLOAT3& GetPosition() { return position_; }
+
+	//弾リストを取得
+	//const std::list<std::unique_ptr<Bullet>>& GetBullets() {return bullets_}
 
 private: // 静的メンバ変数
 // デバイス

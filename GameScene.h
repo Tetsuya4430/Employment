@@ -64,6 +64,8 @@ public:
 	//“G‚ÌUŒ‚
 	void EnemyAttack();
 
+	//‰~‚Æ‰~‚Ì“–‚½‚è”»’è
+	bool CheckCollision(XMFLOAT3 Object1, XMFLOAT3 Object2, float R1, float R2);
 
 private:
 	//’è”
