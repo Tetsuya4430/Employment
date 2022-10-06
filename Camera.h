@@ -1,6 +1,8 @@
 #pragma once
 #include <DirectXMath.h>
 
+#include "Input.h"
+
 class Camera
 {
 private: // エイリアス 
@@ -13,6 +15,9 @@ private: // エイリアス
 
 public:	//メンバ関数
 	
+	//インスタンス
+	static Camera* GetInstance();
+
 	/// <summary>
 	/// 視点座標の設定
 	/// </summary>
@@ -43,6 +48,8 @@ public:	//メンバ関数
 	/// <param name="move">移動量</param>
 	static void CameraMoveVector(XMFLOAT3 move);
 
+	static void CameraMoveEyeVector(XMFLOAT3 move);
+
 	/// <summary>
 	/// カメラ初期化
 	/// </summary>
@@ -57,6 +64,9 @@ public:	//メンバ関数
 
 	//ビュー射影行列の取得
 	static const XMMATRIX& GetmatViewProjection() { return matViewProjection; }
+
+	//ビルボードの取得
+	static const XMMATRIX& GetBillBoard() { return matBillboard; }
 
 	static void Update();
 
@@ -74,4 +84,18 @@ private:	//メンバ変数
 	static XMFLOAT3 target;
 	// 上方向ベクトル
 	static XMFLOAT3 up;
+
+
+
+	//インプット
+	Input* input = nullptr;
+
+	XMFLOAT3 moveVec = { 2.0f, 0.0f, 0.0f };
+
+protected:
+	//ビルボード行列
+	static XMMATRIX matBillboard;
+
+	//Y軸回りビルボード行列
+	static XMMATRIX matBillboardY;
 };

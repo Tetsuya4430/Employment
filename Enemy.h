@@ -79,6 +79,9 @@ public:
 	//衝突検知コールバック関数
 	void OnCollision();
 
+	//ワールド座標を取得
+	XMFLOAT3 GetWorldPosition();
+
 	/// <summary>
 /// 静的初期化
 /// </summary>

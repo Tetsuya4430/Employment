@@ -8,6 +8,10 @@
 #include <DirectXMath.h>
 #include <d3dx12.h>
 #include"Input.h"
+
+//自機クラスの前方宣言
+class Player;
+
 class EnemyBullet
 {
 private: // エイリアス
@@ -33,7 +37,7 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static std::unique_ptr<EnemyBullet>Create(Model* model, Camera* camera, XMFLOAT3 pos);
+	static std::unique_ptr<EnemyBullet>Create(Model* model, Camera* camera, XMFLOAT3 pos, Player* player);
 
 public:
 
@@ -60,7 +64,7 @@ public:
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update(XMFLOAT3 pos);
+	void Update(XMFLOAT3 PlayerPos, XMFLOAT3 EnemyPos);
 
 	//衝突検知コールバック関数
 	void OnCollision();
@@ -87,6 +91,9 @@ public:
 	void SetModel(Model* model) { model_ = model; }
 
 	void SetCamera(Camera* camera) { camera_ = camera; }
+
+	//プレイヤーのセッター
+	void SetPlayer(Player* player) { player_ = player; }
 
 private: // 静的メンバ変数
 // デバイス
@@ -125,8 +132,14 @@ private: // メンバ変数
 
 	Input* input = nullptr;
 
+	//プレイヤー
+	Player* player_ = nullptr;
+
 	//速度
 	float Speed = 5.0f;
+
+	//移動用ベクトル
+	XMFLOAT3 Vec = {0.0f, 0.0f, 0.0f};
 
 	//弾のデスタイマー
 	int DeathTimer = LifeTimer;

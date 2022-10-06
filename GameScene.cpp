@@ -23,12 +23,13 @@ GameScene::~GameScene()
 	delete(postEffect);
 	delete(player);
 	delete(P);
+	delete(particle);
 }
 
 void GameScene::Initialize()
 { 
 	////スプライト共通テクスチャ読み込み
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/BackGround.jpg");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/BackGround.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(100, L"Resources/Image/Sana.png");
 
 	//	スプライトの生成
@@ -38,7 +39,7 @@ void GameScene::Initialize()
 	postEffect = PostEffect::Create(100, { 0, 0 }, false, false);
 
 	//OBJからモデルデータを読み込む
-	//model_1 = Model::LoadFromObj("triangle_mat");
+	model_1 = Model::LoadFromObj("triangle_mat");
 	model_2 = Model::LoadFromObj("Box");
 	model_Bullet = Model::LoadFromObj("Bullet");
 	model_Enemy = Model::LoadFromObj("Enemy");
@@ -58,6 +59,11 @@ void GameScene::Initialize()
 	
 	enemy = Enemy::Create(model_Enemy, camera);
 
+	part = Part::Create(model_1, camera);
+
+	//敵の弾に自キャラにアドレスを渡す
+	//enemybullets
+
 		//デバイスをセット
 		Fbx3d::SetDevice(dxCommon->GetDev());
 		//カメラセット
@@ -74,6 +80,12 @@ void GameScene::Initialize()
 		object1->SetModel(model1);
 
 		object1->SetPosition({ 100.0f, 0.0f, 0.0f });
+
+		//パーティクルの生成
+		particle = Particle::Create(camera);
+		particle->Update();
+
+		
 
 		//カメラ注視点をセット
 		camera->SetTarget({ 0, 20, 0 });
@@ -114,6 +126,16 @@ void GameScene::Update()
 
 	
 
+	//// カメラ移動
+	//if (input->GetInstance()->PushKey(DIK_I) || input->GetInstance()->PushKey(DIK_J) || input->GetInstance()->PushKey(DIK_K) || input->GetInstance()->PushKey(DIK_L))
+	//{
+	//	if (input->GetInstance()->PushKey(DIK_I)) { Camera::CameraMoveEyeVector({ 0.0f,+1.0f,0.0f }); }
+	//	else if (input->GetInstance()->PushKey(DIK_K)) { Camera::CameraMoveEyeVector({ 0.0f,-1.0f,0.0f }); }
+	//	if (input->GetInstance()->PushKey(DIK_L)) { Camera::CameraMoveEyeVector({ +1.0f,0.0f,0.0f }); }
+	//	else if (input->GetInstance()->PushKey(DIK_J)) { Camera::CameraMoveEyeVector({ -1.0f,0.0f,0.0f }); }
+	//}
+
+	//camera->Update();
 
 	//3Dオブジェクトの更新
 
@@ -148,7 +170,7 @@ void GameScene::Update()
 	//敵の弾更新
 	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
 	{
-		bullet->Update(enemy->position);
+		bullet->Update(enemy->position, enemy->position);
 	}
 
 	//デスフラグの立った弾の削除
@@ -164,12 +186,39 @@ void GameScene::Update()
 			return Enemybullet->DeathGetter();
 	});
 
+	for (std::unique_ptr<Bullet>& bullet : bullets)
+	{
+		//当たり判定確認
+		if (enemy->DeathFlag == false)
+		{
+			if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
+			{
+				bullet->DeathFlag = true;
+				enemy->DeathFlag = true;
+			}
+		}
+	}
+
 	
+	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
+	{
+		//自機と敵の弾当たり判定確認
+		if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
+		{
+			bullet->DeathFlag = true;
+		}
+	}
+
 	//FBXオブジェクトの更新
 	object1->Update();
 	
 	//スプライトの更新
 	sprite->Update();
+
+	//パーティクルの更新
+	particle->Update();
+
+	part->Update();
 
 
 	//カメラの更新
@@ -198,8 +247,7 @@ void GameScene::Draw()
 
 	//3Dオブジェクトの描画前処理
 	Object3d::PreDraw();
-
-
+	//Particle::PreDraw();
 
 	P->Draw();
 
@@ -216,33 +264,21 @@ void GameScene::Draw()
 		bullet->Draw();
 	}
 
-	for (std::unique_ptr<Bullet>& bullet : bullets)
-	{
-		//当たり判定確認
-		if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
-		{
-			bullet->DeathFlag = true;
-			enemy->DeathFlag = true;
-		}
-	}
-
 	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
 	{
 		bullet->Draw();
 	}
 
-	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
-	{
-		//自機と敵の弾当たり判定確認
-		if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
-		{
-			bullet->DeathFlag = true;
-		}
-	}
-	
+
+	part->Draw();
 
 	//FBXオブジェクトの描画
 	object1->Draw(cmdList);
+
+	//particle->Draw();
+
+	//Particle::PostDraw();
+	
 
 	//3Dオブジェクトの描画後処理
 	Object3d::PostDraw();
@@ -261,7 +297,7 @@ void GameScene::EnemyUpdate()
 
 	if (EnemyBulletTimer <= 0)
 	{
-		EnemyAttack();
+		EnemyAttack(enemy->GetPosition());
 
 		//発射タイマーを初期化
 		EnemyBulletTimer = BulletInterval;
@@ -281,24 +317,43 @@ void GameScene::Attack()
 	}
 }
 
-void GameScene::EnemyAttack()
+void GameScene::EnemyAttack(XMFLOAT3 EnemyPos)
 {
 	/*if (Input::GetInstance()->TriggerKey(DIK_T))
 	{*/
+
+
+
 		//弾を生成し初期化
 		std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
-		newBullet = EnemyBullet::Create(model_Bullet, camera, enemy->position);
+		newBullet = EnemyBullet::Create(model_Bullet, camera, enemy->position, P);
+
+		/*newBullet->position_B.x = EnemyPos.x;
+		newBullet->position_B.y = EnemyPos.y;
+		newBullet->position_B.z = EnemyPos.z;
+
+		float xv = P->position_.x - newBullet->position_B.x;
+		float yv = P->position_.y - newBullet->position_B.y;
+		float zv = P->position_.z - newBullet->position_B.z;
+
+		float v = sqrtf(xv * xv + yv * yv + zv * zv);
+
+		newBullet->position_B.x = (xv / v) * 2;
+		newBullet->position_B.y = (yv / v) * 2;
+		newBullet->position_B.z = (zv / v) * 2;*/
 
 		//弾を登録
 		enemybullets.push_back(std::move(newBullet));
+
+		//enemybullets
 	//}
 }
 
 bool GameScene::CheckCollision(XMFLOAT3 Object1, XMFLOAT3 Object2, float R1, float R2)
 {
-	float Check = sqrtf((Object1.x - Object2.x) * (Object1.x - Object2.x) +/* (Object2.y - Object1.y) * (Object2.y - Object1.y) +*/ (Object1.z - Object2.z) * (Object1.z - Object2.z));
+	float Check = sqrtf((Object1.x - Object2.x) * (Object1.x - Object2.x) + (Object2.y - Object1.y) * (Object2.y - Object1.y) + (Object1.z - Object2.z) * (Object1.z - Object2.z));
 
-	if (Check <= R1 - R2 || Check <= R2 - R1 || Check < R1 + R2)
+	if (Check <= R1 - R2 || Check <= R2 - R1 || Check < R1 + R2 )
 	{
 		return true;
 	}

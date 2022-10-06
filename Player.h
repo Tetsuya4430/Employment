@@ -21,6 +21,7 @@ private: // エイリアス
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMMATRIX = DirectX::XMMATRIX;
+	using XMVECTOR = DirectX::XMVECTOR;
 
 
 public:
@@ -67,6 +68,9 @@ public:
 
 	//衝突検知コールバック関数
 	void OnCollision();
+
+	//ワールド座標を取得
+	XMFLOAT3 GetWorldPosition();
 
 	/// <summary>
 /// 静的初期化

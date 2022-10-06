@@ -154,7 +154,7 @@ void Enemy::Update()
 		default:
 
 		//移動
-	//	position.z -= Speed;
+		position.z -= Speed;
 
 		//規定の位置で離脱
 		if (position.z <= 30)
@@ -167,6 +167,15 @@ void Enemy::Update()
 		//移動
 		position.x -= Speed;
 		position.z -= Speed;
+
+		if (position.z < -10)
+		{
+			position.x = 0;
+			position.z = 100;
+
+			phase_ = Phase::Approach;
+		}
+
 		break;
 	}
 
@@ -187,6 +196,19 @@ void Enemy::UpdateApproach()
 
 void Enemy::OnCollision()
 {
+}
+
+XMFLOAT3 Enemy::GetWorldPosition()
+{
+	//ワールド座標を入れる変数
+	XMFLOAT3 worldPos;
+
+	//ワールド行列の平行移動成分を取得
+	worldPos.x = position.x;
+	worldPos.y = position.y;
+	worldPos.z = position.z;
+
+	return worldPos;
 }
 
 bool Enemy::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)

@@ -249,6 +249,19 @@ void Player::OnCollision()
 {
 }
 
+XMFLOAT3 Player::GetWorldPosition()
+{
+	//ワールド座標を入れる変数
+	XMFLOAT3 worldPos;
+
+	//ワールド行列の平行移動成分を取得
+	worldPos.x = position_.x;
+	worldPos.y = position_.y;
+	worldPos.z = position_.z;
+
+	return worldPos;
+}
+
 bool Player::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
 {// nullptrチェック
     assert(device);

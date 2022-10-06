@@ -1,11 +1,10 @@
-#include "EnemyBullet.h"
-#include "Input.h"
-#include "Controller.h"
+#include "Part.h"
 #include <d3dcompiler.h>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
+
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
@@ -15,199 +14,151 @@ using namespace std;
 /// <summary>
 /// 静的メンバ変数の実体
 /// </summary>
-ID3D12Device* EnemyBullet::device = nullptr;
-ID3D12GraphicsCommandList* EnemyBullet::cmdList = nullptr;
-ComPtr<ID3D12RootSignature> EnemyBullet::rootsignature;
-ComPtr<ID3D12PipelineState> EnemyBullet::pipelinestate;
+ID3D12Device* Part::device = nullptr;
+ID3D12GraphicsCommandList* Part::cmdList = nullptr;
+ComPtr<ID3D12RootSignature> Part::rootsignature;
+ComPtr<ID3D12PipelineState> Part::pipelinestate;
+//XMMATRIX Object3d::matView{};
+//XMMATRIX Object3d::matProjection{};
+//XMFLOAT3 Object3d::eye = { 0, 0, -50.0f };
+//XMFLOAT3 Object3d::target = { 0, 0, 0 };
+//XMFLOAT3 Object3d::up = { 0, 1, 0 };
+//XMMATRIX Part::matBillboard = XMMatrixIdentity();
+//XMMATRIX Part::matBillboardY = XMMatrixIdentity();
 
-
-std::unique_ptr<EnemyBullet> EnemyBullet::Create(Model* model, Camera* camera, XMFLOAT3 pos, Player* player)
+bool Part::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
 {
-    //3Dオブジェクトのインスタンスを生成
-    EnemyBullet* instance = new EnemyBullet();
-    if (instance == nullptr)
-    {
-        return nullptr;
-    }
+	// nullptrチェック
+	assert(device);
 
-    //初期化
-    if (!instance->Initialize(pos))
-    {
-        delete instance;
-        assert(0);
-    }
+	Part::device = device;
+	Part::cmdList = cmdList;
 
-    //モデルのセット
-    if (model)
-    {
-        instance->SetModel(model);
-    }
+	Model::SetDevice(device);
 
-    //カメラのセット
-    if (camera)
-    {
-        instance->SetCamera(camera);
-    }
+	// カメラ初期化
+	Camera::InitializeCamera(window_width, window_height);
 
-	//プレイヤーのアドレスを取得
-	if (player)
-	{
-		instance->SetPlayer(player);
+	// パイプライン初期化
+	InitializeGraphicsPipeline();
+
+	// テクスチャ読み込み
+	//LoadTexture();
+
+	// モデル生成
+	CreateModel();
+
+	return true;
+}
+
+void Part::PreDraw()
+{
+	//// PreDrawとPostDrawがペアで呼ばれていなければエラー
+	//assert(Object3d::cmdList == nullptr);
+
+	//// コマンドリストをセット
+	//Object3d::cmdList = cmdList;
+
+	// パイプラインステートの設定
+	cmdList->SetPipelineState(pipelinestate.Get());
+	// ルートシグネチャの設定
+	cmdList->SetGraphicsRootSignature(rootsignature.Get());
+	// プリミティブ形状を設定
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void Part::PostDraw()
+{
+	//// コマンドリストを解除
+	//Object3d::cmdList = nullptr;
+}
+
+Part* Part::Create(Model* model, Camera* camera)
+{
+	// 3Dオブジェクトのインスタンスを生成
+	Part* object3d = new Part();
+	if (object3d == nullptr) {
+		return nullptr;
 	}
 
-	return std::unique_ptr<EnemyBullet>(instance);
-}
-
-EnemyBullet* EnemyBullet::GetInstance()
-{
-    static EnemyBullet instance;
-
-    return &instance;
-}
-
-bool EnemyBullet::Initialize(XMFLOAT3 pos)
-{    // nullptrチェック
-    assert(device);
-
-    //コントローラー初期化
-    InitInput();
-
-    position_B = pos;
-
-    HRESULT result;
-    // 定数バッファの生成
-    result = device->CreateCommittedResource(
-        &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
-        D3D12_HEAP_FLAG_NONE,
-        &CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB0) + 0xff) & ~0xff),
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&constBuffB0_));
-
-    return true;
-}
-
-bool EnemyBullet::Finalize()
-{
-    ReleaseInput();
-
-    return true;
-}
-
-void EnemyBullet::Draw()
-{
-    // nullptrチェック
-    assert(device);
-    assert(EnemyBullet::cmdList);
-
-    //モデルの紐づけがない場合は描画しない
-    if (model_ == nullptr)
-    {
-        return;
-    }
-
-
-    cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0_->GetGPUVirtualAddress());
-
-    model_->Draw(cmdList, 1);
-}
-
-void EnemyBullet::Update(XMFLOAT3 PlayerPos, XMFLOAT3 EnemyPos)
-{
-    HRESULT result;
-    XMMATRIX matScale, matRot, matTrans;
-
-    // スケール、回転、平行移動行列の計算
-    matScale = XMMatrixScaling(scale_.x, scale_.y, scale_.z);
-    matRot = XMMatrixIdentity();
-    matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation_.z));
-    matRot *= XMMatrixRotationX(XMConvertToRadians(rotation_.x));
-    matRot *= XMMatrixRotationY(XMConvertToRadians(rotation_.y));
-    matTrans = XMMatrixTranslation(position_B.x, position_B.y, position_B.z);
-
-    // ワールド行列の合成
-    matWorld_ = XMMatrixIdentity(); // 変形をリセット
-    matWorld_ *= matScale; // ワールド行列にスケーリングを反映
-    matWorld_ *= matRot; // ワールド行列に回転を反映
-    matWorld_ *= matTrans; // ワールド行列に平行移動を反映
-
-    // 親オブジェクトがあれば
-    if (parent_ != nullptr) {
-        // 親オブジェクトのワールド行列を掛ける
-        matWorld_ *= parent_->matWorld_;
-    }
-
-    const XMMATRIX& matViewProjection = camera_->GetmatViewProjection();
-
-    // 定数バッファへデータ転送B0
-    ConstBufferDataB0* constMap = nullptr;
-    result = constBuffB0_->Map(0, nullptr, (void**)&constMap);
-    //constMap->color = color;
-    //constMap->mat = matWorld_ * matView * matProjection;	// 行列の合成
-    constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
-    constBuffB0_->Unmap(0, nullptr);
-
-
-
-    //更新処理
-
-	//時間経過で弾を削除
-	if (--DeathTimer <= 0)
-	{
-		DeathFlag = true;
+	// 初期化
+	if (!object3d->Initialize()) {
+		delete object3d;
+		assert(0);
+		return nullptr;
 	}
 
-	/*position_B.x = EnemyPos.x;
-	position_B.y = EnemyPos.y;
-	position_B.z = EnemyPos.z;*/
+	if (model)
+	{
+		object3d->SetModel(model);
+	}
 
-	/*float xv = PlayerPos.x - position_B.x;
-	float yv = PlayerPos.y - position_B.y;
-	float zv = PlayerPos.z - position_B.z;
+	if (camera)
+	{
+		object3d->SetCamera(camera);
+	}
+	//スケールをリセット
+	/*float scale_val = 20;
+	object3d->scale = { scale_val, scale_val , scale_val };*/
 
-	float v = sqrtf(xv * xv + yv * yv + zv * zv);
-
-	Vec.x = (xv / v) * 2;
-	Vec.y = (yv / v) * 2;
-	Vec.z = (zv / v) * 2;
-
-	position_B.x += Vec.x;
-	position_B.y += Vec.y;
-    position_B.z += Vec.z;*/
-
-	position_B.z -= Speed;
-
+	////シェアドポインタを生成してreturn
+	return object3d;
 }
 
-void EnemyBullet::OnCollision()
-{
-	DeathFlag = true;
-}
+//void Object3d::SetEye(XMFLOAT3 eye)
+//{
+//	Object3d::eye = eye;
+//
+//	UpdateViewMatrix();
+//}
 
-bool EnemyBullet::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
-{
-    // nullptrチェック
-    assert(device);
+//void Object3d::SetTarget(XMFLOAT3 target)
+//{
+//	Object3d::target = target;
+//
+//	UpdateViewMatrix();
+//}
 
-    EnemyBullet::device = device;
-    EnemyBullet::cmdList = cmdList;
+//void Object3d::CameraMoveVector(XMFLOAT3 move)
+//{
+//	XMFLOAT3 eye_moved = GetEye();
+//	XMFLOAT3 target_moved = GetTarget();
+//
+//	eye_moved.x += move.x;
+//	eye_moved.y += move.y;
+//	eye_moved.z += move.z;
+//
+//	target_moved.x += move.x;
+//	target_moved.y += move.y;
+//	target_moved.z += move.z;
+//
+//	SetEye(eye_moved);
+//	SetTarget(target_moved);
+//}
 
-    Model::SetDevice(device);
 
-    // カメラ初期化
-    Camera::InitializeCamera(window_width, window_height);
+//void Object3d::InitializeCamera(int window_width, int window_height)
+//{
+//	// ビュー行列の生成
+//	matView = XMMatrixLookAtLH(
+//		XMLoadFloat3(&eye),
+//		XMLoadFloat3(&target),
+//		XMLoadFloat3(&up));
+//
+//	// 平行投影による射影行列の生成
+//	//constMap->mat = XMMatrixOrthographicOffCenterLH(
+//	//	0, window_width,
+//	//	window_height, 0,
+//	//	0, 1);
+//	// 透視投影による射影行列の生成
+//	matProjection = XMMatrixPerspectiveFovLH(
+//		XMConvertToRadians(60.0f),
+//		(float)window_width / window_height,
+//		0.1f, 1000.0f
+//	);
+//}
 
-    // パイプライン初期化
-    InitializeGraphicsPipeline();
-
-    // テクスチャ読み込み
-    //LoadTexture();
-
-
-    return true;
-}
-
-bool EnemyBullet::InitializeGraphicsPipeline()
+bool Part::InitializeGraphicsPipeline()
 {
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
@@ -359,3 +310,104 @@ bool EnemyBullet::InitializeGraphicsPipeline()
 
 	return true;
 }
+
+void Part::CreateModel()
+{
+	/*std::vector<VertexPosNormalUvSkin> realVertices;*/
+}
+
+//void Object3d::UpdateViewMatrix()
+//{
+//	// ビュー行列の更新
+//	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
+//}
+
+bool Part::Initialize()
+{
+	// nullptrチェック
+	assert(device);
+
+	HRESULT result;
+	// 定数バッファの生成
+	result = device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB0) + 0xff) & ~0xff),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&constBuffB0_));
+
+	return true;
+}
+
+void Part::Update()
+{
+	HRESULT result;
+	XMMATRIX matScale, matRot, matTrans;
+
+	// スケール、回転、平行移動行列の計算
+	matScale = XMMatrixScaling(scale_.x, scale_.y, scale_.z);
+	matRot = XMMatrixIdentity();
+	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation_.z));
+	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation_.x));
+	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation_.y));
+	matTrans = XMMatrixTranslation(position_.x, position_.y, position_.z);
+
+	const XMMATRIX& matBillBoard = camera->GetBillBoard();
+
+	// ワールド行列の合成
+	matWorld_ = XMMatrixIdentity(); // 変形をリセット
+	matWorld_ *= matBillBoard;
+	matWorld_ *= matScale; // ワールド行列にスケーリングを反映
+	matWorld_ *= matRot; // ワールド行列に回転を反映
+	matWorld_ *= matTrans; // ワールド行列に平行移動を反映
+
+	// 親オブジェクトがあれば
+	if (parent_ != nullptr) {
+		// 親オブジェクトのワールド行列を掛ける
+		matWorld_ *= parent_->matWorld_;
+	}
+
+	const XMMATRIX& matViewProjection = camera_->GetmatViewProjection();
+
+	//更新処理
+	/*if (Input::GetInstance()->PushKey(DIK_Q))
+	{
+		rotation_.y -= 2.0f;
+	}
+
+	if (Input::GetInstance()->PushKey(DIK_E))
+	{
+		rotation_.y += 2.0f;
+	}*/
+
+
+	// 定数バッファへデータ転送B0
+	ConstBufferDataB0* constMap = nullptr;
+	result = constBuffB0_->Map(0, nullptr, (void**)&constMap);
+	//constMap->color = color;
+	//constMap->mat = matWorld_ * matView * matProjection;	// 行列の合成
+	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
+	constBuffB0_->Unmap(0, nullptr);
+
+}
+
+void Part::Draw()
+{
+	// nullptrチェック
+	assert(device);
+	assert(Part::cmdList);
+
+	//モデルの紐づけがない場合は描画しない
+	if (model_ == nullptr)
+	{
+		return;
+	}
+
+
+	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0_->GetGPUVirtualAddress());
+
+	model_->Draw(cmdList, 1);
+}
+
+

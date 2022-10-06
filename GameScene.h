@@ -8,6 +8,8 @@
 #include "EnemyBullet.h"
 #include "Enemy.h"
 #include "ObjectManager.h"
+#include "Particle.h"
+#include "Part.h"
 #include "PostEffect.h"
 #include "Controller.h"
 
@@ -62,7 +64,7 @@ public:
 	void Attack();
 
 	//“G‚ÌUŒ‚
-	void EnemyAttack();
+	void EnemyAttack(XMFLOAT3 EnemyPos);
 
 	//‰~‚Æ‰~‚Ì“–‚½‚è”»’è
 	bool CheckCollision(XMFLOAT3 Object1, XMFLOAT3 Object2, float R1, float R2);
@@ -114,6 +116,12 @@ private:
 	//Enemy* E = nullptr;
 
 	std::unique_ptr<Enemy> enemy;
+
+	//ƒp[ƒeƒBƒNƒ‹
+	Particle* particle = nullptr;
+
+	Part* part = nullptr;
+
 
 	//“G‚ÌÀ•W
 

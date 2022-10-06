@@ -9,6 +9,8 @@
 #include "EnemyBullet.h"
 #include "FbxLoader.h"
 #include "Sprite.h"
+#include "Particle.h"
+#include "Part.h"
 #include "DebugText.h"
 #include "Audio.h"
 #include "SceneManager.h"
