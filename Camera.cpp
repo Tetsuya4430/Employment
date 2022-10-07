@@ -5,7 +5,7 @@ using namespace DirectX;
 XMMATRIX Camera::matView{};
 XMMATRIX Camera::matProjection{};
 XMMATRIX Camera::matViewProjection{};
-XMFLOAT3 Camera::eye = {70, 0, -50.0f };
+XMFLOAT3 Camera::eye = {0, 0, -50.0f };
 XMFLOAT3 Camera::target = { 0, 0, 0 };
 XMFLOAT3 Camera::up = { 0, 1, 0 };
 XMMATRIX Camera::matBillboard = XMMatrixIdentity();
@@ -138,6 +138,25 @@ void Camera::InitializeCamera(int window_width, int window_height)
 	matBillboard.r[1] = cameraAxisY;
 	matBillboard.r[2] = cameraAxisZ;
 	matBillboard.r[3] = XMVectorSet(0, 0, 0, 1);
+
+	//Y軸回りビルボード行列の計算
+	//カメラX軸、Y軸、Z軸
+	XMVECTOR yBillCameraAxisX, yBillCameraAxisY, yBillCameraAxisZ;
+
+	//X軸は共通
+	yBillCameraAxisX = cameraAxisX;
+
+	//Y軸はワールド座標系のY軸
+	yBillCameraAxisY = XMVector3Normalize(upVector);
+
+	//Z軸はX軸->Y軸の外積で決まる
+	yBillCameraAxisZ = XMVector3Cross(yBillCameraAxisX, yBillCameraAxisY);
+
+	//Y軸回りビルボード行列
+	matBillboardY.r[0] = yBillCameraAxisX;
+	matBillboardY.r[1] = yBillCameraAxisY;
+	matBillboardY.r[2] = yBillCameraAxisZ;
+	matBillboardY.r[3] = XMVectorSet(0, 0, 0, 1);
 
 	// 平行投影による射影行列の生成
 	//constMap->mat = XMMatrixOrthographicOffCenterLH(

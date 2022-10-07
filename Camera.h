@@ -68,6 +68,8 @@ public:	//メンバ関数
 	//ビルボードの取得
 	static const XMMATRIX& GetBillBoard() { return matBillboard; }
 
+	static const XMMATRIX& GetBillBoardY() { return matBillboardY; }
+
 	static void Update();
 
 

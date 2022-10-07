@@ -354,10 +354,11 @@ void Part::Update()
 	matTrans = XMMatrixTranslation(position_.x, position_.y, position_.z);
 
 	const XMMATRIX& matBillBoard = camera->GetBillBoard();
+	const XMMATRIX& matBillBoardY = camera->GetBillBoardY();
 
 	// ワールド行列の合成
 	matWorld_ = XMMatrixIdentity(); // 変形をリセット
-	matWorld_ *= matBillBoard;
+	matWorld_ *= matBillBoardY;
 	matWorld_ *= matScale; // ワールド行列にスケーリングを反映
 	matWorld_ *= matRot; // ワールド行列に回転を反映
 	matWorld_ *= matTrans; // ワールド行列に平行移動を反映
