@@ -20,7 +20,7 @@ ID3D12GraphicsCommandList* Enemy::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Enemy::rootsignature;
 ComPtr<ID3D12PipelineState> Enemy::pipelinestate;
 
-std::unique_ptr<Enemy> Enemy::Create(Model* model, Camera* camera)
+std::unique_ptr<Enemy> Enemy::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 {
 	//3Dオブジェクトのインスタンスを生成
 	Enemy* instance = new Enemy();
@@ -30,7 +30,7 @@ std::unique_ptr<Enemy> Enemy::Create(Model* model, Camera* camera)
 	}
 
 	//初期化
-	if (!instance->Initialize())
+	if (!instance->Initialize(pos))
 	{
 		delete instance;
 		assert(0);
@@ -48,6 +48,7 @@ std::unique_ptr<Enemy> Enemy::Create(Model* model, Camera* camera)
 		instance->SetCamera(camera);
 	}
 
+
 	return std::unique_ptr<Enemy>(instance);
 }
 
@@ -58,7 +59,7 @@ Enemy* Enemy::GetInstance()
 	return &instance;
 }
 
-bool Enemy::Initialize()
+bool Enemy::Initialize(XMFLOAT3 pos)
 {
 	// nullptrチェック
 	assert(device);
@@ -66,10 +67,11 @@ bool Enemy::Initialize()
 	//コントローラー初期化
 	InitInput();
 
+	position = pos;
+
 	//接近フェーズ初期化
 	InitApproach();
 
-	//position_B = pos;
 
 	HRESULT result;
 	// 定数バッファの生成

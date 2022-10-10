@@ -41,7 +41,7 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static std::unique_ptr<Enemy>Create(Model* model, Camera* camera);
+	static std::unique_ptr<Enemy>Create(Model* model, Camera* camera, XMFLOAT3 pos);
 
 public:
 
@@ -52,7 +52,7 @@ public:
 	/// èâä˙âª
 	/// </summary>
 	/// <returns></returns>
-	bool Initialize();
+	bool Initialize(XMFLOAT3 pos);
 
 	/// <summary>
 	/// èIóπèàóù
@@ -158,7 +158,7 @@ public:
 	//XMFLOAT3 position_B = { 0,0,0 };
 
 	//à íu
-	XMFLOAT3 position = { 0,0,100 };
+	XMFLOAT3 position = {0, 0, 0};
 
 	int DeathFlag = false;
 };

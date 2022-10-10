@@ -13,7 +13,10 @@
 #include "PostEffect.h"
 #include "Controller.h"
 
+
 #include <list>
+#include <sstream>
+#include <fstream>
 
 class Player;
 class Bullet;
@@ -66,6 +69,12 @@ public:
 	//敵の攻撃
 	void EnemyAttack(XMFLOAT3 EnemyPos);
 
+	//敵の発生データ読み込み
+	void LoadEnemyPopData();
+
+	//敵発生コマンドの更新
+	void UpdateEnemyPopCommands();
+
 	//円と円の当たり判定
 	bool CheckCollision(XMFLOAT3 Object1, XMFLOAT3 Object2, float R1, float R2);
 
@@ -95,6 +104,13 @@ private:
 	//敵の弾
 	std::list<std::unique_ptr<EnemyBullet>> enemybullets;
 	
+	//敵
+	std::list<std::unique_ptr<Enemy>> enemys;
+
+	//敵発生コマンド
+	std::stringstream enemyPopCommands;
+
+
 
 	/*std::shared_ptr<Object3d> Empty;
 	std::shared_ptr<Object3d> BulletObj;
@@ -133,6 +149,12 @@ private:
 
 	//敵の弾発射タイマー
 	int EnemyBulletTimer = 0;
+
+	//敵の待機フラグ
+	bool EnemyFlag = false;
+
+	//敵の待機タイマー
+	int EnemyTimer = 0;
 
 	public:
 	//弾の発射間隔

@@ -12,6 +12,8 @@
 #include "Bullet.h"
 #include "Enemy.h"
 
+using namespace std;
+
 GameScene::GameScene()
 {
 }
@@ -45,6 +47,7 @@ void GameScene::Initialize()
 	model_Enemy = Model::LoadFromObj("Enemy");
 
 	//敵の初期化
+	LoadEnemyPopData();
 	EnemyInit();
 
 
@@ -57,7 +60,7 @@ void GameScene::Initialize()
 
 	enemy = std::make_unique<Enemy>();
 	
-	enemy = Enemy::Create(model_Enemy, camera);
+	//enemy = Enemy::Create(model_Enemy, camera);
 
 	part = Part::Create(model_1, camera);
 
@@ -146,19 +149,26 @@ void GameScene::Update()
 
 	//E->Update();
 
-	if (enemy)
-	{
-		enemy->Update();
-	}
+	//if (enemy)
+	//{
+	//	enemy->Update();
+	//}
 
 	Attack();
 
 	//EnemyAttack();
 
+	UpdateEnemyPopCommands();
+
 	//敵更新
-	if (enemy->DeathFlag == false)
+	/*if (enemy->DeathFlag == false)
 	{
 		EnemyUpdate();
+	}*/
+
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		enemy->Update();
 	}
 
 	//弾更新
@@ -188,13 +198,16 @@ void GameScene::Update()
 
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
-		//当たり判定確認
-		if (enemy->DeathFlag == false)
+		for (std::unique_ptr<Enemy>& enemy : enemys)
 		{
-			if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
+			//当たり判定確認
+			if (enemy->DeathFlag == false)
 			{
-				bullet->DeathFlag = true;
-				enemy->DeathFlag = true;
+				if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
+				{
+					bullet->DeathFlag = true;
+					enemy->DeathFlag = true;
+				}
 			}
 		}
 	}
@@ -253,9 +266,17 @@ void GameScene::Draw()
 
 	//E->Draw();
 
-	if (enemy->DeathFlag == false)
+	/*if (enemy->DeathFlag == false)
 	{
 		enemy->Draw();
+	}*/
+
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		if (enemy->DeathFlag == false)
+		{
+			enemy->Draw();
+		}
 	}
 
 
@@ -270,7 +291,7 @@ void GameScene::Draw()
 	}
 
 
-	part->Draw();
+	//part->Draw();
 
 	//FBXオブジェクトの描画
 	object1->Draw(cmdList);
@@ -349,6 +370,101 @@ void GameScene::EnemyAttack(XMFLOAT3 EnemyPos)
 	//}
 }
 
+void GameScene::LoadEnemyPopData()
+{
+	//ファイルを開く
+	std::ifstream file;
+	file.open(L"Resources/EnemyPop.csv");
+	assert(file.is_open());
+
+	//ファイルの内容を文字列ストリームにコピー
+	enemyPopCommands << file.rdbuf();
+
+	file.close();
+}
+
+void GameScene::UpdateEnemyPopCommands()
+{
+	//待機処理
+	if (EnemyFlag)
+	{
+		EnemyTimer--;
+
+		if (EnemyTimer <= 0)
+		{
+			//待機完了
+			EnemyFlag = false;
+		}
+		return;
+	}
+
+	//1桁分の文字列を入れる変数
+	std::string line;
+
+	//コマンド実行ループ
+	while (getline(enemyPopCommands, line))
+	{
+		//1桁分の文字列をストリームに変換して解析しやすくする
+		std::istringstream line_stream(line);
+
+		std::string word;
+
+		//,区切りでの行の先頭文字列を取得
+		getline(line_stream, word, ',');
+
+		//"//"から始まる行はコメントアウト
+		if (word.find("//") == 0)
+		{
+			//コメントを飛ばす
+			continue;
+		}
+
+		//POPコマンド
+		if (word.find("POP") == 0)
+		{
+			//x座標
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			//y座標
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			//z座標
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+
+			//取得したx,y,z座標を格納
+			XMFLOAT3 EnemyPos = { x, y, z };
+
+			//敵を発生させる
+			std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
+			newEnemy = Enemy::Create(model_Enemy, camera, EnemyPos);
+
+			enemys.push_back(std::move(newEnemy));
+
+		}
+
+		//WAITコマンド
+		else if (word.find("WAIT") == 0)
+		{
+			getline(line_stream, word, ',');
+
+			//待ち時間
+			int32_t waitTime = atoi(word.c_str());
+
+			//待機時間
+			EnemyFlag = true;
+			EnemyTimer = waitTime;
+
+			//コマンドループを抜ける
+			break;
+		}
+
+	}
+}
+
 bool GameScene::CheckCollision(XMFLOAT3 Object1, XMFLOAT3 Object2, float R1, float R2)
 {
 	float Check = sqrtf((Object1.x - Object2.x) * (Object1.x - Object2.x) + (Object2.y - Object1.y) * (Object2.y - Object1.y) + (Object1.z - Object2.z) * (Object1.z - Object2.z));
@@ -363,5 +479,6 @@ bool GameScene::CheckCollision(XMFLOAT3 Object1, XMFLOAT3 Object2, float R1, flo
 		return false;
 	}
 }
+
 
 

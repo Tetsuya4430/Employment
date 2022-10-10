@@ -127,6 +127,7 @@
     </FxCompile>
     <FxCompile Include="Resources\shaders\FBXVS.hlsl" />
     <FxCompile Include="Resources\shaders\FBXPS.hlsl" />
+    <FxCompile Include="Resources\shaders\BasicGeometryShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Sprite.hlsli">
