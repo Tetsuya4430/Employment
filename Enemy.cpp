@@ -48,7 +48,6 @@ std::unique_ptr<Enemy> Enemy::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 		instance->SetCamera(camera);
 	}
 
-
 	return std::unique_ptr<Enemy>(instance);
 }
 
@@ -161,24 +160,62 @@ void Enemy::Update()
 		//‹K’è‚ÌˆÊ’u‚Å—£’E
 		if (position.z <= 30)
 		{
-			phase_ = Phase::Leave;
+			if (position.x == 0)
+			{
+				phase_ = Phase::LeaveS;
+			}
+
+			else if (position.x > 0)
+			{
+				phase_ = Phase::LeaveR;
+			}
+
+			else
+			{
+				phase_ = Phase::LeaveL;
+			}
 		}
 		break;
 
-		case Phase::Leave:
+		case Phase::LeaveR:
 		//ˆÚ“®
 		position.x -= Speed;
-		position.z -= Speed;
+		//position.z -= Speed;
 
-		if (position.z < -10)
+		if (position.x < -100)
 		{
-			position.x = 0;
-			position.z = 100;
+			//position.x = 0;
+			//position.z = 100;
 
-			phase_ = Phase::Approach;
+			DeathFlag = true;
+			//phase_ = Phase::Approach;
 		}
 
 		break;
+
+		case Phase::LeaveL:
+			//ˆÚ“®
+			position.x += Speed;
+			//position.z -= Speed;
+
+			if (position.x > 100)
+			{
+				DeathFlag = true;
+			}
+
+			break;
+
+		case Phase::LeaveS:
+			//ˆÚ“®
+			
+			position.z -= Speed;
+
+			if (position.z <= 0)
+			{
+				DeathFlag = true;
+			}
+
+			break;
 	}
 
 	

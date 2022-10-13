@@ -61,7 +61,7 @@ public:
 	void EnemyInit();
 
 	//敵の更新関数
-	void EnemyUpdate();
+	void EnemyUpdate(XMFLOAT3 enemyPos);
 
 	//プレイヤーの攻撃
 	void Attack();
@@ -131,7 +131,7 @@ private:
 	Bullet* B = nullptr;
 	//Enemy* E = nullptr;
 
-	std::unique_ptr<Enemy> enemy;
+	//std::unique_ptr<Enemy> enemy;
 
 	//パーティクル
 	Particle* particle = nullptr;
@@ -156,9 +156,16 @@ private:
 	//敵の待機タイマー
 	int EnemyTimer = 0;
 
+	//csvファイルから敵の座標格納用変数
+	XMFLOAT3 Num = {0, 0, 0};
+
 	public:
 	//弾の発射間隔
 	static const int BulletInterval = 60;
+
+
+	//テスト
+	int Timer = 60;
 
 };
 

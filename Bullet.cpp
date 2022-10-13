@@ -153,6 +153,7 @@ void Bullet::Update(XMFLOAT3 pos)
 
 	//’e‚ÌˆÚ“®
 	position_B.z += Speed;
+	//rotation_.z += 5.0f;
 
 }
 

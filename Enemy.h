@@ -9,6 +9,8 @@
 #include <d3dx12.h>
 #include"Input.h"
 
+class GameScene;
+
 class Enemy
 {
 private: // エイリアス
@@ -32,7 +34,9 @@ public:
 	enum class Phase
 	{
 		Approach,	//接近
-		Leave,		//離脱
+		LeaveR,		//離脱(右側)
+		LeaveL,		//離脱(左側)
+		LeaveS,		//離脱(直進)
 	};
 
 	/// <summary>
@@ -100,6 +104,8 @@ public:
 
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
+	void SetGemeScene(GameScene* gameScene) { gameScene_ = gameScene; }
+
 	//getter
 
 	// 座標の取得
@@ -143,6 +149,9 @@ private: // メンバ変数
 
 	Input* input = nullptr;
 
+	//ゲームシーン
+	GameScene* gameScene_ = nullptr;
+
 	//速度
 	float Speed = 0.5f;
 
@@ -161,5 +170,9 @@ public:
 	XMFLOAT3 position = {0, 0, 0};
 
 	int DeathFlag = false;
+
+	static const int IntervalTime = 70;
+
+	int FireTime = 0;
 };
 

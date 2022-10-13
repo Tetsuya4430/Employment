@@ -23,7 +23,6 @@ GameScene::~GameScene()
 	delete(object1);
 	delete(model1);
 	delete(postEffect);
-	delete(player);
 	delete(P);
 	delete(particle);
 }
@@ -42,7 +41,7 @@ void GameScene::Initialize()
 
 	//OBJからモデルデータを読み込む
 	model_1 = Model::LoadFromObj("triangle_mat");
-	model_2 = Model::LoadFromObj("Box");
+	model_2 = Model::LoadFromObj("Jet");
 	model_Bullet = Model::LoadFromObj("Bullet");
 	model_Enemy = Model::LoadFromObj("Enemy");
 
@@ -52,15 +51,13 @@ void GameScene::Initialize()
 
 
 	//3Dオブジェクト生成
-	player = Object3d::Create(model_2, camera);
+//	player = Object3d::Create(model_2, camera);
 
 	P = Player::Create(model_2, camera);
 
-	//E = Enemy::Create(model_Enemy, camera);
-
-	enemy = std::make_unique<Enemy>();
+	//enemy = std::make_unique<Enemy>();
 	
-	//enemy = Enemy::Create(model_Enemy, camera);
+	//enemy = Enemy::Create(model_Enemy, camera, enemy->position);
 
 	part = Part::Create(model_1, camera);
 
@@ -127,49 +124,43 @@ void GameScene::Update()
 		SceneManager::GetInstance()->ChangeScene("TITLE");
 	}
 
-	
-
-	//// カメラ移動
-	//if (input->GetInstance()->PushKey(DIK_I) || input->GetInstance()->PushKey(DIK_J) || input->GetInstance()->PushKey(DIK_K) || input->GetInstance()->PushKey(DIK_L))
-	//{
-	//	if (input->GetInstance()->PushKey(DIK_I)) { Camera::CameraMoveEyeVector({ 0.0f,+1.0f,0.0f }); }
-	//	else if (input->GetInstance()->PushKey(DIK_K)) { Camera::CameraMoveEyeVector({ 0.0f,-1.0f,0.0f }); }
-	//	if (input->GetInstance()->PushKey(DIK_L)) { Camera::CameraMoveEyeVector({ +1.0f,0.0f,0.0f }); }
-	//	else if (input->GetInstance()->PushKey(DIK_J)) { Camera::CameraMoveEyeVector({ -1.0f,0.0f,0.0f }); }
-	//}
-
-	//camera->Update();
-
 	//3Dオブジェクトの更新
 
 
-	player->Update();
+	//player->Update();
 
+	//プレイヤーの更新
 	P->Update();
 
-	//E->Update();
-
-	//if (enemy)
-	//{
-	//	enemy->Update();
-	//}
-
+	//プレイヤーの攻撃関数
 	Attack();
 
-	//EnemyAttack();
 
 	UpdateEnemyPopCommands();
 
-	//敵更新
-	/*if (enemy->DeathFlag == false)
-	{
-		EnemyUpdate();
-	}*/
-
+	//敵の更新
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
-		enemy->Update();
+		if (enemy->DeathFlag == false)
+		{
+			//EnemyUpdate(enemy->position);
+			enemy->Update();
+
+
+			enemy->FireTime--;
+
+			if (enemy->FireTime <= 0)
+			{
+				EnemyAttack(enemy->position);
+
+				//発射タイマーを初期化
+				enemy->FireTime = enemy->IntervalTime;
+			}
+		}
+		
 	}
+
+	//enemy->Update();
 
 	//弾更新
 	for (std::unique_ptr<Bullet>& bullet : bullets)
@@ -180,7 +171,8 @@ void GameScene::Update()
 	//敵の弾更新
 	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
 	{
-		bullet->Update(enemy->position, enemy->position);
+		//仮として引数をプレイヤーの座標にしている
+		bullet->Update(P->position_, P->position_);
 	}
 
 	//デスフラグの立った弾の削除
@@ -231,7 +223,7 @@ void GameScene::Update()
 	//パーティクルの更新
 	particle->Update();
 
-	part->Update();
+	//part->Update();
 
 
 	//カメラの更新
@@ -260,17 +252,16 @@ void GameScene::Draw()
 
 	//3Dオブジェクトの描画前処理
 	Object3d::PreDraw();
-	//Particle::PreDraw();
 
 	P->Draw();
 
-	//E->Draw();
 
 	/*if (enemy->DeathFlag == false)
 	{
 		enemy->Draw();
 	}*/
 
+	//敵の描画
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		if (enemy->DeathFlag == false)
@@ -279,12 +270,13 @@ void GameScene::Draw()
 		}
 	}
 
-
+	//プレイヤーの弾描画
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
 		bullet->Draw();
 	}
 
+	//敵の弾描画
 	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
 	{
 		bullet->Draw();
@@ -295,10 +287,6 @@ void GameScene::Draw()
 
 	//FBXオブジェクトの描画
 	object1->Draw(cmdList);
-
-	//particle->Draw();
-
-	//Particle::PostDraw();
 	
 
 	//3Dオブジェクトの描画後処理
@@ -309,25 +297,34 @@ void GameScene::Draw()
 void GameScene::EnemyInit()
 {
 	//発射タイマーを初期化
-	EnemyBulletTimer = BulletInterval;
+	//EnemyBulletTimer = BulletInterval;
+
+	for (std::unique_ptr<Enemy>& enemy : enemys)
+	{
+		enemy->FireTime = enemy->IntervalTime;
+	}
 }
 
-void GameScene::EnemyUpdate()
+void GameScene::EnemyUpdate(XMFLOAT3 enemyPos)
 {
 	EnemyBulletTimer--;
+	
 
-	if (EnemyBulletTimer <= 0)
+	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
-		EnemyAttack(enemy->GetPosition());
+		if (EnemyBulletTimer <= 0 && enemy->DeathFlag == 0)
+		{
+			EnemyAttack(enemy->GetPosition());
 
-		//発射タイマーを初期化
-		EnemyBulletTimer = BulletInterval;
-	}
+			//発射タイマーを初期化
+			EnemyBulletTimer = BulletInterval;
+		}
+	}	
 }
 
 void GameScene::Attack()
 {
-	if (Input::GetInstance()->TriggerKey(DIK_R))
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
 	{
 		//弾を生成し初期化
 		std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
@@ -340,14 +337,10 @@ void GameScene::Attack()
 
 void GameScene::EnemyAttack(XMFLOAT3 EnemyPos)
 {
-	/*if (Input::GetInstance()->TriggerKey(DIK_T))
-	{*/
-
-
-
+	
 		//弾を生成し初期化
 		std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
-		newBullet = EnemyBullet::Create(model_Bullet, camera, enemy->position, P);
+		newBullet = EnemyBullet::Create(model_Bullet, camera, EnemyPos, P);
 
 		/*newBullet->position_B.x = EnemyPos.x;
 		newBullet->position_B.y = EnemyPos.y;
@@ -367,7 +360,6 @@ void GameScene::EnemyAttack(XMFLOAT3 EnemyPos)
 		enemybullets.push_back(std::move(newBullet));
 
 		//enemybullets
-	//}
 }
 
 void GameScene::LoadEnemyPopData()
@@ -437,6 +429,12 @@ void GameScene::UpdateEnemyPopCommands()
 
 			//取得したx,y,z座標を格納
 			XMFLOAT3 EnemyPos = { x, y, z };
+
+
+			/*for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				enemy->position = EnemyPos;
+			}*/
 
 			//敵を発生させる
 			std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
