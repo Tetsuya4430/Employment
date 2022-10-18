@@ -7,6 +7,7 @@
 #include "Enemy.h"
 #include "Bullet.h"
 #include "EnemyBullet.h"
+#include "St1_Boss.h"
 #include "FbxLoader.h"
 #include "Sprite.h"
 #include "Particle.h"

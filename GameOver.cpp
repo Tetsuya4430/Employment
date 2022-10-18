@@ -7,7 +7,7 @@
 void GameOver::Initialize(/*DirectXCommon* dxCommon*/)
 {
 	////スプライト共通テクスチャ読み込み
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/Sana.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/GameOver.png");
 
 	//	スプライトの生成
 	sprite = Sprite::Create(1, { 0, 0 }, false, false);

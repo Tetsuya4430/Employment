@@ -24,6 +24,7 @@ GameScene::~GameScene()
 	delete(model1);
 	delete(postEffect);
 	delete(P);
+	delete(Boss);
 	delete(particle);
 }
 
@@ -41,9 +42,11 @@ void GameScene::Initialize()
 
 	//OBJからモデルデータを読み込む
 	model_1 = Model::LoadFromObj("triangle_mat");
-	model_2 = Model::LoadFromObj("Jet");
+	model_2 = Model::LoadFromObj("Box");
 	model_Bullet = Model::LoadFromObj("Bullet");
 	model_Enemy = Model::LoadFromObj("Enemy");
+	model_Boss = Model::LoadFromObj("Boss");
+
 
 	//敵の初期化
 	LoadEnemyPopData();
@@ -51,13 +54,7 @@ void GameScene::Initialize()
 
 
 	//3Dオブジェクト生成
-//	player = Object3d::Create(model_2, camera);
-
 	P = Player::Create(model_2, camera);
-
-	//enemy = std::make_unique<Enemy>();
-	
-	//enemy = Enemy::Create(model_Enemy, camera, enemy->position);
 
 	part = Part::Create(model_1, camera);
 
@@ -141,6 +138,15 @@ void GameScene::Update()
 	//プレイヤーの攻撃関数
 	Attack();
 
+	if (Boss)
+	{
+		if (Boss->DeathFlag == false)
+		{
+			//ボスの更新
+			Boss->Update();
+		}
+	}
+
 
 	UpdateEnemyPopCommands();
 
@@ -220,6 +226,28 @@ void GameScene::Update()
 		}
 	}
 
+	//プレイヤーの弾とボスの当たり判定
+	if (Boss)
+	{
+		if (Boss->DeathFlag == false)
+		{
+			for (std::unique_ptr<Bullet>& bullet : bullets)
+			{
+				if (CheckCollision(bullet->GetPosition(), Boss->GetPosition(), 2.0f, 6.0f) == true)
+				{
+					Boss->HP -= 1;
+					bullet->DeathFlag = true;
+				}
+			}
+		}
+
+		if (Boss->HP <= 0)
+		{
+			Boss->DeathFlag = true;
+		}
+	}
+
+
 	//FBXオブジェクトの更新
 	object1->Update();
 	
@@ -261,6 +289,13 @@ void GameScene::Draw()
 
 	P->Draw();
 
+	if (Boss)
+	{
+		if (Boss->DeathFlag == false)
+		{
+			Boss->Draw();
+		}
+	}
 
 	/*if (enemy->DeathFlag == false)
 	{
@@ -436,17 +471,35 @@ void GameScene::UpdateEnemyPopCommands()
 			//取得したx,y,z座標を格納
 			XMFLOAT3 EnemyPos = { x, y, z };
 
-
-			/*for (std::unique_ptr<Enemy>& enemy : enemys)
-			{
-				enemy->position = EnemyPos;
-			}*/
-
 			//敵を発生させる
 			std::unique_ptr<Enemy> newEnemy = std::make_unique<Enemy>();
 			newEnemy = Enemy::Create(model_Enemy, camera, EnemyPos);
 
 			enemys.push_back(std::move(newEnemy));
+
+		}
+
+		//POPコマンド
+		else if (word.find("BOSS_POP") == 0)
+		{
+			//x座標
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			//y座標
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			//z座標
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+
+			//取得したx,y,z座標を格納
+			XMFLOAT3 EnemyPos = { x, y, z };
+
+			//敵を発生させる
+			Boss = St1_Boss::Create(model_Boss, camera, EnemyPos);
 
 		}
 

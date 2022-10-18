@@ -7,6 +7,7 @@
 #include "Bullet.h"
 #include "EnemyBullet.h"
 #include "Enemy.h"
+#include "St1_Boss.h"
 #include "ObjectManager.h"
 #include "Particle.h"
 #include "Part.h"
@@ -89,6 +90,7 @@ private:
 	Model* model_2 = nullptr;
 	Model* model_Bullet = nullptr;
 	Model* model_Enemy = nullptr;
+	Model* model_Boss = nullptr;
 
 	FbxModel* model1 = nullptr;
 	Fbx3d* object1 = nullptr;
@@ -127,9 +129,12 @@ private:
 	Object3d* player = nullptr;
 	//Object3d* Enemy = nullptr;
 
+	//ÉvÉåÉCÉÑÅ[
 	Player* P = nullptr;
 	Bullet* B = nullptr;
 	//Enemy* E = nullptr;
+
+	St1_Boss* Boss = nullptr;
 
 	//std::unique_ptr<Enemy> enemy;
 

@@ -1,6 +1,5 @@
-#include "Player.h"
+#include "St1_Boss.h"
 #include "Input.h"
-#include "Bullet.h"
 #include "Controller.h"
 #include <d3dcompiler.h>
 #include <fstream>
@@ -16,56 +15,62 @@ using namespace std;
 /// <summary>
 /// 静的メンバ変数の実体
 /// </summary>
-ID3D12Device* Player::device = nullptr;
-ID3D12GraphicsCommandList* Player::cmdList = nullptr;
-ComPtr<ID3D12RootSignature> Player::rootsignature;
-ComPtr<ID3D12PipelineState> Player::pipelinestate;
+ID3D12Device* St1_Boss::device = nullptr;
+ID3D12GraphicsCommandList* St1_Boss::cmdList = nullptr;
+ComPtr<ID3D12RootSignature> St1_Boss::rootsignature;
+ComPtr<ID3D12PipelineState> St1_Boss::pipelinestate;
 
-Player* Player::Create(Model* model, Camera* camera)
+St1_Boss* St1_Boss::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 {
-    //3Dオブジェクトのインスタンスを生成
-    Player* instance = new Player();
-    if (instance == nullptr)
-    {
-        return nullptr;
-    }
+	//3Dオブジェクトのインスタンスを生成
+	St1_Boss* instance = new St1_Boss();
+	if (instance == nullptr)
+	{
+		return nullptr;
+	}
 
-    //初期化
-    if (!instance->Initialize())
-    {
-        delete instance;
-        assert(0);
-    }
+	//初期化
+	if (!instance->Initialize(pos))
+	{
+		delete instance;
+		assert(0);
+	}
 
-    //モデルのセット
-    if (model)
-    {
-        instance->SetModel(model);
-    }
+	//モデルのセット
+	if (model)
+	{
+		instance->SetModel(model);
+	}
 
-    //カメラのセット
-    if (camera)
-    {
-        instance->SetCamera(camera);
-    }
+	//カメラのセット
+	if (camera)
+	{
+		instance->SetCamera(camera);
+	}
 
-    return instance;
+	return instance;
 }
 
-Player* Player::GetInstance()
+St1_Boss* St1_Boss::GetInstance()
 {
-	static Player instance;
+	static St1_Boss instance;
 
 	return &instance;
 }
 
-bool Player::Initialize()
+bool St1_Boss::Initialize(XMFLOAT3 pos)
 {
 	// nullptrチェック
 	assert(device);
 
-	//コントローラー初期化
-	InitInput();
+	////コントローラー初期化
+	//InitInput();
+
+	position = pos;
+
+	//接近フェーズ初期化
+	InitApproach();
+
 
 	HRESULT result;
 	// 定数バッファの生成
@@ -77,21 +82,21 @@ bool Player::Initialize()
 		nullptr,
 		IID_PPV_ARGS(&constBuffB0_));
 
-    return true;
+	return true;
 }
 
-bool Player::Finalize()
+bool St1_Boss::Finalize()
 {
 	ReleaseInput();
 
 	return true;
 }
 
-void Player::Draw()
+void St1_Boss::Draw()
 {
 	// nullptrチェック
 	assert(device);
-	assert(Player::cmdList);
+	assert(St1_Boss::cmdList);
 
 	//モデルの紐づけがない場合は描画しない
 	if (model_ == nullptr)
@@ -105,7 +110,7 @@ void Player::Draw()
 	model_->Draw(cmdList, 1);
 }
 
-void Player::Update()
+void St1_Boss::Update()
 {
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
@@ -116,7 +121,7 @@ void Player::Update()
 	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation_.z));
 	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation_.x));
 	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation_.y));
-	matTrans = XMMatrixTranslation(position_.x, position_.y, position_.z);
+	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
 
 	// ワールド行列の合成
 	matWorld_ = XMMatrixIdentity(); // 変形をリセット
@@ -140,167 +145,108 @@ void Player::Update()
 	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
 	constBuffB0_->Unmap(0, nullptr);
 
+
+
 	//更新処理
 
-	//プレイヤーの移動
-	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
-	{ 
-		MoveFlag = 1;
-		if (Input::GetInstance()->PushKey(DIK_D))
-		{
-			if (position_.x <= 45)
-			{
-				position_.x += 0.5f;
-			}
-
-			if (RotlimR < rotation_.z)
-			{
-				rotation_.z -= 0.3f;
-			}
-		}
-
-		if (Input::GetInstance()->PushKey(DIK_A))
-		{
-			MoveFlag = 1;
-			if (Input::GetInstance()->PushKey(DIK_A))
-			{
-				if (position_.x >= -45)
-				{
-					position_.x -= 0.5f;
-				}
-
-				if (RotlimL > rotation_.z)
-				{
-					rotation_.z += 0.3f;
-				}
-			}
-
-		}
-
-		if (Input::GetInstance()->PushKey(DIK_W))
-		{
-			if (position_.y <= 20)
-			{
-				position_.y += 0.5f;
-			}
-		}
-
-		if (Input::GetInstance()->PushKey(DIK_S))
-		{
-			if (position_.y >= -25)
-			{
-				position_.y -= 0.5f;
-			}
-		}
-	}
-
-	else
+	switch (phase_)
 	{
-		MoveFlag = 0;
-	}
+	case Phase::Approach:
+	default:
 
-	//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
-	if (MoveFlag == 0)
-	{
-		if (rotation_.z > 0)
+		//移動
+		position.z -= Speed;
+
+		//規定の位置で離脱
+		if (position.z <= 30)
 		{
-			rotation_.z -= 0.5f;
+			phase_ = Phase::MoveR;
+		}
+		break;
+
+	case Phase::MoveR:
+		if (position.x < 50)
+		{
+			position.x += Speed;
 		}
 
-		if (rotation_.z < 0)
+		if (position.x >= 50)
 		{
-			rotation_.z += 0.5f;
-		}
-	}
-
-
-	if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))
-	{
-		MoveFlag = 1;
-		if (IsButtonPush(ButtonKind::RightButton))
-		{
-			position_.x += 0.5f;
-			if (RotlimR < rotation_.z)
-			{
-				rotation_.z -= 0.3f;
-			}
+			phase_ = Phase::MoveL;
 		}
 
-		if (IsButtonPush(ButtonKind::LeftButton))
+		break;
+
+	case Phase::MoveL:
+		if (position.x > -50)
 		{
-			MoveFlag = 1;
-				position_.x -= 0.5f;
-				if (RotlimL > rotation_.z)
-				{
-					rotation_.z += 0.3f;
-				}
+			position.x -= Speed;
 		}
 
-		if (IsButtonPush(ButtonKind::UpButton))
+		if (position.x <= -50)
 		{
-			position_.y += 0.5f;
+			phase_ = Phase::MoveR;
 		}
 
-		if (IsButtonPush(ButtonKind::DownButton))
-		{
-			position_.y -= 0.5f;
-		}
-	}
-
-	else
-	{
-		MoveFlag = 0;
+		break;
 	}
 
 
 
-
-	//コントローラーの押下情報更新
-	UpdateInput();
 }
 
-void Player::OnCollision()
+void St1_Boss::InitApproach()
+{
+	////発射タイマーを初期化
+	//BulletTimer = BulletInterval;
+}
+
+void St1_Boss::UpdateApproach()
+{
+	/*BulletTimer--;*/
+}
+
+void St1_Boss::OnCollision()
 {
 }
 
-XMFLOAT3 Player::GetWorldPosition()
+XMFLOAT3 St1_Boss::GetWorldPosition()
 {
 	//ワールド座標を入れる変数
 	XMFLOAT3 worldPos;
 
 	//ワールド行列の平行移動成分を取得
-	worldPos.x = position_.x;
-	worldPos.y = position_.y;
-	worldPos.z = position_.z;
+	worldPos.x = position.x;
+	worldPos.y = position.y;
+	worldPos.z = position.z;
 
 	return worldPos;
 }
 
-bool Player::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
-{// nullptrチェック
-    assert(device);
+bool St1_Boss::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
+{
+	// nullptrチェック
+	assert(device);
 
-	Player::device = device;
-	Player::cmdList = cmdList;
+	St1_Boss::device = device;
+	St1_Boss::cmdList = cmdList;
 
-    Model::SetDevice(device);
+	Model::SetDevice(device);
 
-    // カメラ初期化
-    Camera::InitializeCamera(window_width, window_height);
+	// カメラ初期化
+	Camera::InitializeCamera(window_width, window_height);
 
-    // パイプライン初期化
-    InitializeGraphicsPipeline();
+	// パイプライン初期化
+	InitializeGraphicsPipeline();
 
-    // テクスチャ読み込み
-    //LoadTexture();
+	// テクスチャ読み込み
+	//LoadTexture();
 
 
-    return true;
+	return true;
 }
 
-
-
-bool Player::InitializeGraphicsPipeline()
+bool St1_Boss::InitializeGraphicsPipeline()
 {
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
@@ -452,3 +398,4 @@ bool Player::InitializeGraphicsPipeline()
 
 	return true;
 }
+

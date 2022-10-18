@@ -7,7 +7,7 @@
 void GameClear::Initialize(/*DirectXCommon* dxCommon*/)
 {
 	////スプライト共通テクスチャ読み込み
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/Iroha.jpg");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/GameClear.png");
 
 	//	スプライトの生成
 	sprite = Sprite::Create(1, { 0, 0 }, false, false);

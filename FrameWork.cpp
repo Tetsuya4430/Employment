@@ -69,6 +69,9 @@ void FrameWork::Initialize()
 	//敵の弾オブジェクトの静的初期化
 	EnemyBullet::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
+	//ステージ1のボスオブジェクトの静的初期化
+	St1_Boss::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
+
 	//パーティクルの静的初期化
 	Particle::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
