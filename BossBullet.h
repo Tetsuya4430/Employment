@@ -9,9 +9,10 @@
 #include <d3dx12.h>
 #include"Input.h"
 
-class GameScene;
+//自機クラスの前方宣言
+class Player;
 
-class Enemy
+class BossBullet
 {
 private: // エイリアス
 // Microsoft::WRL::を省略
@@ -30,29 +31,18 @@ public:
 		XMMATRIX mat;	// ３Ｄ変換行列
 	};
 
-	//行動フェーズ
-	enum class Phase
-	{
-		Approach,	//接近
-		LeaveR,		//離脱(右側)
-		LeaveL,		//離脱(左側)
-		LeaveS,		//離脱(直進)
-		LeaveU,		//離脱(上)
-		LeaveD,		//離脱(下)
-	};
-
 	/// <summary>
 	/// 3Dオブジェクト生成
 	/// </summary>
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static std::unique_ptr<Enemy>Create(Model* model, Camera* camera, XMFLOAT3 pos);
+	static std::unique_ptr<BossBullet>Create(Model* model, Camera* camera, XMFLOAT3 pos, Player* player);
 
 public:
 
 	//インスタンス
-	static Enemy* GetInstance();
+	static BossBullet* GetInstance();
 
 	/// <summary>
 	/// 初期化
@@ -74,19 +64,10 @@ public:
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update();
-
-	//接近フェーズ初期化
-	void InitApproach();
-
-	//接近フェーズの更新関数
-	void UpdateApproach();
+	void Update(XMFLOAT3 PlayerPos, XMFLOAT3 EnemyPos);
 
 	//衝突検知コールバック関数
 	void OnCollision();
-
-	//ワールド座標を取得
-	XMFLOAT3 GetWorldPosition();
 
 	/// <summary>
 /// 静的初期化
@@ -98,6 +79,11 @@ public:
 /// <returns>成否</returns>
 	static bool StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height);
 
+	//デスフラグのゲッター
+	bool DeathGetter() const { return DeathFlag; }
+
+	// 座標の取得
+	const XMFLOAT3& GetPosition() { return position_B; }
 
 	/// <summary>
 	/// setter
@@ -106,12 +92,8 @@ public:
 
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
-	void SetGemeScene(GameScene* gameScene) { gameScene_ = gameScene; }
-
-	//getter
-
-	// 座標の取得
-	const XMFLOAT3& GetPosition() { return position; }
+	//プレイヤーのセッター
+	void SetPlayer(Player* player) { player_ = player; }
 
 private: // 静的メンバ変数
 // デバイス
@@ -123,9 +105,8 @@ private: // 静的メンバ変数
 	// パイプラインステートオブジェクト
 	static ComPtr<ID3D12PipelineState> pipelinestate;
 
-
-	////弾の発射間隔
-	//static const int BulletInterval = 60;
+	//弾の寿命
+	static const int LifeTimer = 60 * 2;
 
 	/// <summary>
 	/// グラフィックパイプライン生成
@@ -147,34 +128,28 @@ private: // メンバ変数
 	// ローカルワールド変換行列
 	XMMATRIX matWorld_;
 	// 親オブジェクト
-	Enemy* parent_ = nullptr;
+	BossBullet* parent_ = nullptr;
 
 	Input* input = nullptr;
 
-	//ゲームシーン
-	GameScene* gameScene_ = nullptr;
+	//プレイヤー
+	Player* player_ = nullptr;
 
 	//速度
-	float Speed = 0.4f;
+	float Speed = 5.0f;
 
-	//フェーズ
-	Phase phase_ = Phase::Approach;
+	//移動用ベクトル
+	XMFLOAT3 Vec = { 0.0f, 0.0f, 0.0f };
 
-	////発射タイマー
-	//int BulletTimer = 0;
+	//弾のデスタイマー
+	int DeathTimer = LifeTimer;
 
 
 public:
 	// ローカル座標
-	//XMFLOAT3 position_B = { 0,0,0 };
+	XMFLOAT3 position_B = { 0,0,0 };
 
-	//位置
-	XMFLOAT3 position = {0, 0, 0};
-
-	int DeathFlag = false;
-
-	static const int IntervalTime = 70;
-
-	int FireTime = 0;
+	//弾のデスフラグ
+	bool DeathFlag = false;
 };
 

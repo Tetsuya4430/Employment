@@ -23,7 +23,7 @@ void GameOver::Finalize()
 
 void GameOver::Update()
 {
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
+	if (Input::GetInstance()->TriggerKey(DIK_RETURN))
 	{
 		//ƒV[ƒ“Ø‚è‘Ö‚¦
 		SceneManager::GetInstance()->ChangeScene("TITLE");

@@ -48,6 +48,8 @@ void GameScene::Initialize()
 	model_Boss = Model::LoadFromObj("Boss");
 
 
+	
+
 	//敵の初期化
 	LoadEnemyPopData();
 	EnemyInit();
@@ -114,18 +116,21 @@ void GameScene::Update()
 	DebugText::GetInstance()->Print("Debug Text = 0", 0, 50, 2.0f);
 
 	
-
-	if (Input::GetInstance()->TriggerKey(DIK_C))
+	//シーン遷移
+	//敵のHPが0になったらゲームクリア
+	if (Boss)
 	{
-		//シーン切り替え
-		SceneManager::GetInstance()->ChangeScene("GAMECLEAR");
+		if (Boss->HP <= 0)
+		{
+			SceneManager::GetInstance()->ChangeScene("GAMECLEAR");
+		}
 	}
-
-	if (Input::GetInstance()->TriggerKey(DIK_O))
+		//プレイヤーのHPが0になったらゲームオーバー
+	if (P->HP <= 0)
 	{
-		//シーン切り替え
 		SceneManager::GetInstance()->ChangeScene("GAMEOVER");
 	}
+	
 
 	//3Dオブジェクトの更新
 
@@ -172,7 +177,27 @@ void GameScene::Update()
 		
 	}
 
-	//enemy->Update();
+	//ボスの更新
+	if (Boss)
+	{
+		if (Boss->DeathFlag == false)
+		{
+			Boss->Update();
+
+
+			Boss->FireTime--;
+
+			if (Boss->FireTime <= 0)
+			{
+				EnemyAttack(Boss->position);
+
+				//発射タイマーを初期化
+				Boss->FireTime = Boss->IntervalTime;
+			}
+
+		}
+	}
+
 
 	//弾更新
 	for (std::unique_ptr<Bullet>& bullet : bullets)
@@ -182,6 +207,13 @@ void GameScene::Update()
 
 	//敵の弾更新
 	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
+	{
+		//仮として引数をプレイヤーの座標にしている
+		bullet->Update(P->position_, P->position_);
+	}
+
+	//ボスの弾更新
+	for (std::unique_ptr<BossBullet>& bullet : bossbullets)
 	{
 		//仮として引数をプレイヤーの座標にしている
 		bullet->Update(P->position_, P->position_);
@@ -199,6 +231,15 @@ void GameScene::Update()
 	{
 			return Enemybullet->DeathGetter();
 	});
+
+	//ボス弾
+	bossbullets.remove_if([](std::unique_ptr<BossBullet>& Bossbullet)
+		{
+			return Bossbullet->DeathGetter();
+		});
+
+
+	//当たり判定
 
 	for (std::unique_ptr<Bullet>& bullet : bullets)
 	{
@@ -222,6 +263,7 @@ void GameScene::Update()
 		//自機と敵の弾当たり判定確認
 		if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
 		{
+			P->HP -= 1;
 			bullet->DeathFlag = true;
 		}
 	}
@@ -244,6 +286,20 @@ void GameScene::Update()
 		if (Boss->HP <= 0)
 		{
 			Boss->DeathFlag = true;
+		}
+	}
+
+	//ボスの弾とプレイヤーの当たり判定
+	if (Boss)
+	{
+		for (std::unique_ptr<BossBullet>& bullet : bossbullets)
+		{
+			//自機と敵の弾当たり判定確認
+			if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
+			{
+				P->HP -= 1;
+				bullet->DeathFlag = true;
+			}
 		}
 	}
 
@@ -297,11 +353,6 @@ void GameScene::Draw()
 		}
 	}
 
-	/*if (enemy->DeathFlag == false)
-	{
-		enemy->Draw();
-	}*/
-
 	//敵の描画
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
@@ -319,6 +370,12 @@ void GameScene::Draw()
 
 	//敵の弾描画
 	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
+	{
+		bullet->Draw();
+	}
+
+	//ボスの弾描画
+	for (std::unique_ptr<BossBullet>& bullet : bossbullets)
 	{
 		bullet->Draw();
 	}
@@ -344,6 +401,14 @@ void GameScene::EnemyInit()
 	{
 		enemy->FireTime = enemy->IntervalTime;
 	}
+}
+
+void GameScene::BossInit()
+{
+	//発射タイマーを初期化
+	//EnemyBulletTimer = BulletInterval;
+
+		Boss->FireTime = Boss->IntervalTime;
 }
 
 void GameScene::EnemyUpdate(XMFLOAT3 enemyPos)
@@ -401,6 +466,15 @@ void GameScene::EnemyAttack(XMFLOAT3 EnemyPos)
 		enemybullets.push_back(std::move(newBullet));
 
 		//enemybullets
+}
+
+void GameScene::BossAttack(XMFLOAT3 BossPos)
+{
+	//弾を生成し初期化
+	std::unique_ptr<BossBullet> newBullet = std::make_unique<BossBullet>();
+	newBullet = BossBullet::Create(model_Bullet, camera, BossPos, P);
+
+	bossbullets.push_back(std::move(newBullet));
 }
 
 void GameScene::LoadEnemyPopData()

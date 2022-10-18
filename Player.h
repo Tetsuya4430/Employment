@@ -147,5 +147,8 @@ private: // 静的メンバ変数
 	public:
 		// ローカル座標
 		XMFLOAT3 position_ = { 0,0,0 };
+
+		//プレイヤーのHP
+		int HP = 5;
 };
 

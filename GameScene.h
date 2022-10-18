@@ -8,6 +8,7 @@
 #include "EnemyBullet.h"
 #include "Enemy.h"
 #include "St1_Boss.h"
+#include "BossBullet.h"
 #include "ObjectManager.h"
 #include "Particle.h"
 #include "Part.h"
@@ -61,6 +62,9 @@ public:
 	//敵の初期化処理
 	void EnemyInit();
 
+	//ボスの初期化処理
+	void BossInit();
+
 	//敵の更新関数
 	void EnemyUpdate(XMFLOAT3 enemyPos);
 
@@ -69,6 +73,9 @@ public:
 
 	//敵の攻撃
 	void EnemyAttack(XMFLOAT3 EnemyPos);
+
+	//ボスの攻撃
+	void BossAttack(XMFLOAT3 BossPos);
 
 	//敵の発生データ読み込み
 	void LoadEnemyPopData();
@@ -111,6 +118,9 @@ private:
 
 	//敵発生コマンド
 	std::stringstream enemyPopCommands;
+
+	//ボスの弾
+	std::list<std::unique_ptr<BossBullet>> bossbullets;
 
 
 
@@ -161,12 +171,24 @@ private:
 	//敵の待機タイマー
 	int EnemyTimer = 0;
 
+	//ボスの弾発射タイマー
+	int BossBulletTimer = 0;
+
+	//ボスの待機フラグ
+	bool BossFlag = false;
+
+	//ボスの待機タイマー
+	int BossTimer = 0;
+
 	//csvファイルから敵の座標格納用変数
 	XMFLOAT3 Num = {0, 0, 0};
 
 	public:
 	//弾の発射間隔
 	static const int BulletInterval = 60;
+
+	//ボスの弾発射間隔
+	static const int BossBulletInterval = 5;
 
 
 	//テスト
