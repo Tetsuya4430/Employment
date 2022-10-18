@@ -63,8 +63,8 @@ bool Enemy::Initialize(XMFLOAT3 pos)
 	// nullptrチェック
 	assert(device);
 
-	//コントローラー初期化
-	InitInput();
+	////コントローラー初期化
+	//InitInput();
 
 	position = pos;
 
@@ -162,7 +162,15 @@ void Enemy::Update()
 		{
 			if (position.x == 0)
 			{
-				phase_ = Phase::LeaveS;
+				if (position.y >= 0)
+				{
+					phase_ = Phase::LeaveU;
+				}
+
+				else if (position.y < 0)
+				{
+					phase_ = Phase::LeaveD;
+				}
 			}
 
 			else if (position.x > 0)
@@ -211,6 +219,30 @@ void Enemy::Update()
 			position.z -= Speed;
 
 			if (position.z <= 0)
+			{
+				DeathFlag = true;
+			}
+
+			break;
+
+		case Phase::LeaveU:
+			//移動
+
+			position.y += Speed;
+
+			if (position.z >= 50)
+			{
+				DeathFlag = true;
+			}
+
+			break;
+
+		case Phase::LeaveD:
+			//移動
+
+			position.y -= Speed;
+
+			if (position.y <= -50)
 			{
 				DeathFlag = true;
 			}

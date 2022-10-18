@@ -37,6 +37,8 @@ public:
 		LeaveR,		//—£’E(‰E‘¤)
 		LeaveL,		//—£’E(¶‘¤)
 		LeaveS,		//—£’E(’¼i)
+		LeaveU,		//—£’E(ã)
+		LeaveD,		//—£’E(‰º)
 	};
 
 	/// <summary>

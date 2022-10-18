@@ -63,8 +63,6 @@ bool Bullet::Initialize(XMFLOAT3 pos)
     // nullptrチェック
     assert(device);
 
-    //コントローラー初期化
-    InitInput();
 
 	position_B = pos;
 

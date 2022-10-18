@@ -118,10 +118,16 @@ void GameScene::Update()
 
 	
 
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN))
+	if (Input::GetInstance()->TriggerKey(DIK_C))
 	{
 		//シーン切り替え
-		SceneManager::GetInstance()->ChangeScene("TITLE");
+		SceneManager::GetInstance()->ChangeScene("GAMECLEAR");
+	}
+
+	if (Input::GetInstance()->TriggerKey(DIK_O))
+	{
+		//シーン切り替え
+		SceneManager::GetInstance()->ChangeScene("GAMEOVER");
 	}
 
 	//3Dオブジェクトの更新
@@ -310,16 +316,16 @@ void GameScene::EnemyUpdate(XMFLOAT3 enemyPos)
 	EnemyBulletTimer--;
 	
 
-	for (std::unique_ptr<Enemy>& enemy : enemys)
-	{
-		if (EnemyBulletTimer <= 0 && enemy->DeathFlag == 0)
-		{
-			EnemyAttack(enemy->GetPosition());
+	//for (std::unique_ptr<Enemy>& enemy : enemys)
+	//{
+	//	if (EnemyBulletTimer <= 0 /*&& enemy->DeathFlag == 0*/)
+	//	{
+	//		EnemyAttack(/*enemy->position*/ enemyPos);
 
-			//発射タイマーを初期化
-			EnemyBulletTimer = BulletInterval;
-		}
-	}	
+	//		//発射タイマーを初期化
+	//		EnemyBulletTimer = BulletInterval;
+	//	}
+	//}	
 }
 
 void GameScene::Attack()
