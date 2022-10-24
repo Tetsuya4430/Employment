@@ -34,7 +34,7 @@ void GameClear::Update()
 
 
 	//Escキーでウィンドウを閉じる
-	if (Input::GetInstance()->TriggerKey(DIK_ESCAPE))	//ESCキーでウィンドウを閉じる
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE))	//ESCキーでウィンドウを閉じる
 	{
 		//endRequest_ = true;
 		return;

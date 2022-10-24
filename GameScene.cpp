@@ -32,7 +32,7 @@ void GameScene::Initialize()
 { 
 	////スプライト共通テクスチャ読み込み
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/BackGround.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(100, L"Resources/Image/Sana.png");
+	//SpriteCommon::GetInstance()->SpriteCommonLoadTexture(100, L"Resources/Image/Sana.png");
 
 	//	スプライトの生成
 	sprite = Sprite::Create(1, { 0, 0 }, false, false);
@@ -42,7 +42,7 @@ void GameScene::Initialize()
 
 	//OBJからモデルデータを読み込む
 	model_1 = Model::LoadFromObj("triangle_mat");
-	model_2 = Model::LoadFromObj("Box");
+	model_2 = Model::LoadFromObj("enemy2");
 	model_Bullet = Model::LoadFromObj("Bullet");
 	model_Enemy = Model::LoadFromObj("Enemy");
 	model_Boss = Model::LoadFromObj("Boss");
@@ -94,6 +94,9 @@ void GameScene::Initialize()
 
 
 	object1->PlayAnimation();
+
+	//演出タイマー初期化
+	WaitTimer = 0;
 }
 
 void GameScene::Finalize()
@@ -122,13 +125,30 @@ void GameScene::Update()
 	{
 		if (Boss->HP <= 0)
 		{
-			SceneManager::GetInstance()->ChangeScene("GAMECLEAR");
+			if (WaitTimer < 60)
+			{
+				WaitTimer += 1;
+			}
+
+			if (WaitTimer >= 60)
+			{
+				WaitTimer = 0;
+				SceneManager::GetInstance()->ChangeScene("GAMECLEAR");
+			}
 		}
 	}
 		//プレイヤーのHPが0になったらゲームオーバー
 	if (P->HP <= 0)
 	{
-		SceneManager::GetInstance()->ChangeScene("GAMEOVER");
+		if (WaitTimer < 60)
+		{
+			WaitTimer += 1;
+		}
+
+		if (WaitTimer >= 60)
+		{
+			SceneManager::GetInstance()->ChangeScene("GAMEOVER");
+		}
 	}
 	
 

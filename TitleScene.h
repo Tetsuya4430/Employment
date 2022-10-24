@@ -26,5 +26,7 @@ public:
 private:
 	DirectXCommon* dxCommon = nullptr;
 	Sprite* sprite = nullptr;
+
+	Sprite* start = nullptr;
 };
 

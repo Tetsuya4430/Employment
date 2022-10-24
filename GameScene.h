@@ -183,6 +183,9 @@ private:
 	//csvファイルから敵の座標格納用変数
 	XMFLOAT3 Num = {0, 0, 0};
 
+	//ボス撃破からの演出タイマー
+	int WaitTimer = 0;
+
 	public:
 	//弾の発射間隔
 	static const int BulletInterval = 60;

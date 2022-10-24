@@ -164,7 +164,6 @@ void Audio::PlayWave(const std::string& filename)
 	SoundData& soundData = it->second;
 
 	//波形フォーマットを元にSourceVoiceの生成
-	IXAudio2SourceVoice* pSourceVoice = nullptr;
 	result = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result));
 
@@ -178,4 +177,28 @@ void Audio::PlayWave(const std::string& filename)
 	// 波形データの再生
 	result = pSourceVoice->SubmitSourceBuffer(&buf);
 	result = pSourceVoice->Start();
+}
+
+void Audio::StopWave(const std::string& filename)
+{
+	std::map<std::string, SoundData>::iterator it = soundDatas.find(filename);
+
+	//未読み込みの検出
+	assert(it != soundDatas.end());
+
+	//サウンドデータの参照を取得
+	SoundData& soundData = it->second;
+
+
+	XAUDIO2_VOICE_STATE State;
+	soundData.pSourceVoice->GetState(&State);
+	if (State.BuffersQueued == 0)
+	{
+		return;
+	}
+
+	soundData.pSourceVoice->Stop(0);
+	soundData.pSourceVoice->FlushSourceBuffers();
+	soundData.pSourceVoice->SubmitSourceBuffer(&buf);
+
 }

@@ -8,9 +8,11 @@ void TitleScene::Initialize(/*DirectXCommon* dxCommon*/)
 {
 	////スプライト共通テクスチャ読み込み
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/Title.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(2, L"Resources/Image/GameStart.png");
 
 	//	スプライトの生成
 	sprite = Sprite::Create(1, { 0, 0 }, false, false);
+	start = Sprite::Create(2, { 0, 0 }, false, false);
 }
 
 void TitleScene::Finalize()
@@ -48,5 +50,7 @@ void TitleScene::Draw()
 
 	////スプライト描画
 	sprite->Draw();
+
+	//start->Draw();
 
 }
