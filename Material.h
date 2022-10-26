@@ -8,6 +8,7 @@
 #include <string>
 class Material
 {
+private:
 	// Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	// DirectX::を省略
@@ -17,15 +18,23 @@ class Material
 	using XMMATRIX = DirectX::XMMATRIX;
 
 public:
-	//定数バッファ用構造体B1
+	//定数バッファ用構造体
 	struct ConstBufferData //名前変えるかも
 	{
-		XMFLOAT3 ambient;	//アンビエント係数
-		short pad1;	//パディング
-		XMFLOAT3 diffuse;	//ディフーズ係数
-		short pad2;	//パディング
-		XMFLOAT3 specular;	//スペキュラー係数
-		float alpha;		//アルファ
+		//XMFLOAT3 ambient;	//アンビエント係数
+		//short pad1;	//パディング
+		//XMFLOAT3 diffuse;	//ディフーズ係数
+		//short pad2;	//パディング
+		//XMFLOAT3 specular;	//スペキュラー係数
+		//float alpha;		//アルファ
+	//	std::string name;	//マテリアル名
+		XMFLOAT3 ambient;	//アンビエント影響度
+		float pad1;
+		XMFLOAT3 diffuse;	//ディフューズ影響度
+		float pad2;
+		XMFLOAT3 specular;	//スペキュラー影響度
+		float alpha;	//アルファ
+		//std::string textureFilename;	//テクスチャファイル名
 	};
 
 	//静的メンバ関数
@@ -75,7 +84,7 @@ private:
 	//コンストラクタ
 	Material()
 	{
-		ambient = { 0.3f,0.3f, 0.3f };
+		ambient = { 0.3f, 0.3f, 0.3f };
 		diffuse = { 0.0f, 0.0f, 0.0f };
 		specular = { 0.0f, 0.0f, 0.0f };
 		alpha = 1.0f;

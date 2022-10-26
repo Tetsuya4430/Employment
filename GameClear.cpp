@@ -23,7 +23,7 @@ void GameClear::Finalize()
 
 void GameClear::Update()
 {
-	if (Input::GetInstance()->TriggerKey(DIK_RETURN))
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
 	{
 		//ƒV[ƒ“Ø‚è‘Ö‚¦
 		SceneManager::GetInstance()->ChangeScene("TITLE");

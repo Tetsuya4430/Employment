@@ -40,6 +40,9 @@ bool Object3d::StaticInitialize(ID3D12Device * device, ID3D12GraphicsCommandList
 	// パイプライン初期化
 	InitializeGraphicsPipeline();
 
+	//モデルの静的初期化
+	Model::StaticInitialize(device);
+
 	// テクスチャ読み込み
 	//LoadTexture();
 
