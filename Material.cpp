@@ -142,7 +142,7 @@ void Material::CreateConstantBuffer()
 		nullptr,
 		IID_PPV_ARGS(&constBuff));
 
-	if (FAILED(result))
+ 	if (FAILED(result))
 	{
 		assert(0);
 	}

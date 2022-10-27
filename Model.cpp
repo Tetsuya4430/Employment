@@ -17,6 +17,24 @@ const std::string Model::baseDirectory = "Resources/";
 ID3D12Device* Model::device = nullptr;
 UINT Model::descriptorHandleIncrementSize_ = 0;
 
+void Model::StaticInitialize(ID3D12Device* device)
+{
+	Model::device = device;
+
+	//メッシュの静的初期化
+	Mesh::StaticInitialize(device);
+}
+
+Model* Model::LoadFromObj(const std::string& modelname)
+{
+    Model* instance = new Model;
+
+	//OBJファイルからデータを読み込む
+	instance->Initialize(modelname);
+
+	return instance;
+}
+
 Model::~Model()
 {
 	for (auto m : meshes)
@@ -30,172 +48,6 @@ Model::~Model()
 		delete m.second;
 	}
 	materials.clear();
-}
-
-void Model::StaticInitialize(ID3D12Device* device)
-{
-	Model::device = device;
-
-	//メッシュの静的初期化
-	Mesh::StaticInitialize(device);
-}
-
-Model* Model::LoadFromObj(const std::string& modelname)
-{
-    Model* instance = new Model;
-
-	////デスクリプタヒープ生成
-	//instance->InitializeDescriptorHeap();
-
-	//OBJファイルからデータを読み込む
-	instance->Initialize(modelname);
-
-	////バッファ生成
-	//instance->CreateBuffers();
-
-	return instance;
-}
-
-void Model::LoadTexture()
-{
-	int textureIndex = 0;
-	string directoryPath = baseDirectory + name + "/";
-
-	for (auto& m : materials)
-	{
-		Material* material = m.second;
-
-		//テクスチャあり
-		if (material->textureFileName.size() > 0)
-		{
-			CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize_);
-			CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize_);
-
-			//マテリアルにテクスチャ読み込み
-			material->LoadTexture(directoryPath, cpuDescHandleSRV, gpuDescHandleSRV);
-
-			textureIndex++;
-		}
-		//テクスチャなし
-		else
-		{
-			CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize_);
-			CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize_);
-
-			//マテリアルにテクスチャ読み込み
-			material->LoadTexture(directoryPath, cpuDescHandleSRV, gpuDescHandleSRV);
-
-			textureIndex++;
-		}
-	}
-
-	//HRESULT result = S_FALSE;
-
-	//// WICテクスチャのロード
-	//TexMetadata metadata{};
-	//ScratchImage scratchImg{};
-
-	////ファイルパス結合
-	//std::string filepath = directoyPath + filename;
-
-	////ユニコード文字列に変換する
-	//wchar_t wfilepath[128];
-	//int iBufferSize = MultiByteToWideChar(CP_ACP, 0, filepath.c_str(), -1, wfilepath, _countof(wfilepath));
-
-	//result = LoadFromWICFile(
-	//	wfilepath, WIC_FLAGS_NONE,
-	//	&metadata, scratchImg);
-	//if (FAILED(result)) {
-	//	return result;
-	//}
-
-	//const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
-
-	//// リソース設定
-	//CD3DX12_RESOURCE_DESC texresDesc = CD3DX12_RESOURCE_DESC::Tex2D(
-	//	metadata.format,
-	//	metadata.width,
-	//	(UINT)metadata.height,
-	//	(UINT16)metadata.arraySize,
-	//	(UINT16)metadata.mipLevels
-	//);
-
-	//// テクスチャ用バッファの生成
-	//result = device->CreateCommittedResource(
-	//	&CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0),
-	//	D3D12_HEAP_FLAG_NONE,
-	//	&texresDesc,
-	//	D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
-	//	nullptr,
-	//	IID_PPV_ARGS(&texbuff_));
-	//if (FAILED(result)) {
-	//	return result;
-	//}
-
-	//// テクスチャバッファにデータ転送
-	//result = texbuff_->WriteToSubresource(
-	//	0,
-	//	nullptr, // 全領域へコピー
-	//	img->pixels,    // 元データアドレス
-	//	(UINT)img->rowPitch,  // 1ラインサイズ
-	//	(UINT)img->slicePitch // 1枚サイズ
-	//);
-	//if (FAILED(result)) {
-	//	return result;
-	//}
-
-	//// シェーダリソースビュー作成
-	//cpuDescHandleSRV_ = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap_->GetCPUDescriptorHandleForHeapStart(), 0, descriptorHandleIncrementSize_);
-	//gpuDescHandleSRV_ = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap_->GetGPUDescriptorHandleForHeapStart(), 0, descriptorHandleIncrementSize_);
-
-	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{}; // 設定構造体
-	//D3D12_RESOURCE_DESC resDesc = texbuff_->GetDesc();
-
-	//srvDesc.Format = resDesc.Format;
-	//srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	//srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-	//srvDesc.Texture2D.MipLevels = 1;
-
-	//device->CreateShaderResourceView(texbuff_.Get(), //ビューと関連付けるバッファ
-	//	&srvDesc, //テクスチャ設定情報
-	//	cpuDescHandleSRV_
-	//);
-
-	//return true;
-}
-
-void Model::Draw(ID3D12GraphicsCommandList* cmdList, UINT rootParamIndexMaterial)
-{
-	//// 頂点バッファの設定
-	//cmdList->IASetVertexBuffers(0, 1, &vbView_);
-	//// インデックスバッファの設定
-	//cmdList->IASetIndexBuffer(&ibView_);
-
-	////マテリアル用定数バッファビューをセット
-	//cmdList->SetGraphicsRootConstantBufferView(rootParamIndexMaterial, constBuffB1_->GetGPUVirtualAddress());
-
-	//// デスクリプタヒープの配列
-	//ID3D12DescriptorHeap* ppHeaps[] = { descHeap_.Get() };
-	//cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-	//// シェーダリソースビューをセット
-	//if (material.textureFilename.size() > 0)
-	//{
-	//	cmdList->SetGraphicsRootDescriptorTable(2, gpuDescHandleSRV_);
-	//}
-
-	//// 描画コマンド
-	//cmdList->DrawIndexedInstanced(((UINT)indices_.size()), 1, 0, 0, 0);
-
-	// デスクリプタヒープの配列
-	ID3D12DescriptorHeap* ppHeaps[] = { descHeap.Get() };
-	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-	//全メッシュを描画
-	for (auto& mesh : meshes)
-	{
-		mesh->Draw(cmdList);
-	}
 }
 
 void Model::Initialize(const std::string& modelname)
@@ -414,73 +266,48 @@ void Model::Initialize(const std::string& modelname)
 			}
 		}
 	}
-		//ファイルを閉じる
-		file.close();
+	//ファイルを閉じる
+	file.close();
 
-		//コンテナに登録
-		meshes.emplace_back(mesh);
+	//コンテナに登録
+	meshes.emplace_back(mesh);
 
-		//メッシュのマテリアルチェック
-		for (auto& m : meshes)
-		{
-			//マテリアルの割り当てがない
-			if (m->GetMaterial() == nullptr)
-			{
-				if (defaultMaterial == nullptr)
-				{
-					//デフォルトマテリアルを生成
-					defaultMaterial = Material::Create();
-					defaultMaterial->name = "no material";
-					materials.emplace(defaultMaterial->name, defaultMaterial);
-				}
-				//デフォルトマテリアルをセット
-				m->SetMaterial(defaultMaterial);
-			}
-		}
-
-		//メッシュバッファの生成
-		for (auto& m : meshes)
-		{
-			m->CreateBuffers();
-		}
-
-		//マテリアルの数値を定数バッファに反映
-		for (auto& m : materials)
-		{
-			m.second->Update();
-		}
-
-		//デスクリプタヒープの生成
-		InitializeDescriptorHeap();
-
-		//テクスチャの読み込み
-		LoadTexture();
-	}
-
-void Model::InitializeDescriptorHeap()
-{
-	HRESULT result = S_FALSE;
-
-	//マテリアルの数
-	size_t count = materials.size();
-
-	// デスクリプタヒープを生成	
-	if (count > 0)
+	//メッシュのマテリアルチェック
+	for (auto& m : meshes)
 	{
-		D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
-		descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;//シェーダから見えるように
-		descHeapDesc.NumDescriptors = (UINT)count; // シェーダーリソースビュー1つ
-		result = device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
-		if (FAILED(result)) {
-			assert(0);
+		//マテリアルの割り当てがない
+		if (m->GetMaterial() == nullptr)
+		{
+			if (defaultMaterial == nullptr)
+			{
+				//デフォルトマテリアルを生成
+				defaultMaterial = Material::Create();
+				defaultMaterial->name = "no material";
+				materials.emplace(defaultMaterial->name, defaultMaterial);
+			}
+			//デフォルトマテリアルをセット
+			m->SetMaterial(defaultMaterial);
 		}
 	}
 
-	// デスクリプタサイズを取得
-	descriptorHandleIncrementSize_ = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-}
+	//メッシュバッファの生成
+	for (auto& m : meshes)
+	{
+		m->CreateBuffers();
+	}
 
+	//マテリアルの数値を定数バッファに反映
+	for (auto& m : materials)
+	{
+		m.second->Update();
+	}
+
+	//デスクリプタヒープの生成
+	InitializeDescriptorHeap();
+
+	//テクスチャの読み込み
+	LoadTexture();
+}
 
 void Model::LoadMaterial(const std::string& directoryPath, const std::string& filename)
 {
@@ -597,6 +424,79 @@ void Model::AddMaterial(Material* material)
 	//コンテナに登録
 	materials.emplace(material->name, material);
 }
+
+void Model::InitializeDescriptorHeap()
+{
+	HRESULT result = S_FALSE;
+
+	//マテリアルの数
+	size_t count = materials.size();
+
+	// デスクリプタヒープを生成	
+	if (count > 0)
+	{
+		D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
+		descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;//シェーダから見えるように
+		descHeapDesc.NumDescriptors = (UINT)count; // シェーダーリソースビュー1つ
+		result = device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
+		if (FAILED(result)) {
+			assert(0);
+		}
+	}
+
+	// デスクリプタサイズを取得
+	descriptorHandleIncrementSize_ = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+}
+
+void Model::LoadTexture()
+{
+	int textureIndex = 0;
+	string directoryPath = baseDirectory + name + "/";
+
+	for (auto& m : materials)
+	{
+		Material* material = m.second;
+
+		//テクスチャあり
+		if (material->textureFileName.size() > 0)
+		{
+			CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize_);
+			CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize_);
+
+			//マテリアルにテクスチャ読み込み
+			material->LoadTexture(directoryPath, cpuDescHandleSRV, gpuDescHandleSRV);
+
+			textureIndex++;
+		}
+		//テクスチャなし
+		else
+		{
+			CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize_);
+			CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), textureIndex, descriptorHandleIncrementSize_);
+
+			//マテリアルにテクスチャ読み込み
+			material->LoadTexture(baseDirectory, cpuDescHandleSRV, gpuDescHandleSRV);
+
+			textureIndex++;
+		}
+	}
+
+}
+
+void Model::Draw(ID3D12GraphicsCommandList* cmdList, UINT rootParamIndexMaterial)
+{
+	// デスクリプタヒープの配列
+	ID3D12DescriptorHeap* ppHeaps[] = { descHeap.Get() };
+	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+
+	//全メッシュを描画
+	for (auto& mesh : meshes)
+	{
+		mesh->Draw(cmdList);
+	}
+}
+
 
 void Model::CreateBuffers()
 {

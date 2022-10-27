@@ -55,6 +55,12 @@ void Mesh::CreateBuffers()
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
 	vertBuff->Unmap(0, nullptr);
 
+	if (SUCCEEDED(result))
+	{
+		std::copy(vertices.begin(), vertices.end(), vertMap);
+		vertBuff->Unmap(0, nullptr);
+	}
+
 	//頂点バッファビューの生成
 	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
 	vbView.SizeInBytes = sizeVB;
@@ -90,12 +96,12 @@ void Mesh::CreateBuffers()
 	{
 		std::copy(indices.begin(), indices.end(), indexMap);
 		indexBuff->Unmap(0, nullptr);
+	}
 
 		//インデックスバッファビューの作成
 		ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
 		ibView.Format = DXGI_FORMAT_R16_UINT;
 		ibView.SizeInBytes = sizeIB;
-	}
 }
 
 void Mesh::Draw(ID3D12GraphicsCommandList* cmdList)
@@ -106,7 +112,7 @@ void Mesh::Draw(ID3D12GraphicsCommandList* cmdList)
 	cmdList->IASetIndexBuffer(&ibView);
 
 	//シェーダーリソースビューをセット
-	ID3D12Resource* constbuff = material->GetConstBuffer();
+	 cmdList->SetGraphicsRootDescriptorTable(2,  material->GetGpuHandle());
 
 	//マテリアル定数バッファをセット
 	ID3D12Resource* constBuff = material->GetConstBuffer();

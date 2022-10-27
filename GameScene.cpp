@@ -20,7 +20,7 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
-	delete(object1);
+	//delete(object1);
 	delete(model1);
 	delete(postEffect);
 	delete(P);
@@ -41,7 +41,7 @@ void GameScene::Initialize()
 	postEffect = PostEffect::Create(100, { 0, 0 }, false, false);
 
 	//OBJからモデルデータを読み込む
-	model_1 = Model::LoadFromObj("triangle_mat");
+	//model_1 = Model::LoadFromObj("triangle_mat");
 	model_2 = Model::LoadFromObj("Box");
 	model_Bullet = Model::LoadFromObj("Bullet");
 	model_Enemy = Model::LoadFromObj("Enemy");
@@ -58,31 +58,31 @@ void GameScene::Initialize()
 	//3Dオブジェクト生成
 	P = Player::Create(model_2, camera);
 
-	part = Part::Create(model_1, camera);
+	//part = Part::Create(model_1, camera);
 
 	//敵の弾に自キャラにアドレスを渡す
 	//enemybullets
 
-		//デバイスをセット
-		Fbx3d::SetDevice(dxCommon->GetDev());
-		//カメラセット
-		Fbx3d::SetCamera(camera);
-		//グラフィックスパイプラインを生成
-		Fbx3d::CreateGraphicsPipeline();
+		////デバイスをセット
+		//Fbx3d::SetDevice(dxCommon->GetDev());
+		////カメラセット
+		//Fbx3d::SetCamera(camera);
+		////グラフィックスパイプラインを生成
+		//Fbx3d::CreateGraphicsPipeline();
 
 		//モデルを指定してFBXファイルを読み込み
-		model1 = FbxLoader::GetInstance()->LoadModelFromFile("boneTest");
+	//	model1 = FbxLoader::GetInstance()->LoadModelFromFile("boneTest");
 
 		//3dオブジェクト生成とモデルのセット
-		object1 = new Fbx3d;
+	/*	object1 = new Fbx3d;
 		object1->Initialize();
 		object1->SetModel(model1);
 
-		object1->SetPosition({ 100.0f, 0.0f, 0.0f });
+		object1->SetPosition({ 100.0f, 0.0f, 0.0f });*/
 
-		//パーティクルの生成
-		particle = Particle::Create(camera);
-		particle->Update();
+		////パーティクルの生成
+		//particle = Particle::Create(camera);
+		//particle->Update();
 
 		
 
@@ -93,7 +93,7 @@ void GameScene::Initialize()
 	Audio::GetInstance()->LoadWave("Alarm01.wav");
 
 
-	object1->PlayAnimation();
+	/*object1->PlayAnimation();*/
 
 	//演出タイマー初期化
 	WaitTimer = 0;
@@ -105,18 +105,18 @@ void GameScene::Finalize()
 	delete sprite;
 
 	//モデルの解放
-	delete model_1;
+	//delete model_1;
 	delete model_2;
 }
 
 void GameScene::Update()
 {
 	//---デバッグテキスト関係---//
-	//X座標、Y座標を指定して表示
-	DebugText::GetInstance()->Print("Debug Text", 0, 0);
+	////X座標、Y座標を指定して表示
+	//DebugText::GetInstance()->Print("Debug Text", 0, 0);
 
-	//X座標、Y座標、縮尺を指定して表示
-	DebugText::GetInstance()->Print("Debug Text = 0", 0, 50, 2.0f);
+	////X座標、Y座標、縮尺を指定して表示
+	//DebugText::GetInstance()->Print("Debug Text = 0", 0, 50, 2.0f);
 
 	
 	//シーン遷移
@@ -325,13 +325,13 @@ void GameScene::Update()
 
 
 	//FBXオブジェクトの更新
-	object1->Update();
+	//object1->Update();
 	
 	//スプライトの更新
 	sprite->Update();
 
 	//パーティクルの更新
-	particle->Update();
+	//particle->Update();
 
 	//part->Update();
 
@@ -360,6 +360,8 @@ void GameScene::Draw()
 	////スプライト描画
 	sprite->Draw();
 
+	/*SpriteCommon::PostDraw();*/
+	
 	//3Dオブジェクトの描画前処理
 	Object3d::PreDraw();
 
@@ -404,8 +406,8 @@ void GameScene::Draw()
 	//part->Draw();
 
 	//FBXオブジェクトの描画
-	object1->Draw(cmdList);
-	
+	//object1->Draw(cmdList);
+
 
 	//3Dオブジェクトの描画後処理
 	Object3d::PostDraw();

@@ -21,13 +21,6 @@ public:
 	//定数バッファ用構造体
 	struct ConstBufferData //名前変えるかも
 	{
-		//XMFLOAT3 ambient;	//アンビエント係数
-		//short pad1;	//パディング
-		//XMFLOAT3 diffuse;	//ディフーズ係数
-		//short pad2;	//パディング
-		//XMFLOAT3 specular;	//スペキュラー係数
-		//float alpha;		//アルファ
-	//	std::string name;	//マテリアル名
 		XMFLOAT3 ambient;	//アンビエント影響度
 		float pad1;
 		XMFLOAT3 diffuse;	//ディフューズ影響度
