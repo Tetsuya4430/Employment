@@ -38,7 +38,7 @@ void GameScene::Initialize()
 	sprite = Sprite::Create(1, { 0, 0 }, false, false);
 
 	//ポストエフェクトの生成
-	postEffect = PostEffect::Create(100, { 0, 0 }, false, false);
+	//postEffect = PostEffect::Create(100, { 0, 0 }, false, false);
 
 	//OBJからモデルデータを読み込む
 	//model_1 = Model::LoadFromObj("triangle_mat");
