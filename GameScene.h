@@ -98,6 +98,7 @@ private:
 	Model* model_Bullet = nullptr;
 	Model* model_Enemy = nullptr;
 	Model* model_Boss = nullptr;
+	Model* model_sphere = nullptr;
 
 	FbxModel* model1 = nullptr;
 	Fbx3d* object1 = nullptr;
@@ -134,10 +135,12 @@ private:
 	std::unique_ptr<ObjectManager> objectManager_4;*/
 
 
-	Object3d* Empty = nullptr;
+	/*Object3d* Empty = nullptr;
 	Object3d* BulletObj = nullptr;
-	Object3d* player = nullptr;
+	Object3d* player = nullptr;*/
 	//Object3d* Enemy = nullptr;
+
+	Object3d* CelestialSphere = nullptr;
 
 	//ÉvÉåÉCÉÑÅ[
 	Player* P = nullptr;

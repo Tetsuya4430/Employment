@@ -46,6 +46,7 @@ void GameScene::Initialize()
 	model_Bullet = Model::LoadFromObj("Bullet");
 	model_Enemy = Model::LoadFromObj("Enemy");
 	model_Boss = Model::LoadFromObj("Boss");
+	model_sphere = Model::LoadFromObj("CelestialSphere");
 
 
 	
@@ -57,6 +58,9 @@ void GameScene::Initialize()
 
 	//3Dオブジェクト生成
 	P = Player::Create(model_2, camera);
+
+	CelestialSphere = Object3d::Create(model_sphere, camera);
+	CelestialSphere->SetScale({100, 100, 100});
 
 	//part = Part::Create(model_1, camera);
 
@@ -323,6 +327,8 @@ void GameScene::Update()
 		}
 	}
 
+	//天球更新
+	CelestialSphere->Update();
 
 	//FBXオブジェクトの更新
 	//object1->Update();
@@ -402,6 +408,8 @@ void GameScene::Draw()
 		bullet->Draw();
 	}
 
+	//天球の描画
+	CelestialSphere->Draw();
 
 	//part->Draw();
 
