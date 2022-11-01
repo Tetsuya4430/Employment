@@ -14,6 +14,8 @@
 
 using namespace std;
 
+//テスト用
+
 GameScene::GameScene()
 {
 }
