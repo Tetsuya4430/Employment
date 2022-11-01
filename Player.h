@@ -144,6 +144,21 @@ private: // 静的メンバ変数
 	//プレイヤーの移動フラグ
 	int MoveFlag = 0;
 
+	//プレイヤーイージング用変数
+	float dx = 0;
+	float PointPos = -50;
+
+	//回避フラグ
+	bool Avoidanceflag_X = false;
+	bool Avoidanceflag_Y = false;
+
+	//回避タイマー
+	int AvoidanceTimer = 0;
+
+	//回避距離定数
+	const int AvoidDistance_X = 20;
+	const int AvoidDistance_Y = 10;
+
 	public:
 		// ローカル座標
 		XMFLOAT3 position_ = { 0,0,0 };

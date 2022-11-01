@@ -144,119 +144,221 @@ void Player::Update()
 
 	//プレイヤーの移動
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
-	{ 
-		MoveFlag = 1;
-		if (Input::GetInstance()->PushKey(DIK_D))
-		{
-			if (position_.x <= 45)
-			{
-				position_.x += 0.5f;
-			}
-
-			if (RotlimR < rotation_.z)
-			{
-				rotation_.z -= 0.3f;
-			}
-		}
-
-		if (Input::GetInstance()->PushKey(DIK_A))
+	{
+		if (Avoidanceflag_X == false || Avoidanceflag_Y == false)
 		{
 			MoveFlag = 1;
+			if (Input::GetInstance()->PushKey(DIK_D))
+			{
+				if (position_.x <= 45)
+				{
+					position_.x += 0.5f;
+				}
+
+				if (RotlimR < rotation_.z)
+				{
+					rotation_.z -= 0.3f;
+				}
+			}
+
 			if (Input::GetInstance()->PushKey(DIK_A))
 			{
-				if (position_.x >= -45)
+				MoveFlag = 1;
+				if (Input::GetInstance()->PushKey(DIK_A))
 				{
+					if (position_.x >= -45)
+					{
+						position_.x -= 0.5f;
+					}
+
+					if (RotlimL > rotation_.z)
+					{
+						rotation_.z += 0.3f;
+					}
+				}
+
+			}
+
+			if (Input::GetInstance()->PushKey(DIK_W))
+			{
+				if (position_.y <= 20)
+				{
+					position_.y += 0.5f;
+				}
+			}
+
+			if (Input::GetInstance()->PushKey(DIK_S))
+			{
+				if (position_.y >= -25)
+				{
+					position_.y -= 0.5f;
+				}
+			}
+
+
+			else
+			{
+				MoveFlag = 0;
+			}
+
+			//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
+			if (MoveFlag == 0)
+			{
+				if (rotation_.z > 0)
+				{
+					rotation_.z -= 0.5f;
+				}
+
+				if (rotation_.z < 0)
+				{
+					rotation_.z += 0.5f;
+				}
+			}
+
+
+			if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))
+			{
+				MoveFlag = 1;
+				if (IsButtonPush(ButtonKind::RightButton))
+				{
+					position_.x += 0.5f;
+					if (RotlimR < rotation_.z)
+					{
+						rotation_.z -= 0.3f;
+					}
+				}
+
+				if (IsButtonPush(ButtonKind::LeftButton))
+				{
+					MoveFlag = 1;
 					position_.x -= 0.5f;
+					if (RotlimL > rotation_.z)
+					{
+						rotation_.z += 0.3f;
+					}
 				}
 
-				if (RotlimL > rotation_.z)
+				if (IsButtonPush(ButtonKind::UpButton))
 				{
-					rotation_.z += 0.3f;
+					position_.y += 0.5f;
 				}
-			}
 
-		}
-
-		if (Input::GetInstance()->PushKey(DIK_W))
-		{
-			if (position_.y <= 20)
-			{
-				position_.y += 0.5f;
-			}
-		}
-
-		if (Input::GetInstance()->PushKey(DIK_S))
-		{
-			if (position_.y >= -25)
-			{
-				position_.y -= 0.5f;
-			}
-		}
-	}
-
-	else
-	{
-		MoveFlag = 0;
-	}
-
-	//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
-	if (MoveFlag == 0)
-	{
-		if (rotation_.z > 0)
-		{
-			rotation_.z -= 0.5f;
-		}
-
-		if (rotation_.z < 0)
-		{
-			rotation_.z += 0.5f;
-		}
-	}
-
-
-	if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))
-	{
-		MoveFlag = 1;
-		if (IsButtonPush(ButtonKind::RightButton))
-		{
-			position_.x += 0.5f;
-			if (RotlimR < rotation_.z)
-			{
-				rotation_.z -= 0.3f;
-			}
-		}
-
-		if (IsButtonPush(ButtonKind::LeftButton))
-		{
-			MoveFlag = 1;
-				position_.x -= 0.5f;
-				if (RotlimL > rotation_.z)
+				if (IsButtonPush(ButtonKind::DownButton))
 				{
-					rotation_.z += 0.3f;
+					position_.y -= 0.5f;
 				}
-		}
+			}
 
-		if (IsButtonPush(ButtonKind::UpButton))
-		{
-			position_.y += 0.5f;
-		}
+			else
+			{
+				MoveFlag = 0;
+			}
 
-		if (IsButtonPush(ButtonKind::DownButton))
-		{
-			position_.y -= 0.5f;
+
+
+
+			//コントローラーの押下情報更新
+			UpdateInput();
 		}
 	}
 
-	else
+	//回避モーション
+
+	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 	{
-		MoveFlag = 0;
+		//右回避
+		if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_D) && Avoidanceflag_X == false)
+		{
+			PointPos = position_.x + AvoidDistance_X;
+
+			Avoidanceflag_X = true;
+
+		}
+
+		//左回避
+		if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_A) && Avoidanceflag_X == false)
+		{
+			PointPos = position_.x - AvoidDistance_X;
+
+			Avoidanceflag_X = true;
+
+		}
+
+		//上回避
+		if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_W) && Avoidanceflag_Y == false)
+		{
+			PointPos = position_.y + AvoidDistance_Y;
+
+			Avoidanceflag_Y = true;
+
+		}
+
+		//下回避
+		if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_S) && Avoidanceflag_Y == false)
+		{
+			PointPos = position_.y - AvoidDistance_Y;
+
+			Avoidanceflag_Y = true;
+
+		}
+	}
+
+	//実際の回避処理
+	if (Avoidanceflag_X == true)
+	{
+		AvoidanceTimer += 1;
+
+		position_.x += dx;
+		dx = (PointPos - position_.x) / 10.0f;
+		position_.x += dx;
+
+		if (AvoidanceTimer >= 20)
+		{
+			AvoidanceTimer = 0;
+			Avoidanceflag_X = false;
+		}
+	}
+
+	if (Avoidanceflag_Y == true)
+	{
+		AvoidanceTimer += 1;
+
+		position_.y += dx;
+		dx = (PointPos - position_.y) / 10.0f;
+		position_.y += dx;
+
+		if (AvoidanceTimer >= 20)
+		{
+			AvoidanceTimer = 0;
+			Avoidanceflag_Y = false;
+		}
 	}
 
 
+	//プレイヤーが画面買外に進出しようとするときは押し戻す
+	//右側
+	if (position_.x >= 45)
+	{
+		position_.x = 45;
+	}
 
+	//左側
+	if (position_.x <= -45)
+	{
+		position_.x = -45;
+	}
 
-	//コントローラーの押下情報更新
-	UpdateInput();
+	//上側
+	if (position_.y >= 20)
+	{
+		position_.y = 20;
+	}
+
+	//下側
+	if (position_.y <= -20)
+	{
+		position_.y = -20;
+	}
 }
 
 void Player::OnCollision()
