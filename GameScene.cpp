@@ -42,7 +42,7 @@ void GameScene::Initialize()
 
 	//OBJからモデルデータを読み込む
 	//model_1 = Model::LoadFromObj("triangle_mat");
-	model_2 = Model::LoadFromObj("Box");
+	model_2 = Model::LoadFromObj("Player");
 	model_Bullet = Model::LoadFromObj("Bullet");
 	model_Enemy = Model::LoadFromObj("Enemy");
 	model_Boss = Model::LoadFromObj("Boss");

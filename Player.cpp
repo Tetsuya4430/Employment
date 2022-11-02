@@ -204,14 +204,17 @@ void Player::Update()
 			//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
 			if (MoveFlag == 0)
 			{
-				if (rotation_.z > 0)
+				if (Avoidanceflag_X == false && Avoidanceflag_Y == false)
 				{
-					rotation_.z -= 0.5f;
-				}
+					if (rotation_.z > 0)
+					{
+						rotation_.z -= 0.5f;
+					}
 
-				if (rotation_.z < 0)
-				{
-					rotation_.z += 0.5f;
+					if (rotation_.z < 0)
+					{
+						rotation_.z += 0.5f;
+					}
 				}
 			}
 
@@ -263,73 +266,116 @@ void Player::Update()
 	}
 
 	//回避モーション
-
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 	{
-		//右回避
-		if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_D) && Avoidanceflag_X == false)
+
+		if (AvoidanceTimer_X == 0)
 		{
-			PointPos = position_.x + AvoidDistance_X;
+			//右回避
+			if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_D) && Avoidanceflag_X == false)
+			{
+				PointPos = position_.x + AvoidDistance_X;
+				RotFlag_R = true;
 
-			Avoidanceflag_X = true;
+				Avoidanceflag_X = true;
+			}
 
+			//左回避
+			if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_A) && Avoidanceflag_X == false)
+			{
+				PointPos = position_.x - AvoidDistance_X;
+				RotFlag_L = true;
+
+				Avoidanceflag_X = true;
+			}
 		}
 
-		//左回避
-		if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_A) && Avoidanceflag_X == false)
+		if (AvoidanceTimer_Y == 0)
 		{
-			PointPos = position_.x - AvoidDistance_X;
+			//上回避
+			if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_W) && Avoidanceflag_Y == false)
+			{
+				PointPos = position_.y + AvoidDistance_Y;
 
-			Avoidanceflag_X = true;
+				Avoidanceflag_Y = true;
+			}
 
+			//下回避
+			if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_S) && Avoidanceflag_Y == false)
+			{
+				PointPos = position_.y - AvoidDistance_Y;
+
+				Avoidanceflag_Y = true;
+			}
 		}
+	}
 
-		//上回避
-		if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_W) && Avoidanceflag_Y == false)
-		{
-			PointPos = position_.y + AvoidDistance_Y;
+	//斜め回避は受け付けない
+	if (Input::GetInstance()->PushKey(DIK_W) && Input::GetInstance()->PushKey(DIK_D))
+	{
+		Avoidanceflag_X = false;
+		Avoidanceflag_Y = false;
+	}
 
-			Avoidanceflag_Y = true;
+	if (Input::GetInstance()->PushKey(DIK_W) && Input::GetInstance()->PushKey(DIK_A))
+	{
+		Avoidanceflag_X = false;
+		Avoidanceflag_Y = false;
+	}
 
-		}
+	if (Input::GetInstance()->PushKey(DIK_S) && Input::GetInstance()->PushKey(DIK_D))
+	{
+		Avoidanceflag_X = false;
+		Avoidanceflag_Y = false;
+	}
 
-		//下回避
-		if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_S) && Avoidanceflag_Y == false)
-		{
-			PointPos = position_.y - AvoidDistance_Y;
-
-			Avoidanceflag_Y = true;
-
-		}
+	if (Input::GetInstance()->PushKey(DIK_S) && Input::GetInstance()->PushKey(DIK_A))
+	{
+		Avoidanceflag_X = false;
+		Avoidanceflag_Y = false;
 	}
 
 	//実際の回避処理
 	if (Avoidanceflag_X == true)
 	{
-		AvoidanceTimer += 1;
+		AvoidanceTimer_X += 1;
 
 		position_.x += dx;
 		dx = (PointPos - position_.x) / 10.0f;
 		position_.x += dx;
 
-		if (AvoidanceTimer >= 20)
+		if (RotFlag_R == true)
 		{
-			AvoidanceTimer = 0;
+			rotation_.z -= 10;
+		}
+
+		else if (RotFlag_L == true)
+		{
+			rotation_.z += 10;
+		}
+
+		if (AvoidanceTimer_X >= 20)
+		{
+			AvoidanceTimer_X = 0;
+			rotation_.z = 0;
+			RotFlag_R = false;
+			RotFlag_L = false;
 			Avoidanceflag_X = false;
 		}
+
 	}
 
 	if (Avoidanceflag_Y == true)
 	{
-		AvoidanceTimer += 1;
+		AvoidanceTimer_Y += 1;
 
 		position_.y += dx;
 		dx = (PointPos - position_.y) / 10.0f;
 		position_.y += dx;
 
-		if (AvoidanceTimer >= 20)
+		if (AvoidanceTimer_Y >= 20)
 		{
-			AvoidanceTimer = 0;
+			AvoidanceTimer_Y = 0;
 			Avoidanceflag_Y = false;
 		}
 	}

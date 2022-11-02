@@ -9,6 +9,7 @@
 #include <DirectXMath.h>
 #include <d3dx12.h>
 #include"Input.h"
+#include "Easing.h"
 
 
 class Player 
@@ -148,16 +149,24 @@ private: // 静的メンバ変数
 	float dx = 0;
 	float PointPos = -50;
 
+	//回避開始時の自機の座標を格納する変数
+	float AvoidStart_X = 0;
+
 	//回避フラグ
 	bool Avoidanceflag_X = false;
 	bool Avoidanceflag_Y = false;
 
 	//回避タイマー
-	int AvoidanceTimer = 0;
+	int AvoidanceTimer_X = 0;
+	int AvoidanceTimer_Y = 0;
 
 	//回避距離定数
 	const int AvoidDistance_X = 20;
 	const int AvoidDistance_Y = 10;
+
+	//回避旋回方向フラグ
+	bool RotFlag_R = false;
+	bool RotFlag_L = false;
 
 	public:
 		// ローカル座標
