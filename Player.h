@@ -164,9 +164,20 @@ private: // 静的メンバ変数
 	const int AvoidDistance_X = 20;
 	const int AvoidDistance_Y = 10;
 
+	//回転距離定数
+	const float RoleDistance = 360;
+
+	//回転格納変数
+	float RolePos = 0;
+
+	float rx = 0;
+
 	//回避旋回方向フラグ
 	bool RotFlag_R = false;
 	bool RotFlag_L = false;
+
+	//回避タイム
+	const float AvoidCount = 10.0f;
 
 	public:
 		// ローカル座標

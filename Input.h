@@ -3,7 +3,7 @@
 #include <wrl.h>
 #include "WinApp.h"
 
-#define SIRECTINPUT_VERSION 0x0000	//DirectIputのバージョン指定
+#define DIRECTINPUT_VERSION 0x0800	//DirectIputのバージョン指定
 #include <dinput.h>
 
 //入力

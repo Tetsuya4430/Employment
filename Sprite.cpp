@@ -68,10 +68,10 @@ void Sprite::Initialize(UINT texNumber, DirectX::XMFLOAT2 anchorpoint, bool isFl
 	);
 
 	//---頂点バッファへのデータ転送---//
-	//VertexPosUv* vertMap = nullptr;
-	//result = vertBuff_->Map(0, nullptr, (void**)&vertMap);
-	//memcpy(vertMap, vertices, sizeof(vertices));
-	//vertBuff_->Unmap(0, nullptr);
+	VertexPosUv* vertMap = nullptr;
+	result = vertBuff_->Map(0, nullptr, (void**)&vertMap);
+	memcpy(vertMap, vertices, sizeof(vertices));
+	vertBuff_->Unmap(0, nullptr);
 
 	TransferVertexBuffer();
 

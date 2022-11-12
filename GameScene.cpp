@@ -32,10 +32,12 @@ void GameScene::Initialize()
 { 
 	////スプライト共通テクスチャ読み込み
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/BackGround.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(2, L"Resources/Image/LifeOverlay.png");
 	//SpriteCommon::GetInstance()->SpriteCommonLoadTexture(100, L"Resources/Image/Sana.png");
 
 	//	スプライトの生成
 	sprite = Sprite::Create(1, { 0, 0 }, false, false);
+	UI = Sprite::Create(2, { 0, 0 }, false, false);
 
 	//ポストエフェクトの生成
 	//postEffect = PostEffect::Create(100, { 0, 0 }, false, false);
@@ -107,6 +109,7 @@ void GameScene::Finalize()
 {
 	//スプライト解放
 	delete sprite;
+	delete UI;
 
 	//モデルの解放
 	//delete model_1;
@@ -335,6 +338,7 @@ void GameScene::Update()
 	
 	//スプライトの更新
 	sprite->Update();
+	UI->Update();
 
 	//パーティクルの更新
 	//particle->Update();
@@ -364,7 +368,8 @@ void GameScene::Draw()
 	postEffect->PreDraw();
 
 	////スプライト描画
-	sprite->Draw();
+	//sprite->Draw();
+	UI->Draw();
 
 	/*SpriteCommon::PostDraw();*/
 	
@@ -409,7 +414,7 @@ void GameScene::Draw()
 	}
 
 	//天球の描画
-	CelestialSphere->Draw();
+	//CelestialSphere->Draw();
 
 	//part->Draw();
 
@@ -476,7 +481,7 @@ void GameScene::EnemyAttack(XMFLOAT3 EnemyPos)
 	
 		//弾を生成し初期化
 		std::unique_ptr<EnemyBullet> newBullet = std::make_unique<EnemyBullet>();
-		newBullet = EnemyBullet::Create(model_Bullet, camera, EnemyPos, P);
+		newBullet = EnemyBullet::Create(model_Bullet, camera, EnemyPos, P->position_);
 
 		/*newBullet->position_B.x = EnemyPos.x;
 		newBullet->position_B.y = EnemyPos.y;

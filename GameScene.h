@@ -93,6 +93,7 @@ private:
 private:
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	Sprite* sprite = nullptr;
+	Sprite* UI = nullptr;
 	Model* model_1 = nullptr;
 	Model* model_2 = nullptr;
 	Model* model_Bullet = nullptr;

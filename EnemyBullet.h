@@ -37,7 +37,7 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static std::unique_ptr<EnemyBullet>Create(Model* model, Camera* camera, XMFLOAT3 pos, Player* player);
+	static std::unique_ptr<EnemyBullet>Create(Model* model, Camera* camera, XMFLOAT3 pos, XMFLOAT3 PlayerPos);
 
 public:
 
@@ -48,7 +48,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <returns></returns>
-	bool Initialize(XMFLOAT3 pos);
+	bool Initialize(XMFLOAT3 pos, XMFLOAT3 PlayerPos);
 
 	/// <summary>
 	/// 終了処理
@@ -136,7 +136,7 @@ private: // メンバ変数
 	Player* player_ = nullptr;
 
 	//速度
-	float Speed = 5.0f;
+	XMFLOAT3 Speed = {0.0f, 0.0f, 0.0f};
 
 	//移動用ベクトル
 	XMFLOAT3 Vec = {0.0f, 0.0f, 0.0f};
@@ -144,6 +144,9 @@ private: // メンバ変数
 	//弾のデスタイマー
 	int DeathTimer = LifeTimer;
 
+	//自機狙い弾用
+	float PointPos = 0;
+	float Count = 80.0f;
 
 public:
 	// ローカル座標

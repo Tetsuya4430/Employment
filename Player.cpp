@@ -145,8 +145,8 @@ void Player::Update()
 	//プレイヤーの移動
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 	{
-		if (Avoidanceflag_X == false || Avoidanceflag_Y == false)
-		{
+		/*if (Avoidanceflag_X == false || Avoidanceflag_Y == false)
+		{*/
 			MoveFlag = 1;
 			if (Input::GetInstance()->PushKey(DIK_D))
 			{
@@ -155,10 +155,10 @@ void Player::Update()
 					position_.x += 0.5f;
 				}
 
-				if (RotlimR < rotation_.z)
+				/*if (RotlimR < rotation_.z)
 				{
 					rotation_.z -= 0.3f;
-				}
+				}*/
 			}
 
 			if (Input::GetInstance()->PushKey(DIK_A))
@@ -171,10 +171,10 @@ void Player::Update()
 						position_.x -= 0.5f;
 					}
 
-					if (RotlimL > rotation_.z)
+					/*if (RotlimL > rotation_.z)
 					{
 						rotation_.z += 0.3f;
-					}
+					}*/
 				}
 
 			}
@@ -206,7 +206,7 @@ void Player::Update()
 			{
 				if (Avoidanceflag_X == false && Avoidanceflag_Y == false)
 				{
-					if (rotation_.z > 0)
+					/*if (rotation_.z > 0)
 					{
 						rotation_.z -= 0.5f;
 					}
@@ -214,7 +214,7 @@ void Player::Update()
 					if (rotation_.z < 0)
 					{
 						rotation_.z += 0.5f;
-					}
+					}*/
 				}
 			}
 
@@ -262,7 +262,7 @@ void Player::Update()
 
 			//コントローラーの押下情報更新
 			UpdateInput();
-		}
+		//}
 	}
 
 	//回避モーション
@@ -275,6 +275,7 @@ void Player::Update()
 			if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_D) && Avoidanceflag_X == false)
 			{
 				PointPos = position_.x + AvoidDistance_X;
+				RolePos = rotation_.z - RoleDistance;
 				RotFlag_R = true;
 
 				Avoidanceflag_X = true;
@@ -284,6 +285,7 @@ void Player::Update()
 			if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_A) && Avoidanceflag_X == false)
 			{
 				PointPos = position_.x - AvoidDistance_X;
+				RolePos = rotation_.z + RoleDistance;
 				RotFlag_L = true;
 
 				Avoidanceflag_X = true;
@@ -340,18 +342,20 @@ void Player::Update()
 	{
 		AvoidanceTimer_X += 1;
 
-		position_.x += dx;
-		dx = (PointPos - position_.x) / 10.0f;
+		
+		dx = (PointPos - position_.x) / AvoidCount;
 		position_.x += dx;
 
 		if (RotFlag_R == true)
 		{
-			rotation_.z -= 10;
+			rx = (RolePos - rotation_.z) / AvoidCount;
+			rotation_.z += rx;
 		}
 
 		else if (RotFlag_L == true)
 		{
-			rotation_.z += 10;
+			rx = (RolePos - rotation_.z) / AvoidCount;
+			rotation_.z += rx;
 		}
 
 		if (AvoidanceTimer_X >= 20)
@@ -369,8 +373,8 @@ void Player::Update()
 	{
 		AvoidanceTimer_Y += 1;
 
-		position_.y += dx;
-		dx = (PointPos - position_.y) / 10.0f;
+		
+		dx = (PointPos - position_.y) / AvoidCount;
 		position_.y += dx;
 
 		if (AvoidanceTimer_Y >= 20)

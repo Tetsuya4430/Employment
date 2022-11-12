@@ -21,7 +21,7 @@ ComPtr<ID3D12RootSignature> EnemyBullet::rootsignature;
 ComPtr<ID3D12PipelineState> EnemyBullet::pipelinestate;
 
 
-std::unique_ptr<EnemyBullet> EnemyBullet::Create(Model* model, Camera* camera, XMFLOAT3 pos, Player* player)
+std::unique_ptr<EnemyBullet> EnemyBullet::Create(Model* model, Camera* camera, XMFLOAT3 pos, XMFLOAT3 PlayerPos)
 {
     //3Dオブジェクトのインスタンスを生成
     EnemyBullet* instance = new EnemyBullet();
@@ -31,7 +31,7 @@ std::unique_ptr<EnemyBullet> EnemyBullet::Create(Model* model, Camera* camera, X
     }
 
     //初期化
-    if (!instance->Initialize(pos))
+    if (!instance->Initialize(pos, PlayerPos))
     {
         delete instance;
         assert(0);
@@ -49,11 +49,11 @@ std::unique_ptr<EnemyBullet> EnemyBullet::Create(Model* model, Camera* camera, X
         instance->SetCamera(camera);
     }
 
-	//プレイヤーのアドレスを取得
-	if (player)
-	{
-		instance->SetPlayer(player);
-	}
+	////プレイヤーのアドレスを取得
+	//if (player)
+	//{
+	//	instance->SetPlayer(player);
+	//}
 
 	return std::unique_ptr<EnemyBullet>(instance);
 }
@@ -65,7 +65,7 @@ EnemyBullet* EnemyBullet::GetInstance()
     return &instance;
 }
 
-bool EnemyBullet::Initialize(XMFLOAT3 pos)
+bool EnemyBullet::Initialize(XMFLOAT3 pos, XMFLOAT3 PlayerPos)
 {    // nullptrチェック
     assert(device);
 
@@ -73,6 +73,10 @@ bool EnemyBullet::Initialize(XMFLOAT3 pos)
     //InitInput();
 
     position_B = pos;
+
+	Speed.x = (PlayerPos.x - position_B.x) / Count;
+	Speed.y = (PlayerPos.y - position_B.y) / Count;
+	Speed.z = (PlayerPos.z - position_B.z) / Count;
 
     HRESULT result;
     // 定数バッファの生成
@@ -175,7 +179,13 @@ void EnemyBullet::Update(XMFLOAT3 PlayerPos, XMFLOAT3 EnemyPos)
 	position_B.y += Vec.y;
     position_B.z += Vec.z;*/
 
-	position_B.z -= Speed;
+	/*Speed.x = (PlayerPos.x - position_B.x) / Count;
+	Speed.y = (PlayerPos.y - position_B.y) / Count;
+	Speed.z = (PlayerPos.z - position_B.z) / Count;*/
+
+	position_B.x += Speed.x;
+	position_B.y += Speed.y;
+	position_B.z += Speed.z;
 
 }
 

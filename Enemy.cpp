@@ -230,7 +230,7 @@ void Enemy::Update()
 
 			position.y += Speed;
 
-			if (position.z >= 50)
+			if (position.y >= 50)
 			{
 				DeathFlag = true;
 			}

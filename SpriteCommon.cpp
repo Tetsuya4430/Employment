@@ -281,15 +281,15 @@ void SpriteCommon::CreateGraphicsPipeline()
 	//レンダーターゲットブレンドの設定(アルファ値を細かく設定するための準備)
 	D3D12_RENDER_TARGET_BLEND_DESC& blenddesc = gpipeline.BlendState.RenderTarget[0];
 	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;	//標準設定
-	blenddesc.BlendEnable = false;					//ブレンドを有効にする
+	blenddesc.BlendEnable = true;					//ブレンドを有効にする
 	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;	//加算
 	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;		//ソースの値を100%使う
 	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;	//デストの値を0%使う
 
 	//加算合成
 	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;	//加算
-	blenddesc.SrcBlend = D3D12_BLEND_ONE;	//ソースの値を100%使う
-	blenddesc.DestBlend = D3D12_BLEND_ONE;	//デスとの値を0%使う
+	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;	//ソースの値を100%使う
+	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	//デスとの値を0%使う
 
 
 
