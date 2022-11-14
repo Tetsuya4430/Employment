@@ -99,6 +99,17 @@ public:
 	// 座標の取得
 	const XMFLOAT3& GetPosition() { return position_; }
 
+	//setter
+
+	/// <summary>
+	/// 座標の設定
+	/// </summary>
+	/// <param name="position">座標</param>
+	void SetPosition(XMFLOAT3 position) { this->position_ = position; }
+
+	//大きさの設定
+	void SetScale(XMFLOAT3 scale) { this->scale_ = scale; }
+
 	//弾リストを取得
 	//const std::list<std::unique_ptr<Bullet>>& GetBullets() {return bullets_}
 
@@ -182,6 +193,9 @@ private: // 静的メンバ変数
 	public:
 		// ローカル座標
 		XMFLOAT3 position_ = { 0,0,0 };
+
+		//レティクル座標
+		XMFLOAT3 ReticlePos = { 0, 0, 0 };
 
 		//プレイヤーのHP
 		int HP = 5;

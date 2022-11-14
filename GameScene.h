@@ -100,6 +100,7 @@ private:
 	Model* model_Enemy = nullptr;
 	Model* model_Boss = nullptr;
 	Model* model_sphere = nullptr;
+	Model* model_reticle = nullptr;
 
 	FbxModel* model1 = nullptr;
 	Fbx3d* object1 = nullptr;
@@ -142,9 +143,11 @@ private:
 	//Object3d* Enemy = nullptr;
 
 	Object3d* CelestialSphere = nullptr;
+	/*Object3d* Reticle = nullptr;*/
 
 	//プレイヤー
 	Player* P = nullptr;
+	Player* Reticle = nullptr;
 	Bullet* B = nullptr;
 	//Enemy* E = nullptr;
 
@@ -197,6 +200,8 @@ private:
 	//ボスの弾発射間隔
 	static const int BossBulletInterval = 5;
 
+	//レティクル座標
+	XMFLOAT3 ReticlePos = { 0, 0, 0 };
 
 	//テスト
 	int Timer = 60;

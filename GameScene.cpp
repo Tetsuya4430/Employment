@@ -49,6 +49,7 @@ void GameScene::Initialize()
 	model_Enemy = Model::LoadFromObj("Enemy");
 	model_Boss = Model::LoadFromObj("Boss");
 	model_sphere = Model::LoadFromObj("CelestialSphere");
+	model_reticle = Model::LoadFromObj("Reticle");
 
 
 	
@@ -61,8 +62,16 @@ void GameScene::Initialize()
 	//3Dオブジェクト生成
 	P = Player::Create(model_2, camera);
 
+	//天球生成
 	CelestialSphere = Object3d::Create(model_sphere, camera);
 	CelestialSphere->SetScale({100, 100, 100});
+
+	//レティクル生成
+	Reticle = Player::Create(model_reticle, camera);
+	Reticle->SetScale({ 2, 2, 2 });
+
+	//レティクルの初期位置
+	Reticle->SetPosition({ Reticle->ReticlePos.x, Reticle->ReticlePos.y , Reticle->ReticlePos.z });
 
 	//part = Part::Create(model_1, camera);
 
@@ -96,7 +105,7 @@ void GameScene::Initialize()
 		camera->SetTarget({ 0, 20, 0 });
 
 	//音声読み込みと再生
-	Audio::GetInstance()->LoadWave("Alarm01.wav");
+	/*Audio::GetInstance()->LoadWave("Alarm01.wav");*/
 
 
 	/*object1->PlayAnimation();*/
@@ -333,6 +342,9 @@ void GameScene::Update()
 	//天球更新
 	CelestialSphere->Update();
 
+	//レティクル行進
+	Reticle->Update();
+
 	//FBXオブジェクトの更新
 	//object1->Update();
 	
@@ -414,7 +426,10 @@ void GameScene::Draw()
 	}
 
 	//天球の描画
-	//CelestialSphere->Draw();
+	CelestialSphere->Draw();
+
+	//レティクル描画
+	Reticle->Draw();
 
 	//part->Draw();
 

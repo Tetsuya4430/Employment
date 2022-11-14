@@ -67,6 +67,11 @@ bool Player::Initialize()
 	//コントローラー初期化
 	InitInput();
 
+	//レティクル初期化
+	ReticlePos.x = position_.x;
+	ReticlePos.y = position_.y;
+	ReticlePos.z = position_.z + 30.0f;
+
 	HRESULT result;
 	// 定数バッファの生成
 	result = device->CreateCommittedResource(
@@ -141,6 +146,8 @@ void Player::Update()
 	constBuffB0_->Unmap(0, nullptr);
 
 	//更新処理
+
+	//ReticlePos = ({ position_.x,position_.y ,position_.z + 30.0f });
 
 	//プレイヤーの移動
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
