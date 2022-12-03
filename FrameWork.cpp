@@ -42,9 +42,9 @@ void FrameWork::Initialize()
 	//デバッグテキスト用のテクスチャ番号を指定
 	const int debugTextTexNumber = 0;
 	//デバッグテキスト用のテクスチャ読み込み
-	spriteCommon->SpriteCommonLoadTexture(debugTextTexNumber, L"Resources/Font/ASCII_Font.png");
+	spriteCommon->SpriteCommonLoadTexture(debugTextTexNumber, L"Resources/Font/debugfont.png");
 	//デバッグテキスト初期化
-	debugText->Initialize(spriteCommon, debugTextTexNumber);
+	debugText->Initialize(debugTextTexNumber);
 
 	//入力の初期化
 	input = Input::GetInstance();
@@ -60,6 +60,9 @@ void FrameWork::Initialize()
 	//プレイヤーの静的初期化
 	Player::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
+	//レティクルの静的初期化
+	Reticle::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
+
 	//敵の静的初期化
 	Enemy::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
@@ -71,11 +74,6 @@ void FrameWork::Initialize()
 
 	//ステージ1のボスオブジェクトの静的初期化
 	St1_Boss::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
-
-	//パーティクルの静的初期化
-	Particle::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
-
-	Part::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
 	//FBXローダーの初期化処理
 	FbxLoader::GetInstance()->Initialize(dxCommon->GetDev());

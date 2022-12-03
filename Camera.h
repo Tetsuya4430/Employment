@@ -74,8 +74,6 @@ public:	//メンバ関数
 
 
 private:	//メンバ変数
-		// ビュー行列
-	static XMMATRIX matView;
 	// 射影行列
 	static XMMATRIX matProjection;
 	//ビュー射影行列
@@ -86,6 +84,7 @@ private:	//メンバ変数
 	static XMFLOAT3 target;
 	// 上方向ベクトル
 	static XMFLOAT3 up;
+
 
 
 
@@ -100,4 +99,8 @@ protected:
 
 	//Y軸回りビルボード行列
 	static XMMATRIX matBillboardY;
+
+public:
+	// ビュー行列
+	static XMMATRIX matView;
 };

@@ -1,5 +1,16 @@
 #include "DebugText.h"
 
+DebugText::DebugText()
+{
+}
+
+DebugText::~DebugText()
+{
+	for (int i = 0; i < _countof(sprites_); i++) {
+		delete sprites_[i];
+	}
+}
+
 DebugText* DebugText::GetInstance()
 {
 	static DebugText instance;
@@ -7,14 +18,8 @@ DebugText* DebugText::GetInstance()
 	return &instance;
 }
 
-void DebugText::Initialize(SpriteCommon* spriteCommon, UINT texnumber)
+void DebugText::Initialize(UINT texnumber)
 {
-	//nullptrチェック
-	assert(spriteCommon);
-
-	//引数をメンバ変数に格納
-	spriteCommon_ = spriteCommon;
-
 	//全てのスプライトデータについて
 	for (int i = 0; i < _countof(sprites_); i++)
 	{
@@ -74,7 +79,7 @@ void DebugText::DrawAll()
 	spriteIndex_ = 0;
 }
 
-void DebugText::Finalize()
-{
-	delete sprites_;
-}
+//void DebugText::Finalize()
+//{
+//	delete sprites_;
+//}

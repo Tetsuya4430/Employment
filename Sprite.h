@@ -47,7 +47,7 @@ public:
 	/// <param name="anchorpoint">アンカーポイント</param>
 	/// <param name="isFlipX">X反転するか</param>
 	/// <param name="isFlipY">Y反転するか</param>
-	static Sprite* Create(UINT texNumber, DirectX::XMFLOAT2 anchorpoint = {0.5f, 0.5f}, bool isFlipX = false, bool isFlipY = false);
+	static Sprite* Create(UINT texNumber, DirectX::XMFLOAT2 anchorpoint = {1.0f, 1.0f}, bool isFlipX = false, bool isFlipY = false);
 
 	/// <summary>
 	/// 初期化
@@ -89,9 +89,6 @@ public:
 	//z軸まわりの回転角
 	float rotation_ = 0.0f;
 
-	//座標
-	DirectX::XMFLOAT3 position_ = { 0, 0, 0 };
-
 	//ワールド座標
 	DirectX::XMMATRIX matWorld_;
 
@@ -105,7 +102,7 @@ public:
 	DirectX::XMFLOAT2 size_ = { 100, 200 };
 
 	//アンカーポイント
-	DirectX::XMFLOAT2 anchorpoint_ = { 0.5f, 0.5f };
+	DirectX::XMFLOAT2 anchorpoint_ = { 1.0f, 1.0f };
 
 	//左右反転
 	bool isFlipX_ = false;
@@ -122,5 +119,8 @@ public:
 	//非表示
 	bool isInvisible_ = false;
 
+	public:
+	//座標
+	DirectX::XMFLOAT3 position_ = { 0, 0, 0 };
 };
 

@@ -8,20 +8,24 @@
 class DebugText
 {
 public:
-	//ここに定数宣言を記述
-	static const int maxCharCount = 256;	//1フレームでの最大表示文字数
-	static const int fontWidth = 25;		//フォント画像内1文字分の横幅
-	static const int fontHeight = 25;		//フォント画像内1文字分の縦幅
-	static const int fontLineCount = 10;	//フォント画像内1桁分の文字数
-
-//ここにメンバ関数の宣言を記述
 	static DebugText* GetInstance();
 
-	void Initialize(SpriteCommon* spriteCommon, UINT texnumber);
+	//ここに定数宣言を記述
+	static const int maxCharCount = 256;	//1フレームでの最大表示文字数
+	static const int fontWidth = 9;		//フォント画像内1文字分の横幅
+	static const int fontHeight = 18;		//フォント画像内1文字分の縦幅
+	static const int fontLineCount = 14;	//フォント画像内1桁分の文字数
+
+//ここにメンバ関数の宣言を記述
+
+	DebugText();
+	~DebugText();
+
+	void Initialize(UINT texnumber);
 	void Print(const std::string& text, const float& x, const float& y, const float& scale = 1.0f);
 	void DrawAll();
 
-	void Finalize();
+	/*void Finalize();*/
 private:
 	//ここにメンバ変数の宣言を記述
 

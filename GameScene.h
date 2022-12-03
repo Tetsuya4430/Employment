@@ -1,17 +1,18 @@
 #include "BaseScene.h"
 #include "DirectXCommon.h"
+#include "WinApp.h"
+#include "DebugText.h"
 #include "Sprite.h"
 #include "Object3d.h"
 #include "Fbx3d.h"
 #include "Input.h"
 #include "Bullet.h"
+#include "Reticle.h"
 #include "EnemyBullet.h"
 #include "Enemy.h"
 #include "St1_Boss.h"
 #include "BossBullet.h"
 #include "ObjectManager.h"
-#include "Particle.h"
-#include "Part.h"
 #include "PostEffect.h"
 #include "Controller.h"
 
@@ -40,6 +41,8 @@ private: // エイリアス
 	using XMMATRIX = DirectX::XMMATRIX;
 
 public:
+	static const int debugTextTexNumber = 0;
+
 	// コンストクラタ
 	GameScene();
 
@@ -86,17 +89,32 @@ public:
 	//円と円の当たり判定
 	bool CheckCollision(XMFLOAT3 Object1, XMFLOAT3 Object2, float R1, float R2);
 
+	//スプライト読み込み
+	void LoadSprite();
+
+	//スプライト更新
+	void UpdateSprite();
+
+	//スプライト描画
+	void DrawSprite();
+
 private:
 	//定数
 	const int MAX_Object = 10;
 
 private:
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
-	Sprite* sprite = nullptr;
-	Sprite* UI = nullptr;
+
+	//WindowsAPI
+	WinApp* winApp =  nullptr;
+
+	//デバッグテキスト
+	DebugText debugText;
+
 	Model* model_1 = nullptr;
 	Model* model_2 = nullptr;
 	Model* model_Bullet = nullptr;
+	Model* model_EnemyBullet = nullptr;
 	Model* model_Enemy = nullptr;
 	Model* model_Boss = nullptr;
 	Model* model_sphere = nullptr;
@@ -126,40 +144,45 @@ private:
 	std::list<std::unique_ptr<BossBullet>> bossbullets;
 
 
-
-	/*std::shared_ptr<Object3d> Empty;
-	std::shared_ptr<Object3d> BulletObj;
-	std::shared_ptr<Object3d> player;
-	std::shared_ptr<Object3d> Enemy;
-	std::unique_ptr<ObjectManager> objectManager_1;
-	std::unique_ptr<ObjectManager> objectManager_2;
-	std::unique_ptr<ObjectManager> objectManager_3;
-	std::unique_ptr<ObjectManager> objectManager_4;*/
-
-
-	/*Object3d* Empty = nullptr;
-	Object3d* BulletObj = nullptr;
-	Object3d* player = nullptr;*/
-	//Object3d* Enemy = nullptr;
-
 	Object3d* CelestialSphere = nullptr;
-	/*Object3d* Reticle = nullptr;*/
 
 	//プレイヤー
 	Player* P = nullptr;
-	Player* Reticle = nullptr;
+	Reticle* Reticle = nullptr;
 	Bullet* B = nullptr;
-	//Enemy* E = nullptr;
 
 	St1_Boss* Boss = nullptr;
 
-	//std::unique_ptr<Enemy> enemy;
 
-	//パーティクル
-	Particle* particle = nullptr;
 
-	Part* part = nullptr;
 
+	//UI
+	Sprite* sprite = nullptr;
+	Sprite* UI = nullptr;
+	Sprite* HP_0 = nullptr;
+	Sprite* HP_1 = nullptr;
+	Sprite* HP_2 = nullptr;
+	Sprite* HP_3 = nullptr;
+	Sprite* HP_4 = nullptr;
+	Sprite* HP_5 = nullptr;
+
+	//ボスHPスプライト
+	Sprite* BossHP_0 = nullptr;
+	Sprite* BossHP_1 = nullptr;
+	Sprite* BossHP_2 = nullptr;
+	Sprite* BossHP_3 = nullptr;
+	Sprite* BossHP_4 = nullptr;
+	Sprite* BossHP_5 = nullptr;
+	Sprite* BossHP_6 = nullptr;
+	Sprite* BossHP_7 = nullptr;
+	Sprite* BossHP_8 = nullptr;
+	Sprite* BossHP_9 = nullptr;
+	Sprite* BossHP_10 = nullptr;
+	Sprite* BossHP_11 = nullptr;
+	Sprite* BossHP_12 = nullptr;
+	Sprite* BossHP_13 = nullptr;
+	Sprite* BossHP_14 = nullptr;
+	Sprite* BossHP_15 = nullptr;
 
 	//敵の座標
 
@@ -185,7 +208,7 @@ private:
 	bool BossFlag = false;
 
 	//ボスの待機タイマー
-	int BossTimer = 0;
+	int BossTimer = 128;
 
 	//csvファイルから敵の座標格納用変数
 	XMFLOAT3 Num = {0, 0, 0};
@@ -205,6 +228,12 @@ private:
 
 	//テスト
 	int Timer = 60;
+
+	//ボス登場フラグ
+	bool BossHPFlag = false;
+
+	//ボス体力タイマー
+	int BossHPTimer = 120;
 
 };
 

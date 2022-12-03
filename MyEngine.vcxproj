@@ -117,10 +117,10 @@
     <ClCompile Include="MyGame.cpp" />
     <ClCompile Include="Object3d.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
-    <ClCompile Include="Part.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PostEffect.cpp" />
+    <ClCompile Include="Reticle.cpp" />
     <ClCompile Include="SceneFactory.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Sprite.cpp" />
@@ -226,11 +226,11 @@
     <ClInclude Include="MyGame.h" />
     <ClInclude Include="Object3d.h" />
     <ClInclude Include="ObjectManager.h" />
-    <ClInclude Include="Part.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="PipelineSet.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PostEffect.h" />
+    <ClInclude Include="Reticle.h" />
     <ClInclude Include="SceneFactory.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Sprite.h" />

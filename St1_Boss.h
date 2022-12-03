@@ -138,7 +138,7 @@ private: // メンバ変数
 	//行列用定数バッファ
 	ComPtr<ID3D12Resource> constBuffB0_;
 	// ローカルスケール
-	XMFLOAT3 scale_ = { 3,3,3 };
+	XMFLOAT3 scale_ = { 1,1,1 };
 	// X,Y,Z軸回りのローカル回転角
 	XMFLOAT3 rotation_ = { 0,0,0 };
 	// ローカルワールド変換行列
@@ -175,6 +175,6 @@ public:
 	int FireTime = 0;
 
 	//ボスの体力
-	int HP = 30;
+	int HP = 15;
 };
 

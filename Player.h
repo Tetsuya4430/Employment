@@ -67,9 +67,6 @@ public:
 	/// </summary>
 	void Update();
 
-	//衝突検知コールバック関数
-	void OnCollision();
-
 	//ワールド座標を取得
 	XMFLOAT3 GetWorldPosition();
 
@@ -137,7 +134,7 @@ private: // 静的メンバ変数
 	//行列用定数バッファ
 	ComPtr<ID3D12Resource> constBuffB0_;
 	// ローカルスケール
-	XMFLOAT3 scale_ = {1,1,1 };
+	XMFLOAT3 scale_ = {0.5,0.5,0.5 };
 	// X,Y,Z軸回りのローカル回転角
 	XMFLOAT3 rotation_ = { 0,0,0 };
 	// ローカルワールド変換行列

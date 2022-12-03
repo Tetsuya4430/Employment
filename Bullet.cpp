@@ -20,7 +20,7 @@ ID3D12GraphicsCommandList* Bullet::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Bullet::rootsignature;
 ComPtr<ID3D12PipelineState> Bullet::pipelinestate;
 
-std::unique_ptr<Bullet> Bullet::Create(Model* model, Camera* camera, XMFLOAT3 pos)
+std::unique_ptr<Bullet> Bullet::Create(Model* model, Camera* camera, XMFLOAT3 pos, XMFLOAT3 ReticlePos)
 {    
     //3Dオブジェクトのインスタンスを生成
     Bullet* instance = new Bullet();
@@ -30,7 +30,7 @@ std::unique_ptr<Bullet> Bullet::Create(Model* model, Camera* camera, XMFLOAT3 po
     }
 
     //初期化
-    if (!instance->Initialize(pos))
+    if (!instance->Initialize(pos, ReticlePos))
     {
         delete instance;
         assert(0);
@@ -58,7 +58,7 @@ Bullet* Bullet::GetInstance()
 	return &instance;
 }
 
-bool Bullet::Initialize(XMFLOAT3 pos)
+bool Bullet::Initialize(XMFLOAT3 pos, XMFLOAT3 PointPos)
 {
     // nullptrチェック
     assert(device);
@@ -67,6 +67,10 @@ bool Bullet::Initialize(XMFLOAT3 pos)
 	//InitInput();
 
 	position_B = pos;
+
+	Speed.x = (PointPos.x - position_B.x) / Count;
+	Speed.y = (PointPos.y - position_B.y) / Count;
+	Speed.z = ((PointPos.z + 30.0f) - position_B.z) / Count;
 
     HRESULT result;
     // 定数バッファの生成
@@ -152,8 +156,12 @@ void Bullet::Update(XMFLOAT3 pos)
 	}
 
 	//弾の移動
-	position_B.z += Speed;
-	//rotation_.z += 5.0f;
+	/*position_B.x += Speed.x;
+	position_B.y += Speed.y;
+	position_B.z += Speed.z;*/
+
+	position_B.z += 5.0f;
+	
 
 }
 

@@ -14,7 +14,8 @@ public:
 
 public:	//静的メンバ関数
 	static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-
+	//インスタンス生成
+	static WinApp* GetInstance();
 private:
 	//ウィンドウハンドル
 	HWND hwnd = nullptr;

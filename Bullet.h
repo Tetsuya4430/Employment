@@ -34,7 +34,7 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static std::unique_ptr<Bullet>Create(Model* model, Camera* camera, XMFLOAT3 pos);
+	static std::unique_ptr<Bullet>Create(Model* model, Camera* camera, XMFLOAT3 pos, XMFLOAT3 ReticlePos);
 
 public:
 
@@ -45,7 +45,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <returns></returns>
-	bool Initialize(XMFLOAT3 pos);
+	bool Initialize(XMFLOAT3 pos, XMFLOAT3 PointPos);
 
 	/// <summary>
 	/// 終了処理
@@ -129,7 +129,10 @@ private: // メンバ変数
 	Input* input = nullptr;
 
 	//速度
-	float Speed = 5.0f;
+	XMFLOAT3 Speed = {0.0f, 0.0f, 0.0f};
+
+	//カウント
+	float Count = 50;
 
 	//弾のデスタイマー
 	int DeathTimer = LifeTimer;

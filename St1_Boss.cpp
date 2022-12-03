@@ -145,7 +145,7 @@ void St1_Boss::Update()
 	constMap->mat = matWorld_ * matViewProjection;	// s—ñ‚Ì‡¬
 	constBuffB0_->Unmap(0, nullptr);
 
-
+	rotation_.z += 2.0f;
 
 	//XVˆ—
 

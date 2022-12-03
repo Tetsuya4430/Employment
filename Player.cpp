@@ -147,8 +147,6 @@ void Player::Update()
 
 	//更新処理
 
-	//ReticlePos = ({ position_.x,position_.y ,position_.z + 30.0f });
-
 	//プレイヤーの移動
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 	{
@@ -265,12 +263,11 @@ void Player::Update()
 			}
 
 
-
-
 			//コントローラーの押下情報更新
 			UpdateInput();
 		//}
 	}
+
 
 	//回避モーション
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
@@ -418,9 +415,6 @@ void Player::Update()
 	}
 }
 
-void Player::OnCollision()
-{
-}
 
 XMFLOAT3 Player::GetWorldPosition()
 {
