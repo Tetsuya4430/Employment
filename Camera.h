@@ -74,8 +74,6 @@ public:	//メンバ関数
 
 
 private:	//メンバ変数
-	// 射影行列
-	static XMMATRIX matProjection;
 	//ビュー射影行列
 	static XMMATRIX matViewProjection;
 	// 視点座標
@@ -103,4 +101,6 @@ protected:
 public:
 	// ビュー行列
 	static XMMATRIX matView;
+	// 射影行列
+	static XMMATRIX matProjection;
 };

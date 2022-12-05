@@ -120,7 +120,6 @@ void GameScene::Update()
 {
 	//---デバッグテキスト関係---//
 
-
 	//マウス座標を2Dレティクルのスプライトに代入
 	UI->position_.x = Reticle->MousePosition.x;
 	UI->position_.y = Reticle->MousePosition.y;
@@ -281,6 +280,7 @@ void GameScene::Update()
 				{
 					bullet->DeathFlag = true;
 					enemy->DeathFlag = true;
+					P->EXP += 1;
 				}
 			}
 		}

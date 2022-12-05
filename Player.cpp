@@ -9,6 +9,9 @@
 #include <vector>
 #pragma comment(lib, "d3dcompiler.lib")
 
+#include "DebugText.h"
+#include <iomanip>
+
 using namespace DirectX;
 using namespace Microsoft::WRL;
 using namespace std;
@@ -72,6 +75,10 @@ bool Player::Initialize()
 	ReticlePos.y = position_.y;
 	ReticlePos.z = position_.z + 30.0f;
 
+	//プレイヤー各種ステータス初期化
+	Level = 1;
+	EXP = 0;
+
 	HRESULT result;
 	// 定数バッファの生成
 	result = device->CreateCommittedResource(
@@ -112,6 +119,14 @@ void Player::Draw()
 
 void Player::Update()
 {
+	//EXP
+	std::ostringstream EXPstr;
+	EXPstr << "EXP("
+		<< std::fixed << std::setprecision(2)
+		<< EXP << ")";
+
+	DebugText::GetInstance()->Print(EXPstr.str(), 0, 70, 2.0f);
+
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
 
@@ -157,7 +172,8 @@ void Player::Update()
 			{
 				if (position_.x <= 45)
 				{
-					position_.x += 0.5f;
+					position_.x += Speed * Mag;
+					Old.x = Speed * Mag;
 				}
 
 				/*if (RotlimR < rotation_.z)
@@ -166,14 +182,13 @@ void Player::Update()
 				}*/
 			}
 
-			if (Input::GetInstance()->PushKey(DIK_A))
-			{
-				MoveFlag = 1;
+			
 				if (Input::GetInstance()->PushKey(DIK_A))
 				{
 					if (position_.x >= -45)
 					{
-						position_.x -= 0.5f;
+						position_.x -= Speed * Mag;
+						Old.x = -Speed * Mag;
 					}
 
 					/*if (RotlimL > rotation_.z)
@@ -182,13 +197,13 @@ void Player::Update()
 					}*/
 				}
 
-			}
 
 			if (Input::GetInstance()->PushKey(DIK_W))
 			{
 				if (position_.y <= 20)
 				{
-					position_.y += 0.5f;
+					position_.y += Speed * Mag;
+					Old.y = Speed * Mag;
 				}
 			}
 
@@ -196,15 +211,44 @@ void Player::Update()
 			{
 				if (position_.y >= -25)
 				{
-					position_.y -= 0.5f;
+					position_.y -= Speed * Mag;
+					Old.y = -Speed * Mag;
 				}
 			}
-
 
 			else
 			{
 				MoveFlag = 0;
+				Mag = 0.0f;
 			}
+
+			if (Input::GetInstance()->PushKey(DIK_A) && Input::GetInstance()->PushKey(DIK_W))
+			{
+				Mag = 0.71f;
+			}
+
+			else if (Input::GetInstance()->PushKey(DIK_A) && Input::GetInstance()->PushKey(DIK_S))
+			{
+				Mag = 0.71f;
+			}
+
+			else if (Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->PushKey(DIK_W))
+			{
+				Mag = 0.71f;
+			}
+
+			else if (Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->PushKey(DIK_S))
+			{
+				Mag = 0.71f;
+			}
+
+			else
+			{
+				Mag = 1.0f;
+			}
+
+
+			
 
 			//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
 			if (MoveFlag == 0)
@@ -268,6 +312,42 @@ void Player::Update()
 		//}
 	}
 
+
+	////もし移動が終了しているなら
+	//if (Mag == 0.0)
+	//{
+	//	//まだ移動量が0でないのならば
+	//	if (Old.x != 0.0f)
+	//	{
+	//		if (Old.x < 0.0f)
+	//		{
+	//			Old.x += 0.1f;
+	//		}
+
+	//		if (Old.x > 0.0f)
+	//		{
+	//			Old.x -= 0.1f;
+	//		}
+	//	}
+
+	//	//まだ移動量が0でないのならば
+	//	if (Old.y != 0.0f)
+	//	{
+	//		if (Old.y < 0.0f)
+	//		{
+	//			Old.y += 0.1f;
+	//		}
+
+	//		if (Old.y > 0.0f)
+	//		{
+	//			Old.y -= 0.1f;
+	//		}
+	//	}
+
+	//	//移動領分動かす
+	//	position_.x += Old.x;
+	//	position_.y += Old.y;
+	//}
 
 	//回避モーション
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))

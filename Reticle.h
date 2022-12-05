@@ -105,9 +105,6 @@ public:
 	//大きさの設定
 	void SetScale(XMFLOAT3 scale) { this->scale_ = scale; }
 
-	//弾リストを取得
-	//const std::list<std::unique_ptr<Bullet>>& GetBullets() {return bullets_}
-
 private: // 静的メンバ変数
 	// デバイス
 	static ID3D12Device* device;

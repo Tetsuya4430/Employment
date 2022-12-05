@@ -155,19 +155,19 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 	ScreenToClient(hwnd, &MousePosition);
 
 	//ビュープロジェクションビューポート合成行列
-	XMMATRIX matVPV = camera_->matView * matViewProjection;
+	XMMATRIX matVPV = camera_->matView * camera_->matProjection;
 
 	//合成行列の逆行列をを計算する
 	XMMATRIX matInverseVPV = XMMatrixInverse(nullptr, matVPV);
 
 	//スクリーン座標
-	XMVECTOR PosNear = { MousePosition.x, MousePosition.y, 0, 1 };
-	XMVECTOR PosFar = { MousePosition.x, MousePosition.y, 1, 1 };
+	XMVECTOR PosNear = { MousePosition.x, MousePosition.y, 0};
+	XMVECTOR PosFar = { MousePosition.x, MousePosition.y, 1};
 
 	//スクリーン座標系からワールド座標系へ
-	//PosNear = MousePosition * matInverseVPV()
+	//PosNear = 
 
-	////X座標、Y座標、縮尺を指定して表示
+	//デバッグテキスト
 	std::ostringstream Mousestr;
 	Mousestr << "MousePosition("
 		<< std::fixed << std::setprecision(2)
@@ -175,6 +175,7 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 		<< MousePosition.y << ")";
 
 	DebugText::GetInstance()->Print(Mousestr.str(), 0, 50, 2.0f);
+
 
 
 	//プレイヤーの移動
@@ -321,6 +322,8 @@ bool Reticle::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* 
 
 	return true;
 }
+
+
 
 
 

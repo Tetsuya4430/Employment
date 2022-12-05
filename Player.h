@@ -145,6 +145,14 @@ private: // 静的メンバ変数
 	Input* input = nullptr;
 
 	
+	//プレイヤーの移動スピード
+	float Speed = 0.5f;
+
+	//プレイヤーの移動係数
+	float Mag = 1.0f;
+
+	//プレイヤーの移動量保存
+	XMFLOAT2 Old = { 0.0f, 0.0f };
 
 	//プレイヤー回転限度
 	float RotlimR = -15.0f;
@@ -196,5 +204,11 @@ private: // 静的メンバ変数
 
 		//プレイヤーのHP
 		int HP = 5;
+
+		//プレイヤーのレベル
+		int Level = 1;
+
+		//プレイヤーの経験値
+		int EXP = 0;
 };
 
