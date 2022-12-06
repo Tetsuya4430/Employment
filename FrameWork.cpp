@@ -25,7 +25,7 @@ void FrameWork::Run()
 void FrameWork::Initialize()
 {
 	//WindowsAPI‚Ì‰Šú‰»
-	winApp = new WinApp();
+	winApp = WinApp::GetInstance();
 	winApp->Initialize();
 
 	//DirectX‚Ì‰Šú‰»
@@ -105,7 +105,7 @@ void FrameWork::Finalize()
 	winApp->Finalie();
 
 	//WindowsAPI‚Ì‰ð•ú
-	delete winApp;
+	//delete winApp;
 }
 
 void FrameWork::Update()

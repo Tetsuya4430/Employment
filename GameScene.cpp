@@ -12,9 +12,12 @@
 #include "Bullet.h"
 #include "Enemy.h"
 
+#include <DirectXMath.h>
+
 #include <iomanip>
 
 using namespace std;
+using namespace DirectX;
 
 GameScene::GameScene()
 {
@@ -138,10 +141,57 @@ void GameScene::Finalize()
 void GameScene::Update()
 {
 	//---デバッグテキスト関係---//
+	 // マウス座標
+	POINT MousePosition;
+	
+	////マウス座標取得
+	//GetCursorPos(&MousePosition);
+
+	////クライアントエリア座標に変換
+	//HWND hwnd = WinApp::GetInstance()->GetHwnd();
+	//ScreenToClient(hwnd, &MousePosition);
+
+	////マウス座標を2Dレティクルのスプライトに代入
+	//UI->position_.x = Reticle->MousePosition.x;
+	//UI->position_.y = Reticle->MousePosition.y;
+
+	////ビューポート行列
+	//XMMATRIX matViewport = XMMatrixIdentity();	//単位行列
+
+	//matViewport.r[0].m128_f32[0] = 1280 / 2;
+	//matViewport.r[1].m128_f32[1] = -720 / 2;
+	//matViewport.r[3].m128_f32[0] = 1280 / 2;
+	//matViewport.r[3].m128_f32[1] = 720 / 2;
+
+	////ビュープロジェクションビューポート合成行列
+	//XMMATRIX matVPV = camera->matView * camera->matProjection * matViewport;
+
+	////合成行列の逆行列をを計算する
+	//XMMATRIX matInverseVPV = XMMatrixInverse(nullptr, matVPV);
+
+	////スクリーン座標
+	//XMVECTOR PosNear = { MousePosition.x, MousePosition.y, 0 };
+	//XMVECTOR PosFar = { MousePosition.x, MousePosition.y, 1 };
+
+	////スクリーン座標系からワールド座標系へ
+	//PosNear = XMVector3Transform(PosNear, matInverseVPV);
+	//PosFar = XMVector3Transform(PosFar, matInverseVPV);
+
+	////マウスレイの方向
+	//XMVECTOR mouseDirection = PosNear - PosFar;
+	//mouseDirection = XMVector3Normalize(mouseDirection);
+
+	////カメラから照準オブジェクトの距離
+	//const float kDistanceTestObject = 30.0f;
+	//UI->position_.x = PosNear.m128_f32[0] - mouseDirection.m128_f32[0];
+	//UI->position_.y = PosNear.m128_f32[1] - mouseDirection.m128_f32[1];
+	//UI->position_.z = PosNear.m128_f32[2] - mouseDirection.m128_f32[2] + kDistanceTestObject;
 
 	//マウス座標を2Dレティクルのスプライトに代入
 	UI->position_.x = Reticle->MousePosition.x;
 	UI->position_.y = Reticle->MousePosition.y;
+
+	UI->Update();
 
 	
 
@@ -365,7 +415,6 @@ void GameScene::Update()
 
 	//スプライトの更新
 	sprite->Update();
-	UI->Update();
 	HP_0->Update();
 	HP_1->Update();
 	HP_2->Update();

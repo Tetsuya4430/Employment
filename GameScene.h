@@ -39,6 +39,7 @@ private: // エイリアス
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMMATRIX = DirectX::XMMATRIX;
+	using XMVECTOR = DirectX::XMVECTOR;
 
 public:
 	static const int debugTextTexNumber = 0;
@@ -106,7 +107,7 @@ private:
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
 	//WindowsAPI
-	WinApp* winApp =  nullptr;
+	//WinApp* winApp =  nullptr;
 
 	//デバッグテキスト
 	DebugText debugText;

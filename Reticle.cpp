@@ -149,13 +149,22 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 
 	//マウス座標取得
 	GetCursorPos(&MousePosition);
+	ShowCursor(false);
 
 	//クライアントエリア座標に変換
 	HWND hwnd = WinApp::GetInstance()->GetHwnd();
 	ScreenToClient(hwnd, &MousePosition);
 
+	//ビューポート行列
+	XMMATRIX matViewport = XMMatrixIdentity();	//単位行列
+
+	matViewport.r[0].m128_f32[0] = 1280 / 2;
+	matViewport.r[1].m128_f32[1] = -720 / 2;
+	matViewport.r[3].m128_f32[0] = 1280 / 2;
+	matViewport.r[3].m128_f32[1] = 720 / 2;
+
 	//ビュープロジェクションビューポート合成行列
-	XMMATRIX matVPV = camera_->matView * camera_->matProjection;
+	XMMATRIX matVPV = camera_->matView * camera_->matProjection * matViewport;
 
 	//合成行列の逆行列をを計算する
 	XMMATRIX matInverseVPV = XMMatrixInverse(nullptr, matVPV);
@@ -165,9 +174,21 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 	XMVECTOR PosFar = { MousePosition.x, MousePosition.y, 1};
 
 	//スクリーン座標系からワールド座標系へ
-	//PosNear = 
+	PosNear = XMVector3Transform(PosNear, matInverseVPV);
+	PosFar = XMVector3Transform(PosFar, matInverseVPV);
+
+	//マウスレイの方向
+	XMVECTOR mouseDirection = PosNear - PosFar;
+	mouseDirection = XMVector3Normalize(mouseDirection);
+
+	//カメラから照準オブジェクトの距離
+	const float kDistanceTestObject = 30.0f;
+	position_.x = PosNear.m128_f32[0] - mouseDirection.m128_f32[0];
+	position_.y = PosNear.m128_f32[1] - mouseDirection.m128_f32[1];
+	position_.z = PosNear.m128_f32[2] - mouseDirection.m128_f32[2] + kDistanceTestObject;
 
 	//デバッグテキスト
+	//マウス座標
 	std::ostringstream Mousestr;
 	Mousestr << "MousePosition("
 		<< std::fixed << std::setprecision(2)
@@ -175,6 +196,27 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 		<< MousePosition.y << ")";
 
 	DebugText::GetInstance()->Print(Mousestr.str(), 0, 50, 2.0f);
+
+	//ニア
+	std::ostringstream Nearstr;
+	Nearstr << "PosNear("
+		<< std::fixed << std::setprecision(5)
+		<< PosNear.m128_f32[0] << ","
+		<< PosNear.m128_f32[1] << ","
+		<< PosNear.m128_f32[2] << ")";
+
+	DebugText::GetInstance()->Print(Nearstr.str(), 0, 200, 2.0f);
+
+	//ファー
+	std::ostringstream Farstr;
+	Farstr << "PosFar("
+		<< std::fixed << std::setprecision(5)
+		<< PosFar.m128_f32[0] << ","
+		<< PosFar.m128_f32[1] << ","
+		<< PosFar.m128_f32[2] << ")";
+
+	DebugText::GetInstance()->Print(Farstr.str(), 0, 250, 2.0f);
+	
 
 
 
@@ -224,7 +266,7 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 		
 
 
-		if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))
+		/*if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))
 		{
 			
 			if (IsButtonPush(ButtonKind::RightButton))
@@ -246,7 +288,7 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 			{
 				position_.y -= ReticleMove;
 			}
-		}
+		}*/
 
 
 

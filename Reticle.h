@@ -146,6 +146,9 @@ public:
 	// ローカル座標
 	XMFLOAT3 position_ = { 0,0,0 };
 
+	//ベクトル
+	XMVECTOR velocity = { 0, 0, 30 };
+
 	//プレイヤーのHP
 	int HP = 5;
 
