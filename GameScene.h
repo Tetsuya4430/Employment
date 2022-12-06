@@ -184,6 +184,18 @@ private:
 	Sprite* BossHP_14 = nullptr;
 	Sprite* BossHP_15 = nullptr;
 
+	//プレイヤー経験値スプライト
+	Sprite* ExpBar_0 = nullptr;
+	Sprite* ExpBar_1 = nullptr;
+	Sprite* ExpBar_2 = nullptr;
+	Sprite* ExpBar_3 = nullptr;
+	Sprite* ExpBar_4 = nullptr;
+	Sprite* ExpBar_5 = nullptr;
+	Sprite* Level_1 = nullptr;
+	Sprite* Level_2 = nullptr;
+	Sprite* Level_3 = nullptr;
+
+
 	//敵の座標
 
 	float MoveVec = 1.0f;

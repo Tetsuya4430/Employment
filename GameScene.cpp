@@ -40,6 +40,15 @@ void GameScene::Initialize()
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(6, L"Resources/Image/HP_2.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(7, L"Resources/Image/HP_1.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(8, L"Resources/Image/HP_0.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(25, L"Resources/Image/ExpBar/ExpUI_0.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(26, L"Resources/Image/ExpBar/ExpUI_1.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(27, L"Resources/Image/ExpBar/ExpUI_2.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(28, L"Resources/Image/ExpBar/ExpUI_3.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(29, L"Resources/Image/ExpBar/ExpUI_4.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(30, L"Resources/Image/ExpBar/ExpUI_5.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(31, L"Resources/Image/ExpBar/Level_1.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(32, L"Resources/Image/ExpBar/Level_2.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(33, L"Resources/Image/ExpBar/Level_3.png");
 
 	//	スプライトの生成
 	sprite = Sprite::Create(1, { 0, 0 }, false, false);
@@ -50,6 +59,16 @@ void GameScene::Initialize()
 	HP_3 = Sprite::Create(5, { 0, 0 }, false, false);
 	HP_4 = Sprite::Create(4, { 0, 0 }, false, false);
 	HP_5 = Sprite::Create(3, { 0, 0 }, false, false);
+
+	ExpBar_0 = Sprite::Create(25, { 0, 0 }, false, false);
+	ExpBar_1 = Sprite::Create(26, { 0, 0 }, false, false);
+	ExpBar_2 = Sprite::Create(27, { 0, 0 }, false, false);
+	ExpBar_3 = Sprite::Create(28, { 0, 0 }, false, false);
+	ExpBar_4 = Sprite::Create(29, { 0, 0 }, false, false);
+	ExpBar_5 = Sprite::Create(30, { 0, 0 }, false, false);
+	Level_1 = Sprite::Create(31, { 0, 0 }, false, false);
+	Level_2 = Sprite::Create(32, { 0, 0 }, false, false);
+	Level_3 = Sprite::Create(33, { 0, 0 }, false, false);
 
 	
 
@@ -353,6 +372,12 @@ void GameScene::Update()
 	HP_3->Update();
 	HP_4->Update();
 	HP_5->Update();
+	ExpBar_0->Update();
+	ExpBar_1->Update();
+	ExpBar_2->Update();
+	ExpBar_3->Update();
+	ExpBar_4->Update();
+	ExpBar_5->Update();
 
 	UpdateSprite();
 
@@ -906,6 +931,53 @@ void GameScene::DrawSprite()
 		}
 	}
 	
+	//経験値UIの描画
+	if (P->EXP == 0)
+	{
+		ExpBar_0->Draw();
+	}
+
+	else if (P->EXP == 1)
+	{
+		ExpBar_1->Draw();
+	}
+
+	else if (P->EXP == 2)
+	{
+		ExpBar_2->Draw();
+	}
+
+	else if (P->EXP == 3)
+	{
+		ExpBar_3->Draw();
+	}
+
+	else if (P->EXP == 4)
+	{
+		ExpBar_4->Draw();
+	}
+
+	else if (P->EXP == 5)
+	{
+		ExpBar_5->Draw();
+	}
+
+	//レベル
+	if (P->Level == 1)
+	{
+		Level_1->Draw();
+	}
+
+	else if (P->Level == 2)
+	{
+		Level_2->Draw();
+	}
+
+	else if (P->Level == 3)
+	{
+		Level_3->Draw();
+	}
+
 }
 
 

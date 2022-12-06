@@ -76,6 +76,8 @@ bool Player::Initialize()
 	ReticlePos.z = position_.z + 30.0f;
 
 	//プレイヤー各種ステータス初期化
+	position_.z = -50;
+	position_.y = -10;
 	Level = 1;
 	EXP = 0;
 
@@ -119,13 +121,27 @@ void Player::Draw()
 
 void Player::Update()
 {
+	if (position_.z < 0)
+	{
+		position_.z += 3;
+	}
+
 	//EXP
 	std::ostringstream EXPstr;
 	EXPstr << "EXP("
 		<< std::fixed << std::setprecision(2)
 		<< EXP << ")";
 
-	DebugText::GetInstance()->Print(EXPstr.str(), 0, 70, 2.0f);
+	DebugText::GetInstance()->Print(EXPstr.str(), 0, 100, 2.0f);
+
+	//Level
+	std::ostringstream Levelstr;
+	Levelstr << "Level("
+		<< std::fixed << std::setprecision(2)
+		<< Level << ")";
+
+	DebugText::GetInstance()->Print(Levelstr.str(), 0, 150, 2.0f);
+
 
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
@@ -492,6 +508,15 @@ void Player::Update()
 	if (position_.y <= -20)
 	{
 		position_.y = -20;
+	}
+
+	//レベルの管理
+	//経験値が5たまったら
+	if (EXP == 5 && Level < 3)
+	{
+		//経験値をリセットして、レベルを1上昇
+		EXP = 0;
+		Level += 1;
 	}
 }
 
