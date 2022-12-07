@@ -114,6 +114,53 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
 
+	//マウス座標取得
+	GetCursorPos(&MousePosition);
+	ShowCursor(false);	//カーソルを表示しない
+
+	//クライアントエリア座標に変換
+	HWND hwnd = WinApp::GetInstance()->GetHwnd();
+	ScreenToClient(hwnd, &MousePosition);
+
+	//ビューポート行列
+	XMMATRIX matViewport = XMMatrixIdentity();	//単位行列
+
+	matViewport.r[0].m128_f32[0] = 640;
+	matViewport.r[1].m128_f32[1] = -360;
+	matViewport.r[3].m128_f32[0] = 640;
+	matViewport.r[3].m128_f32[1] = 360;
+
+	//ビュープロジェクションビューポート合成行列
+	XMMATRIX matVPV = camera_->matView * camera_->matProjection * matViewport;
+
+	//合成行列の逆行列をを計算する
+	XMMATRIX matInverseVPV = XMMatrixInverse(nullptr, matVPV);
+
+	//スクリーン座標
+	XMVECTOR PosNear = { MousePosition.x, MousePosition.y, 0 };
+	XMVECTOR PosFar = { MousePosition.x, MousePosition.y, 1 };
+
+	//スクリーン座標系からワールド座標系へ
+	PosNear = XMVector3Transform(PosNear, matInverseVPV);
+	PosFar = XMVector3Transform(PosFar, matInverseVPV);
+
+	//マウスレイの方向
+	XMVECTOR mouseDirection = PosNear - PosFar;
+	mouseDirection = XMVector3Normalize(mouseDirection);
+
+	//カメラから照準オブジェクトの距離
+	const float kDistanceTestObject = 30.0f;
+
+	//XMVECTOR VecPos;
+
+	//VecPos = XMLoadFloat3(&position_);
+
+	//XMLoadFloat3(&position_) = PosNear - mouseDirection + XMLoadFloat(&kDistanceTestObject);
+
+	XMStoreFloat3(&position_, PosNear - mouseDirection + XMLoadFloat(&kDistanceTestObject));
+
+	//position_.z = 20.0f;
+
 	// スケール、回転、平行移動行列の計算
 	matScale = XMMatrixScaling(scale_.x, scale_.y, scale_.z);
 	matRot = XMMatrixIdentity();
@@ -146,46 +193,7 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 
 	//更新処理
 
-
-	//マウス座標取得
-	GetCursorPos(&MousePosition);
-	ShowCursor(false);
-
-	//クライアントエリア座標に変換
-	HWND hwnd = WinApp::GetInstance()->GetHwnd();
-	ScreenToClient(hwnd, &MousePosition);
-
-	//ビューポート行列
-	XMMATRIX matViewport = XMMatrixIdentity();	//単位行列
-
-	matViewport.r[0].m128_f32[0] = 1280 / 2;
-	matViewport.r[1].m128_f32[1] = -720 / 2;
-	matViewport.r[3].m128_f32[0] = 1280 / 2;
-	matViewport.r[3].m128_f32[1] = 720 / 2;
-
-	//ビュープロジェクションビューポート合成行列
-	XMMATRIX matVPV = camera_->matView * camera_->matProjection * matViewport;
-
-	//合成行列の逆行列をを計算する
-	XMMATRIX matInverseVPV = XMMatrixInverse(nullptr, matVPV);
-
-	//スクリーン座標
-	XMVECTOR PosNear = { MousePosition.x, MousePosition.y, 0};
-	XMVECTOR PosFar = { MousePosition.x, MousePosition.y, 1};
-
-	//スクリーン座標系からワールド座標系へ
-	PosNear = XMVector3Transform(PosNear, matInverseVPV);
-	PosFar = XMVector3Transform(PosFar, matInverseVPV);
-
-	//マウスレイの方向
-	XMVECTOR mouseDirection = PosNear - PosFar;
-	mouseDirection = XMVector3Normalize(mouseDirection);
-
-	//カメラから照準オブジェクトの距離
-	const float kDistanceTestObject = 30.0f;
-	position_.x = PosNear.m128_f32[0] - mouseDirection.m128_f32[0];
-	position_.y = PosNear.m128_f32[1] - mouseDirection.m128_f32[1];
-	position_.z = PosNear.m128_f32[2] - mouseDirection.m128_f32[2] + kDistanceTestObject;
+	
 
 	//デバッグテキスト
 	//マウス座標
@@ -216,6 +224,16 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 		<< PosFar.m128_f32[2] << ")";
 
 	DebugText::GetInstance()->Print(Farstr.str(), 0, 250, 2.0f);
+
+	//オブジェクトの座標
+	std::ostringstream Objstr;
+	Objstr << "ObjPos("
+		<< std::fixed << std::setprecision(5)
+		<< position_.x << ","
+		<< position_.y << ","
+		<< position_.z << ")";
+
+	DebugText::GetInstance()->Print(Objstr.str(), 0, 300, 2.0f);
 	
 
 
@@ -297,36 +315,33 @@ void Reticle::Update(XMFLOAT3 PlayerPos)
 		//}
 	}
 
-	position_.x = PlayerPos.x;
-	position_.y = PlayerPos.y;
-	position_.z = PlayerPos.z + 30.0f;
 	
 
 
-	//プレイヤーが画面買外に進出しようとするときは押し戻す
-	//右側
-	if (position_.x >= 45)
-	{
-		position_.x = 45;
-	}
+	////プレイヤーが画面買外に進出しようとするときは押し戻す
+	////右側
+	//if (position_.x >= 45)
+	//{
+	//	position_.x = 45;
+	//}
 
-	//左側
-	if (position_.x <= -45)
-	{
-		position_.x = -45;
-	}
+	////左側
+	//if (position_.x <= -45)
+	//{
+	//	position_.x = -45;
+	//}
 
-	//上側
-	if (position_.y >= 20)
-	{
-		position_.y = 20;
-	}
+	////上側
+	//if (position_.y >= 20)
+	//{
+	//	position_.y = 20;
+	//}
 
-	//下側
-	if (position_.y <= -20)
-	{
-		position_.y = -20;
-	}
+	////下側
+	//if (position_.y <= -20)
+	//{
+	//	position_.y = -20;
+	//}
 }
 
 
