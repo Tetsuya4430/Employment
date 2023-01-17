@@ -121,7 +121,6 @@
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PostEffect.cpp" />
-    <ClCompile Include="Reticle.cpp" />
     <ClCompile Include="SceneFactory.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Sprite.cpp" />

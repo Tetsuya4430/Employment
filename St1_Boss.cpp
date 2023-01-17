@@ -82,6 +82,9 @@ bool St1_Boss::Initialize(XMFLOAT3 pos)
 		nullptr,
 		IID_PPV_ARGS(&constBuffB0_));
 
+	IntervalTime = 70;
+	Speed = 0.5;
+
 	return true;
 }
 
@@ -148,6 +151,12 @@ void St1_Boss::Update()
 	rotation_.z += 2.0f;
 
 	//çXêVèàóù
+
+	if (HP <= 8)
+	{
+		IntervalTime = 35;
+		Speed = 1.0;
+	}
 
 	switch (phase_)
 	{

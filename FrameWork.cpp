@@ -61,7 +61,7 @@ void FrameWork::Initialize()
 	Player::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
 	//レティクルの静的初期化
-	Reticle::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
+	//Reticle::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
 	//敵の静的初期化
 	Enemy::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
@@ -77,6 +77,10 @@ void FrameWork::Initialize()
 
 	//FBXローダーの初期化処理
 	FbxLoader::GetInstance()->Initialize(dxCommon->GetDev());
+
+	//パーティクル初期化
+	Particle::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
+
 
 }
 

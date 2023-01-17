@@ -3,6 +3,7 @@
 #include "BaseScene.h"
 #include "Sprite.h"
 #include "Object3d.h"
+#include "Audio.h"
 
 /// <summary>
 /// タイトルシーン
@@ -26,5 +27,14 @@ public:
 private:
 	DirectXCommon* dxCommon = nullptr;
 	Sprite* sprite = nullptr;
+
+
+	Sprite* LoadBG = nullptr;
+
+
+	Audio* audio = Audio::GetInstance();
+
+	//ロードフラグ
+	bool LoadFlag = false;
 };
 

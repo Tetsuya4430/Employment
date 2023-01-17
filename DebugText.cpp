@@ -24,7 +24,7 @@ void DebugText::Initialize(UINT texnumber)
 	for (int i = 0; i < _countof(sprites_); i++)
 	{
 		//スプライトを生成
-		sprites_[i] = Sprite::Create(texnumber, { 0, 0 });
+		sprites_[i] = Sprite::Create(texnumber, { 1, 1, 1, 1 }, { 0, 0 });
 	}
 }
 

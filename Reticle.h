@@ -154,5 +154,7 @@ public:
 
 	// マウス座標
 	POINT MousePosition;
+
+	XMFLOAT3 Mouse;
 };
 

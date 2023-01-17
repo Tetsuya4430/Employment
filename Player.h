@@ -2,6 +2,7 @@
 #include "Model.h"
 #include "Camera.h"
 #include "Bullet.h"
+#include "Audio.h"
 
 #include <Windows.h>
 #include <wrl.h>
@@ -135,8 +136,6 @@ private: // 静的メンバ変数
 	ComPtr<ID3D12Resource> constBuffB0_;
 	// ローカルスケール
 	XMFLOAT3 scale_ = {0.5,0.5,0.5 };
-	// X,Y,Z軸回りのローカル回転角
-	XMFLOAT3 rotation_ = { 0,0,0 };
 	// ローカルワールド変換行列
 	XMMATRIX matWorld_;
 	// 親オブジェクト
@@ -144,9 +143,12 @@ private: // 静的メンバ変数
 
 	Input* input = nullptr;
 
+	Audio* audio = Audio::GetInstance();
+
 	
 	//プレイヤーの移動スピード
 	float Speed = 0.5f;
+	float K = 0.5f;
 
 	//プレイヤーの移動係数
 	float Mag = 1.0f;
@@ -195,12 +197,24 @@ private: // 静的メンバ変数
 	//回避タイム
 	const float AvoidCount = 10.0f;
 
-	public:
+	//滑る時間
+	int Timer = 0;
+
+	//移動方向
+	bool moveR = false;
+	bool moveL = false; 
+	bool moveD = false;
+	bool moveU = false;
+
+public:
 		// ローカル座標
 		XMFLOAT3 position_ = { 0,0,0 };
 
 		//レティクル座標
 		XMFLOAT3 ReticlePos = { 0, 0, 0 };
+		
+		// X,Y,Z軸回りのローカル回転角
+		XMFLOAT3 rotation_ = { 0,0,0 };
 
 		//プレイヤーのHP
 		int HP = 5;
@@ -210,5 +224,8 @@ private: // 静的メンバ変数
 
 		//プレイヤーの経験値
 		int EXP = 0;
+
+		//移動可能フラグ
+		bool MoveCanFlag = false;
 };
 

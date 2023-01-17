@@ -5,9 +5,10 @@
 #include "Sprite.h"
 #include "Object3d.h"
 #include "Fbx3d.h"
+#include "Audio.h"
 #include "Input.h"
 #include "Bullet.h"
-#include "Reticle.h"
+//#include "Reticle.h"
 #include "EnemyBullet.h"
 #include "Enemy.h"
 #include "St1_Boss.h"
@@ -15,6 +16,7 @@
 #include "ObjectManager.h"
 #include "PostEffect.h"
 #include "Controller.h"
+#include "Particle.h"
 
 
 #include <list>
@@ -73,7 +75,7 @@ public:
 	void EnemyUpdate(XMFLOAT3 enemyPos);
 
 	//プレイヤーの攻撃
-	void Attack();
+	void Attack(XMFLOAT3 StartPos);
 
 	//敵の攻撃
 	void EnemyAttack(XMFLOAT3 EnemyPos);
@@ -98,6 +100,9 @@ public:
 
 	//スプライト描画
 	void DrawSprite();
+
+	//スタート演出
+	void Start();
 
 private:
 	//定数
@@ -129,8 +134,14 @@ private:
 	Camera* camera = nullptr;
 	PostEffect* postEffect = nullptr;
 
+	Audio* audio = Audio::GetInstance();
+
 	//弾
 	std::list<std::unique_ptr<Bullet>> bullets;
+
+	//コア弾
+	std::list<std::unique_ptr<Bullet>> CoreR_bullets;
+	std::list<std::unique_ptr<Bullet>> CoreL_bullets;
 
 	//敵の弾
 	std::list<std::unique_ptr<EnemyBullet>> enemybullets;
@@ -149,12 +160,15 @@ private:
 
 	//プレイヤー
 	Player* P = nullptr;
-	Reticle* Reticle = nullptr;
+	Player* CoreR = nullptr;
+	Player* CoreL = nullptr;
+	//Reticle* Reticle = nullptr;
 	Bullet* B = nullptr;
 
 	St1_Boss* Boss = nullptr;
 
-
+	//パーティクル
+	Particle* particle = nullptr;
 
 
 	//UI
@@ -166,6 +180,10 @@ private:
 	Sprite* HP_3 = nullptr;
 	Sprite* HP_4 = nullptr;
 	Sprite* HP_5 = nullptr;
+	Sprite* Stage_1 = nullptr;
+	Sprite* Go = nullptr;
+	Sprite* Rule = nullptr;
+	Sprite* LoadBG = nullptr;
 
 	//ボスHPスプライト
 	Sprite* BossHP_0 = nullptr;
@@ -196,6 +214,13 @@ private:
 	Sprite* Level_2 = nullptr;
 	Sprite* Level_3 = nullptr;
 
+	//ボス登場演出UI
+	Sprite* BossUI_U = nullptr;
+	Sprite* BossUI_U_2 = nullptr;
+	Sprite* BossUI_D = nullptr;
+	Sprite* BossUI_D_2 = nullptr;
+	Sprite* Warning = nullptr;
+
 
 	//敵の座標
 
@@ -220,6 +245,22 @@ private:
 	//ボスの待機フラグ
 	bool BossFlag = false;
 
+	//ボス登場演出フラグ
+	bool BossFlag_S = false;
+	bool BossFlag_E = false;
+
+	//ボス演出UI回帰用フラグ
+	bool EndUIFlag = false;
+	
+	//ボスUI描画フラグ
+	bool BossUIDrawFlag = false;
+
+	//Warningフラグ
+	bool WarningFlag = false;
+
+	//ロードフラグ
+	bool LoadFlag = false;
+
 	//ボスの待機タイマー
 	int BossTimer = 128;
 
@@ -228,6 +269,9 @@ private:
 
 	//ボス撃破からの演出タイマー
 	int WaitTimer = 0;
+
+	//ゲームスタート演出用
+	int StartTimer = 0;
 
 	public:
 	//弾の発射間隔
@@ -247,6 +291,8 @@ private:
 
 	//ボス体力タイマー
 	int BossHPTimer = 120;
+
+	XMFLOAT2 BarSize = { 100, 200 };
 
 };
 

@@ -62,6 +62,23 @@ public:	//メンバ関数
 	/// </summary>
 	static void UpdateViewMatrix();
 
+
+	/// <summary>
+	/// 射影行列の取得
+	/// </summary>
+	/// <returns>射影行列</returns>
+	inline const XMMATRIX& GetProjectionMatrix() {
+		return matProjection;
+	}
+
+	/// <summary>
+	/// ビュー射影行列の取得
+	/// </summary>
+	/// <returns>ビュー射影行列</returns>
+	inline const XMMATRIX& GetViewProjectionMatrix() {
+		return matViewProjection;
+	}
+
 	//ビュー射影行列の取得
 	static const XMMATRIX& GetmatViewProjection() { return matViewProjection; }
 

@@ -47,12 +47,12 @@ public:
 	/// <param name="anchorpoint">アンカーポイント</param>
 	/// <param name="isFlipX">X反転するか</param>
 	/// <param name="isFlipY">Y反転するか</param>
-	static Sprite* Create(UINT texNumber, DirectX::XMFLOAT2 anchorpoint = {1.0f, 1.0f}, bool isFlipX = false, bool isFlipY = false);
+	static Sprite* Create(UINT texNumber, XMFLOAT4 color, DirectX::XMFLOAT2 anchorpoint = {1.0f, 1.0f}, bool isFlipX = false, bool isFlipY = false);
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(UINT texNumber, DirectX::XMFLOAT2 anchorpoint , bool isFlipX, bool isFlipY);
+	void Initialize(UINT texNumber, XMFLOAT4 color_, DirectX::XMFLOAT2 anchorpoint , bool isFlipX, bool isFlipY);
 
 	/// <summary>
 	/// 頂点バッファの転送
@@ -75,6 +75,12 @@ public:
 	void SetSize(const DirectX::XMFLOAT2& size) { size_ = size; }
 	void SetTexLeftTop(const DirectX::XMFLOAT2& texLeftTop) { texLeftTop_ = texLeftTop; }
 	void SetTexSize(const DirectX::XMFLOAT2& texSize) { texSize_ = texSize; }
+	void SetColor(const DirectX::XMFLOAT4& color) { color_ = color; }
+
+	//getter
+	// 座標の取得
+	const XMFLOAT2& GetSize() { return size_; }
+
 
 	protected:
 	//頂点バッファ
@@ -92,14 +98,12 @@ public:
 	//ワールド座標
 	DirectX::XMMATRIX matWorld_;
 
-	//色(RGBA)
-	DirectX::XMFLOAT4 color_ = { 1, 1, 1, 1 };
 
 	//テクスチャ番号
 	UINT texNumber_ = 0;
 
 	//大きさ
-	DirectX::XMFLOAT2 size_ = { 100, 200 };
+	DirectX::XMFLOAT2 size_ = { BarSize.x, BarSize.y };
 
 	//アンカーポイント
 	DirectX::XMFLOAT2 anchorpoint_ = { 1.0f, 1.0f };
@@ -119,8 +123,23 @@ public:
 	//非表示
 	bool isInvisible_ = false;
 
+	
+
 	public:
 	//座標
 	DirectX::XMFLOAT3 position_ = { 0, 0, 0 };
+	//サイズ変更用変数
+	XMFLOAT2 BarSize = { 100, 200 };
+
+	// 色(RGBA)
+	DirectX::XMFLOAT4 color_ = { 1, 1, 1, 1 };
+
+	//イージング用変数
+	XMFLOAT2 Vec = { 0, 0 };
+	XMFLOAT2 PointPos ={0, 0};
+
+	//移動完了フラグ
+	bool ComFlag = false;
+	bool ComFlag_2 = false;
 };
 

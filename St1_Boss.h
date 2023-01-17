@@ -170,7 +170,7 @@ public:
 
 	int DeathFlag = false;
 
-	static const int IntervalTime = 70;
+	int IntervalTime = 70;
 
 	int FireTime = 0;
 

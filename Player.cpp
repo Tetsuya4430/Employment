@@ -81,6 +81,12 @@ bool Player::Initialize()
 	Level = 1;
 	EXP = 0;
 
+	audio->Initialize();
+
+
+	Audio::GetInstance()->LoadWave("Avoid.wav");
+	Audio::GetInstance()->LoadWave("LevelUp.wav");
+
 	HRESULT result;
 	// 定数バッファの生成
 	result = device->CreateCommittedResource(
@@ -121,27 +127,10 @@ void Player::Draw()
 
 void Player::Update()
 {
-	if (position_.z < 0)
+	/*if (position_.z < 0)
 	{
 		position_.z += 3;
-	}
-
-	//EXP
-	std::ostringstream EXPstr;
-	EXPstr << "EXP("
-		<< std::fixed << std::setprecision(2)
-		<< EXP << ")";
-
-	DebugText::GetInstance()->Print(EXPstr.str(), 0, 100, 2.0f);
-
-	//Level
-	std::ostringstream Levelstr;
-	Levelstr << "Level("
-		<< std::fixed << std::setprecision(2)
-		<< Level << ")";
-
-	DebugText::GetInstance()->Print(Levelstr.str(), 0, 150, 2.0f);
-
+	}*/
 
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
@@ -178,94 +167,135 @@ void Player::Update()
 
 	//更新処理
 
+	Mag = 0.0f;
+
+	if (Level == 1)
+	{
+		Speed = 0.5f;
+	}
+
+	else if (Level == 2)
+	{
+		Speed = 0.75f;
+	}
+
+	else if (Level == 3)
+	{
+		Speed = 1.0f;
+	}
+
+	
+
+	//コントローラーの押下情報更新
+	UpdateInput();
+
 	//プレイヤーの移動
+	//キーボード
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 	{
-		/*if (Avoidanceflag_X == false || Avoidanceflag_Y == false)
-		{*/
-			MoveFlag = 1;
-			if (Input::GetInstance()->PushKey(DIK_D))
+		
+			K = 0.5f;
+		
+			if (MoveCanFlag == true)
 			{
-				if (position_.x <= 45)
+
+
+				if (Input::GetInstance()->PushKey(DIK_A) && Input::GetInstance()->PushKey(DIK_W))
 				{
-					position_.x += Speed * Mag;
-					Old.x = Speed * Mag;
+					Mag = 0.71f;
+					moveR = false;
+					moveL = false;
+					moveU = false;
+					moveD = false;
 				}
 
-				/*if (RotlimR < rotation_.z)
+				else if (Input::GetInstance()->PushKey(DIK_A) && Input::GetInstance()->PushKey(DIK_S))
 				{
-					rotation_.z -= 0.3f;
-				}*/
-			}
+					Mag = 0.71f;
+					moveR = false;
+					moveL = false;
+					moveU = false;
+					moveD = false;
+				}
 
-			
+				else if (Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->PushKey(DIK_W))
+				{
+					Mag = 0.71f;
+					moveR = false;
+					moveL = false;
+					moveU = false;
+					moveD = false;
+				}
+
+				else if (Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->PushKey(DIK_S))
+				{
+					Mag = 0.71f;
+					moveR = false;
+					moveL = false;
+					moveU = false;
+					moveD = false;
+				}
+
+				else
+				{
+					Mag = 1.0f;
+
+					moveR = false;
+					moveL = false;
+					moveU = false;
+					moveD = false;
+				}
+
+
+				MoveFlag = 1;
+				if (Input::GetInstance()->PushKey(DIK_D))
+				{
+					moveR = true;
+					if (position_.x <= 45)
+					{
+						position_.x += Speed * Mag;
+						Old.x = Speed * Mag;
+					}
+				}
+
+
 				if (Input::GetInstance()->PushKey(DIK_A))
 				{
+					moveL = true;
 					if (position_.x >= -45)
 					{
 						position_.x -= Speed * Mag;
 						Old.x = -Speed * Mag;
 					}
+				}
 
-					/*if (RotlimL > rotation_.z)
+
+				if (Input::GetInstance()->PushKey(DIK_W))
+				{
+					moveU = true;
+					if (position_.y <= 20)
 					{
-						rotation_.z += 0.3f;
-					}*/
+						position_.y += Speed * Mag;
+						Old.y = Speed * Mag;
+					}
 				}
 
-
-			if (Input::GetInstance()->PushKey(DIK_W))
-			{
-				if (position_.y <= 20)
+				if (Input::GetInstance()->PushKey(DIK_S))
 				{
-					position_.y += Speed * Mag;
-					Old.y = Speed * Mag;
+					moveD = true;
+					if (position_.y >= -25)
+					{
+						position_.y -= Speed * Mag;
+						Old.y = -Speed * Mag;
+					}
 				}
-			}
 
-			if (Input::GetInstance()->PushKey(DIK_S))
-			{
-				if (position_.y >= -25)
+				else
 				{
-					position_.y -= Speed * Mag;
-					Old.y = -Speed * Mag;
+					MoveFlag = 0;
 				}
 			}
-
-			else
-			{
-				MoveFlag = 0;
-				Mag = 0.0f;
-			}
-
-			if (Input::GetInstance()->PushKey(DIK_A) && Input::GetInstance()->PushKey(DIK_W))
-			{
-				Mag = 0.71f;
-			}
-
-			else if (Input::GetInstance()->PushKey(DIK_A) && Input::GetInstance()->PushKey(DIK_S))
-			{
-				Mag = 0.71f;
-			}
-
-			else if (Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->PushKey(DIK_W))
-			{
-				Mag = 0.71f;
-			}
-
-			else if (Input::GetInstance()->PushKey(DIK_D) && Input::GetInstance()->PushKey(DIK_S))
-			{
-				Mag = 0.71f;
-			}
-
-			else
-			{
-				Mag = 1.0f;
-			}
-
-
 			
-
 			//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
 			if (MoveFlag == 0)
 			{
@@ -323,10 +353,268 @@ void Player::Update()
 			}
 
 
-			//コントローラーの押下情報更新
-			UpdateInput();
 		//}
 	}
+
+
+	//キーボード
+	if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))
+	{
+
+		K = 0.5f;
+
+		if (MoveCanFlag == true)
+		{
+
+
+			if (IsButtonPush(ButtonKind::LeftButton) && IsButtonPush(ButtonKind::UpButton))
+			{
+				Mag = 0.71f;
+				moveR = false;
+				moveL = false;
+				moveU = false;
+				moveD = false;
+			}
+
+			else if (IsButtonPush(ButtonKind::LeftButton) && IsButtonPush(ButtonKind::DownButton))
+			{
+				Mag = 0.71f;
+				moveR = false;
+				moveL = false;
+				moveU = false;
+				moveD = false;
+			}
+
+			else if (IsButtonPush(ButtonKind::RightButton) && IsButtonPush(ButtonKind::UpButton))
+			{
+				Mag = 0.71f;
+				moveR = false;
+				moveL = false;
+				moveU = false;
+				moveD = false;
+			}
+
+			else if (IsButtonPush(ButtonKind::RightButton) && IsButtonPush(ButtonKind::DownButton))
+			{
+				Mag = 0.71f;
+				moveR = false;
+				moveL = false;
+				moveU = false;
+				moveD = false;
+			}
+
+			else
+			{
+				Mag = 1.0f;
+
+				moveR = false;
+				moveL = false;
+				moveU = false;
+				moveD = false;
+			}
+
+
+			MoveFlag = 1;
+			if (IsButtonPush(ButtonKind::RightButton))
+			{
+				moveR = true;
+				if (position_.x <= 45)
+				{
+					position_.x += Speed * Mag;
+					Old.x = Speed * Mag;
+				}
+			}
+
+
+			if (IsButtonPush(ButtonKind::LeftButton))
+			{
+				moveL = true;
+				if (position_.x >= -45)
+				{
+					position_.x -= Speed * Mag;
+					Old.x = -Speed * Mag;
+				}
+			}
+
+
+			if (IsButtonPush(ButtonKind::UpButton))
+			{
+				moveU = true;
+				if (position_.y <= 20)
+				{
+					position_.y += Speed * Mag;
+					Old.y = Speed * Mag;
+				}
+			}
+
+			if (IsButtonPush(ButtonKind::DownButton))
+			{
+				moveD = true;
+				if (position_.y >= -25)
+				{
+					position_.y -= Speed * Mag;
+					Old.y = -Speed * Mag;
+				}
+			}
+
+			else
+			{
+				MoveFlag = 0;
+			}
+		}
+
+
+		//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
+		if (MoveFlag == 0)
+		{
+			if (Avoidanceflag_X == false && Avoidanceflag_Y == false)
+			{
+				/*if (rotation_.z > 0)
+				{
+					rotation_.z -= 0.5f;
+				}
+
+				if (rotation_.z < 0)
+				{
+					rotation_.z += 0.5f;
+				}*/
+			}
+		}
+
+
+		if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))
+		{
+			MoveFlag = 1;
+			if (IsButtonPush(ButtonKind::RightButton))
+			{
+				position_.x += 0.5f;
+				if (RotlimR < rotation_.z)
+				{
+					rotation_.z -= 0.3f;
+				}
+			}
+
+			if (IsButtonPush(ButtonKind::LeftButton))
+			{
+				MoveFlag = 1;
+				position_.x -= 0.5f;
+				if (RotlimL > rotation_.z)
+				{
+					rotation_.z += 0.3f;
+				}
+			}
+
+			if (IsButtonPush(ButtonKind::UpButton))
+			{
+				position_.y += 0.5f;
+			}
+
+			if (IsButtonPush(ButtonKind::DownButton))
+			{
+				position_.y -= 0.5f;
+			}
+		}
+
+		else
+		{
+			MoveFlag = 0;
+		}
+
+
+		//コントローラーの押下情報更新
+		UpdateInput();
+		//}
+	}
+
+	//もし移動していないのであれば
+	if (Mag == 0.0f)
+	{
+		//移動量分動かす
+		if (K > 0)
+		{
+			if (moveR == true)
+			{
+				K -= 0.01f;
+				position_.x += K;
+			}
+
+			if (moveL == true)
+			{
+				K -= 0.01f;
+				position_.x -= K;
+			}
+
+			if (moveU == true)
+			{
+				K -= 0.01f;
+				position_.y += K;
+			}
+
+			if (moveD == true)
+			{
+				K -= 0.01f;
+				position_.y -= K;
+			}
+
+			//斜め移動
+			else if (moveR == true && moveU == true)
+			{
+				K -= 0.01f;
+				position_.x += K;
+				position_.y += K;
+			}
+
+			else if (moveR == true && moveD == true)
+			{
+				K -= 0.01f;
+				position_.x += K;
+				position_.y -= K;
+			}
+
+			else if (moveL == true && moveD == true)
+			{
+				K -= 0.01f;
+				position_.x -= K;
+				position_.y -= K;
+			}
+
+			else if (moveL == true && moveU == true)
+			{
+				K -= 0.01f;
+				position_.x -= K;
+				position_.y += K;
+			}
+		}
+
+	}
+
+//デバッグ用
+	//オブジェクトの座標
+	//std::ostringstream Objstr;
+	//Objstr << "ObjPos("
+	//	<< std::fixed << std::setprecision(5)
+	//	<< position_.x << ","
+	//	<< position_.y << ","
+	//	<< position_.z << ")";
+
+	//DebugText::GetInstance()->Print(Objstr.str(), 0, 300, 2.0f);
+
+	////mag
+	//std::ostringstream Magstr;
+	//Magstr << "Mag("
+	//	<< std::fixed << std::setprecision(5)
+	//	<< Mag << ")";
+
+	//DebugText::GetInstance()->Print(Magstr.str(), 0, 0, 2.0f);
+
+	////Old
+	//std::ostringstream Oldstr;
+	//Oldstr << "OldPos("
+	//	<< std::fixed << std::setprecision(5)
+	//	<< Old.x << ","
+	//	<< Old.y << ")";
+
+	//DebugText::GetInstance()->Print(Oldstr.str(), 0, 50, 2.0f);
 
 
 	////もし移動が終了しているなら
@@ -366,6 +654,7 @@ void Player::Update()
 	//}
 
 	//回避モーション
+	//キーボード
 	if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 	{
 
@@ -374,6 +663,7 @@ void Player::Update()
 			//右回避
 			if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_D) && Avoidanceflag_X == false)
 			{
+				Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
 				PointPos = position_.x + AvoidDistance_X;
 				RolePos = rotation_.z - RoleDistance;
 				RotFlag_R = true;
@@ -384,6 +674,7 @@ void Player::Update()
 			//左回避
 			if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_A) && Avoidanceflag_X == false)
 			{
+				Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
 				PointPos = position_.x - AvoidDistance_X;
 				RolePos = rotation_.z + RoleDistance;
 				RotFlag_L = true;
@@ -397,6 +688,7 @@ void Player::Update()
 			//上回避
 			if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_W) && Avoidanceflag_Y == false)
 			{
+				Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
 				PointPos = position_.y + AvoidDistance_Y;
 
 				Avoidanceflag_Y = true;
@@ -405,6 +697,7 @@ void Player::Update()
 			//下回避
 			if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_S) && Avoidanceflag_Y == false)
 			{
+				Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
 				PointPos = position_.y - AvoidDistance_Y;
 
 				Avoidanceflag_Y = true;
@@ -432,6 +725,82 @@ void Player::Update()
 	}
 
 	if (Input::GetInstance()->PushKey(DIK_S) && Input::GetInstance()->PushKey(DIK_A))
+	{
+		Avoidanceflag_X = false;
+		Avoidanceflag_Y = false;
+	}
+
+	//コントローラー
+	if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))
+	{
+
+		if (AvoidanceTimer_X == 0)
+		{
+			//右回避
+			if (IsButtonPush(ButtonKind::Button_A) && IsButtonPush(ButtonKind::RightButton) && Avoidanceflag_X == false)
+			{
+				Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
+				PointPos = position_.x + AvoidDistance_X;
+				RolePos = rotation_.z - RoleDistance;
+				RotFlag_R = true;
+
+				Avoidanceflag_X = true;
+			}
+
+			//左回避
+			if (IsButtonPush(ButtonKind::Button_A) && IsButtonPush(ButtonKind::LeftButton) && Avoidanceflag_X == false)
+			{
+				Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
+				PointPos = position_.x - AvoidDistance_X;
+				RolePos = rotation_.z + RoleDistance;
+				RotFlag_L = true;
+
+				Avoidanceflag_X = true;
+			}
+		}
+
+		if (AvoidanceTimer_Y == 0)
+		{
+			//上回避
+			if (IsButtonPush(ButtonKind::Button_A) && IsButtonPush(ButtonKind::UpButton) && Avoidanceflag_Y == false)
+			{
+				Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
+				PointPos = position_.y + AvoidDistance_Y;
+
+				Avoidanceflag_Y = true;
+			}
+
+			//下回避
+			if (IsButtonPush(ButtonKind::Button_A) && IsButtonPush(ButtonKind::DownButton) && Avoidanceflag_Y == false)
+			{
+				Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
+				PointPos = position_.y - AvoidDistance_Y;
+
+				Avoidanceflag_Y = true;
+			}
+		}
+	}
+
+	//斜め回避は受け付けない
+	if (IsButtonPush(ButtonKind::UpButton) && IsButtonPush(ButtonKind::RightButton))
+	{
+		Avoidanceflag_X = false;
+		Avoidanceflag_Y = false;
+	}
+
+	if (IsButtonPush(ButtonKind::UpButton) && IsButtonPush(ButtonKind::LeftButton))
+	{
+		Avoidanceflag_X = false;
+		Avoidanceflag_Y = false;
+	}
+
+	if (IsButtonPush(ButtonKind::DownButton) && IsButtonPush(ButtonKind::RightButton))
+	{
+		Avoidanceflag_X = false;
+		Avoidanceflag_Y = false;
+	}
+
+	if (IsButtonPush(ButtonKind::DownButton) && IsButtonPush(ButtonKind::LeftButton))
 	{
 		Avoidanceflag_X = false;
 		Avoidanceflag_Y = false;
@@ -514,6 +883,7 @@ void Player::Update()
 	//経験値が5たまったら
 	if (EXP == 5 && Level < 3)
 	{
+		Audio::GetInstance()->PlayWave("LevelUp.wav", 0.3f, false);
 		//経験値をリセットして、レベルを1上昇
 		EXP = 0;
 		Level += 1;

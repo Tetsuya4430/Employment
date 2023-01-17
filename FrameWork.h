@@ -15,6 +15,7 @@
 #include "Audio.h"
 #include "SceneManager.h"
 #include "AbstractSceneFactory.h"
+#include "Particle.h"
 
 
 /// <summary>

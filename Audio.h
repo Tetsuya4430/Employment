@@ -57,7 +57,7 @@ public: // メンバ関数
 	static Audio* GetInstance();
 
 	// 初期化
-	void Initialize(const std::string& directoryPath = "Resources/Music/");
+	void Initialize(const std::string& directoryPath = "Resources/Audio/");
 
 	//解放処理
 	void Finalize();
@@ -69,7 +69,7 @@ public: // メンバ関数
 	void UnLoad(SoundData* soundData);
 
 	// サウンドファイルの再生
-	void PlayWave(const std::string& filename);
+	void PlayWave(const std::string& filename, const float Volume, bool Loop = false);
 
 	//サウンドファイルの停止
 	void StopWave(const std::string& filename);

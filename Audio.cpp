@@ -63,7 +63,7 @@ void Audio::LoadWave(const std::string& filename)
 	// Waveファイルを開く
 	file.open(fullpath, std::ios_base::binary);
 	// ファイルオープン失敗をチェック
-	assert(file.is_open());
+	//assert(file.is_open());
 
 	// RIFFヘッダーの読み込み
 	RiffHeader riff;
@@ -151,7 +151,7 @@ void Audio::UnLoad(SoundData* soundData)
 
 }
 
-void Audio::PlayWave(const std::string& filename)
+void Audio::PlayWave(const std::string& filename, const float Volume, bool Loop)
 {
 	HRESULT result;
 
@@ -164,7 +164,7 @@ void Audio::PlayWave(const std::string& filename)
 	SoundData& soundData = it->second;
 
 	//波形フォーマットを元にSourceVoiceの生成
-	result = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
+	result = xAudio2->CreateSourceVoice(&soundData.pSourceVoice, &soundData.wfex);
 	assert(SUCCEEDED(result));
 
 	// 再生する波形データの設定
@@ -173,10 +173,16 @@ void Audio::PlayWave(const std::string& filename)
 	buf.AudioBytes = soundData.bufferSize;
 	//buf.pContext = pBuffer;
 	buf.Flags = XAUDIO2_END_OF_STREAM;
+	if (Loop)
+	{
+		buf.LoopCount = XAUDIO2_LOOP_INFINITE;
+	}
+
+	soundData.pSourceVoice->SetVolume(Volume);
 
 	// 波形データの再生
-	result = pSourceVoice->SubmitSourceBuffer(&buf);
-	result = pSourceVoice->Start();
+	result = soundData.pSourceVoice->SubmitSourceBuffer(&buf);
+	result = soundData.pSourceVoice->Start();
 }
 
 void Audio::StopWave(const std::string& filename)

@@ -34,47 +34,8 @@ GameScene::~GameScene()
 
 void GameScene::Initialize()
 {
-	////スプライト共通テクスチャ読み込み
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/BackGround.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(2, L"Resources/Image/Reticle.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(3, L"Resources/Image/HP_5.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(4, L"Resources/Image/HP_4.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(5, L"Resources/Image/HP_3.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(6, L"Resources/Image/HP_2.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(7, L"Resources/Image/HP_1.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(8, L"Resources/Image/HP_0.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(25, L"Resources/Image/ExpBar/ExpUI_0.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(26, L"Resources/Image/ExpBar/ExpUI_1.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(27, L"Resources/Image/ExpBar/ExpUI_2.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(28, L"Resources/Image/ExpBar/ExpUI_3.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(29, L"Resources/Image/ExpBar/ExpUI_4.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(30, L"Resources/Image/ExpBar/ExpUI_5.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(31, L"Resources/Image/ExpBar/Level_1.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(32, L"Resources/Image/ExpBar/Level_2.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(33, L"Resources/Image/ExpBar/Level_3.png");
-
-	//	スプライトの生成
-	sprite = Sprite::Create(1, { 0, 0 }, false, false);
-	UI = Sprite::Create(2, { 0.5, 0.5 }, false, false);
-	HP_0 = Sprite::Create(8, { 0, 0 }, false, false);
-	HP_1 = Sprite::Create(7, { 0, 0 }, false, false);
-	HP_2 = Sprite::Create(6, { 0, 0 }, false, false);
-	HP_3 = Sprite::Create(5, { 0, 0 }, false, false);
-	HP_4 = Sprite::Create(4, { 0, 0 }, false, false);
-	HP_5 = Sprite::Create(3, { 0, 0 }, false, false);
-
-	ExpBar_0 = Sprite::Create(25, { 0, 0 }, false, false);
-	ExpBar_1 = Sprite::Create(26, { 0, 0 }, false, false);
-	ExpBar_2 = Sprite::Create(27, { 0, 0 }, false, false);
-	ExpBar_3 = Sprite::Create(28, { 0, 0 }, false, false);
-	ExpBar_4 = Sprite::Create(29, { 0, 0 }, false, false);
-	ExpBar_5 = Sprite::Create(30, { 0, 0 }, false, false);
-	Level_1 = Sprite::Create(31, { 0, 0 }, false, false);
-	Level_2 = Sprite::Create(32, { 0, 0 }, false, false);
-	Level_3 = Sprite::Create(33, { 0, 0 }, false, false);
-
 	
-
+	
 	LoadSprite();
 	//ポストエフェクトの生成
 	//postEffect = PostEffect::Create(100, { 0, 0 }, false, false);
@@ -87,9 +48,17 @@ void GameScene::Initialize()
 	model_Enemy = Model::LoadFromObj("Enemy_1");
 	model_Boss = Model::LoadFromObj("Boss");
 	model_sphere = Model::LoadFromObj("CelestialSphere");
-	model_reticle = Model::LoadFromObj("Reticle");
+	model_reticle = Model::LoadFromObj("Box");
 
+	Audio::GetInstance()->Initialize();
 
+	Audio::GetInstance()->LoadWave("Bullet.wav");
+	Audio::GetInstance()->LoadWave("BossDown.wav");
+	Audio::GetInstance()->LoadWave("Damage.wav");
+	Audio::GetInstance()->LoadWave("EnemyDown.wav");
+	Audio::GetInstance()->LoadWave("GameOver.wav");
+	Audio::GetInstance()->LoadWave("GameScene.wav");
+	Audio::GetInstance()->LoadWave("GameClear.wav");
 	
 
 	//敵の初期化
@@ -99,14 +68,16 @@ void GameScene::Initialize()
 
 	//3Dオブジェクト生成
 	P = Player::Create(model_2, camera);
+	CoreR = Player::Create(model_reticle, camera);
+	CoreL = Player::Create(model_reticle, camera);
 
 	//天球生成
 	CelestialSphere = Object3d::Create(model_sphere, camera);
 	CelestialSphere->SetScale({100, 100, 100});
 
 	//レティクル生成
-	Reticle = Reticle::Create(model_reticle, camera);
-	Reticle->SetScale({ 2, 2, 2 });
+	//Reticle = Reticle::Create(model_reticle, camera);
+	//Reticle->SetScale({ 0.5, 0.5, 0.5 });
 
 
 
@@ -116,9 +87,65 @@ void GameScene::Initialize()
 
 	/*object1->PlayAnimation();*/
 
+	//パーティクル生成
+	particle = Particle::Create(camera);
+	particle->Update();
+
+
+	// パーティクルマネージャ生成
+	//partMan = PartMan::Create(dxCommon->GetDevice(), camera);
+
+
 	//演出タイマー初期化
 	WaitTimer = 0;
 	BossTimer = 128;
+
+	//ステージスタート時UIの初期化
+	Stage_1->position_.x = 1280;
+	Stage_1->position_.y = 285;
+	Go->position_.y = -720;
+
+	BossUI_U->SetColor({ 1, 1, 1, 0.7f });
+	BossUI_U_2->SetColor({ 1, 1, 1, 0.7f });
+	BossUI_D->SetColor({ 1, 1, 1, 0.7f });
+	BossUI_D_2->SetColor({ 1, 1, 1, 0.7f });
+
+	BossUI_U->position_.x = 0;
+	BossUI_U->position_.y = 100;
+	BossUI_U_2->position_.x = -1280;
+	BossUI_U_2->position_.y = 100;
+
+	BossUI_D->position_.x = 0;
+	BossUI_D->position_.y = -100;
+	BossUI_D_2->position_.x = 1280;
+	BossUI_D_2->position_.y = -100;
+
+	//最初の目的座標
+	Stage_1->PointPos.x = 460;
+	Stage_1->PointPos.y = 285;
+	Go->PointPos.y = 0;
+
+	BossUI_U->PointPos.x = 1280;
+	BossUI_U->PointPos.y = 0;
+	BossUI_U_2->PointPos.x = 0;
+	BossUI_U_2->PointPos.y = 0;
+
+	BossUI_D->PointPos.x = -1280;
+	BossUI_D->PointPos.y = 0;
+	BossUI_D_2->PointPos.x = 0;
+	BossUI_D_2->PointPos.y = 0;
+
+	LoadBG->color_.w = 1.0f;
+
+	
+	CoreR->SetScale({ 0.5f, 0.5f, 0.5f });
+	CoreL->SetScale({ 0.5f, 0.5f, 0.5f });
+
+	//コントローラー初期化
+	InitInput();
+
+
+	Audio::GetInstance()->PlayWave("GameScene.wav", 0.1f, true);
 }
 
 void GameScene::Finalize()
@@ -140,18 +167,90 @@ void GameScene::Finalize()
 
 void GameScene::Update()
 {
-	
-	UI->position_.x = Reticle->MousePosition.x;
-	UI->position_.y = Reticle->MousePosition.y;
 
-	UI->Update();
-
-	//シーン遷移
-	//敵のHPが0になったらゲームクリア
-	if (Boss)
+	if (!LoadBG->color_.w <= 0.0f)
 	{
-		if (Boss->HP <= 0 && BossTimer <= 0)
+		LoadBG->color_.w -= 0.02f;
+
+		LoadBG->Update();
+	}
+
+	/*if (LoadBG->color_.w <= 0.0f)
+	{
+		LoadFlag = true;
+	}*/
+
+	if (LoadBG->color_.w <= 0.0f)
+	{
+		LoadBG->color_.w = 0.0f;
+		Start();
+	}
+
+		//UI->position_.x = Reticle->MousePosition.x;
+		//UI->position_.y = Reticle->MousePosition.y;
+
+		//プレイヤーコアの座標設定
+		CoreR->position_.x = P->position_.x + 6;
+		CoreR->position_.y = P->position_.y - 1;
+		CoreR->position_.z = P->position_.z;
+
+		CoreL->position_.x = P->position_.x - 6;
+		CoreL->position_.y = P->position_.y - 1;
+		CoreL->position_.z = P->position_.z;
+
+		CoreR->rotation_ = { 0.0f, 0.0f, 0.0f };
+		CoreL->rotation_ = { 0.0f, 0.0f, 0.0f };
+
+		if (Input::GetInstance()->PushKey(DIK_P))
 		{
+			UI->BarSize.x += 1;
+			UI->BarSize.y += 1;
+
+			UI->SetSize(BarSize);
+		}
+
+		//攻撃時SE再生
+		if (P->MoveCanFlag == true && Input::GetInstance()->TriggerKey(DIK_SPACE))
+		{
+			Audio::GetInstance()->PlayWave("Bullet.wav", 0.5f, false);
+		}
+
+		if (P->MoveCanFlag == true && (ButtonKind::Button_B))
+		{
+			Audio::GetInstance()->PlayWave("Bullet.wav", 0.5f, false);
+		}
+
+		UI->GetSize();
+
+		UI->Update();
+
+
+		//シーン遷移
+		//敵のHPが0になったらゲームクリア
+		if (Boss)
+		{
+			if (Boss->HP <= 0 && BossTimer <= 0)
+			{
+				if (WaitTimer < 60)
+				{
+					WaitTimer += 1;
+				}
+
+				if (WaitTimer >= 60)
+				{
+					WaitTimer = 0;
+					Audio::GetInstance()->StopWave("GameScene.wav");
+					SceneManager::GetInstance()->ChangeScene("GAMECLEAR");
+				}
+			}
+		}
+		//プレイヤーのHPが0になったらゲームオーバー
+		if (P->HP <= 0)
+		{
+			/*if (WaitTimer < 60)
+			{
+				WaitTimer += 1;
+			}*/
 			if (WaitTimer < 60)
 			{
 				WaitTimer += 1;
@@ -160,216 +259,292 @@ void GameScene::Update()
 			if (WaitTimer >= 60)
 			{
 				WaitTimer = 0;
-				SceneManager::GetInstance()->ChangeScene("GAMECLEAR");
+				Audio::GetInstance()->StopWave("GameScene.wav");
+				SceneManager::GetInstance()->ChangeScene("GAMEOVER");
 			}
-		}
-	}
-		//プレイヤーのHPが0になったらゲームオーバー
-	if (P->HP <= 0)
-	{
-		if (WaitTimer < 60)
-		{
-			WaitTimer += 1;
+
 		}
 
-		if (WaitTimer >= 60)
+
+		//3Dオブジェクトの更新
+
+		//player->Update();
+
+		//プレイヤーの更新
+		P->Update();
+		CoreR->Update();
+		CoreL->Update();
+
+		/*Reticle->Update();*/
+
+		//プレイヤーの攻撃関数
+		if (P->MoveCanFlag == true)
 		{
-			SceneManager::GetInstance()->ChangeScene("GAMEOVER");
+			Attack(P->position_);
 		}
-	}
-	
 
-	//3Dオブジェクトの更新
-
-	//player->Update();
-
-	//プレイヤーの更新
-	P->Update();
-
-	//Reticle->Update();
-
-	//プレイヤーの攻撃関数
-	Attack();
-
-	if (Boss)
-	{
-		if (Boss->DeathFlag == false)
+		if (P->Level >= 2)
 		{
-			//ボスの更新
-			Boss->Update();
+			Attack(CoreR->position_);
 		}
-	}
 
-
-	UpdateEnemyPopCommands();
-
-	//敵の更新
-	for (std::unique_ptr<Enemy>& enemy : enemys)
-	{
-		if (enemy->DeathFlag == false)
+		if (P->Level >= 3)
 		{
-			//EnemyUpdate(enemy->position);
-			enemy->Update();
+			Attack(CoreL->position_);
+		}
 
-
-			enemy->FireTime--;
-
-			if (enemy->FireTime <= 0)
+		if (Boss)
+		{
+			if (Boss->DeathFlag == false)
 			{
-				EnemyAttack(enemy->position);
-
-				//発射タイマーを初期化
-				enemy->FireTime = enemy->IntervalTime;
+				//ボスの更新
+				Boss->Update();
 			}
 		}
-		
-	}
-
-	//ボスの更新
-	if (Boss)
-	{
-		if (Boss->DeathFlag == false)
-		{
-			Boss->Update();
 
 
-			Boss->FireTime--;
+		UpdateEnemyPopCommands();
 
-			if (Boss->FireTime <= 0)
-			{
-				EnemyAttack(Boss->position);
-
-				//発射タイマーを初期化
-				Boss->FireTime = Boss->IntervalTime;
-			}
-
-		}
-	}
-
-
-	//弾更新
-	for (std::unique_ptr<Bullet>& bullet : bullets)
-	{
-		bullet->Update(P->position_);
-	}
-
-	//敵の弾更新
-	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
-	{
-		//仮として引数をプレイヤーの座標にしている
-		bullet->Update(P->position_, P->position_);
-	}
-
-	//ボスの弾更新
-	for (std::unique_ptr<BossBullet>& bullet : bossbullets)
-	{
-		//仮として引数をプレイヤーの座標にしている
-		bullet->Update(P->position_, P->position_);
-	}
-
-	//デスフラグの立った弾の削除
-	//プレイヤー弾
-	bullets.remove_if([](std::unique_ptr<Bullet>&bullet)
-	{
-		return bullet->DeathGetter();
-	});
-
-	//敵弾
-	enemybullets.remove_if([](std::unique_ptr<EnemyBullet>& Enemybullet)
-	{
-			return Enemybullet->DeathGetter();
-	});
-
-	//ボス弾
-	bossbullets.remove_if([](std::unique_ptr<BossBullet>& Bossbullet)
-		{
-			return Bossbullet->DeathGetter();
-		});
-
-
-	//当たり判定
-
-	for (std::unique_ptr<Bullet>& bullet : bullets)
-	{
+		//敵の更新
 		for (std::unique_ptr<Enemy>& enemy : enemys)
 		{
-			//当たり判定確認
 			if (enemy->DeathFlag == false)
 			{
-				if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
+				//EnemyUpdate(enemy->position);
+				enemy->Update();
+
+
+				enemy->FireTime--;
+
+				if (enemy->FireTime <= 0)
 				{
-					bullet->DeathFlag = true;
-					enemy->DeathFlag = true;
-					P->EXP += 1;
+					EnemyAttack(enemy->position);
+
+					//発射タイマーを初期化
+					enemy->FireTime = enemy->IntervalTime;
 				}
 			}
-		}
-	}
 
-	
-	for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
-	{
-		//自機と敵の弾当たり判定確認
-		if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
-		{
-			P->HP -= 1;
-			bullet->DeathFlag = true;
 		}
-	}
 
-	//プレイヤーの弾とボスの当たり判定
-	if (Boss)
-	{
-		if (Boss->DeathFlag == false)
+		//ボスの更新
+		if (Boss)
 		{
-			for (std::unique_ptr<Bullet>& bullet : bullets)
+			if (Boss->DeathFlag == false)
 			{
-				if (CheckCollision(bullet->GetPosition(), Boss->GetPosition(), 2.0f, 6.0f) == true)
+				Boss->Update();
+
+				Boss->FireTime--;
+
+				if (Boss->FireTime <= 0)
 				{
-					Boss->HP -= 1;
-					bullet->DeathFlag = true;
+					EnemyAttack(Boss->position);
+
+					//発射タイマーを初期化
+					Boss->FireTime = Boss->IntervalTime;
+				}
+
+			}
+		}
+
+
+		//弾更新
+		for (std::unique_ptr<Bullet>& bullet : bullets)
+		{
+			bullet->Update(P->position_);
+		}
+
+		for (std::unique_ptr<Bullet>& CoreR_bullet : CoreR_bullets)
+		{
+			CoreR_bullet->Update(CoreR->position_);
+		}
+
+		for (std::unique_ptr<Bullet>& CoreL_bullet : CoreL_bullets)
+		{
+			CoreL_bullet->Update(CoreL->position_);
+		}
+
+		//敵の弾更新
+		for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
+		{
+			//仮として引数をプレイヤーの座標にしている
+			bullet->Update(P->position_, P->position_);
+		}
+
+		//ボスの弾更新
+		for (std::unique_ptr<BossBullet>& bullet : bossbullets)
+		{
+			//仮として引数をプレイヤーの座標にしている
+			bullet->Update(P->position_, P->position_);
+		}
+
+		//デスフラグの立った弾の削除
+		//プレイヤー弾
+		bullets.remove_if([](std::unique_ptr<Bullet>& bullet)
+			{
+				return bullet->DeathGetter();
+			});
+
+		//コア弾
+		CoreR_bullets.remove_if([](std::unique_ptr<Bullet>& CoreR_bullet)
+			{
+				return CoreR_bullet->DeathGetter();
+			});
+
+		CoreL_bullets.remove_if([](std::unique_ptr<Bullet>& CoreL_bullet)
+			{
+				return CoreL_bullet->DeathGetter();
+			});
+
+		//敵弾
+		enemybullets.remove_if([](std::unique_ptr<EnemyBullet>& Enemybullet)
+			{
+				return Enemybullet->DeathGetter();
+			});
+
+		//ボス弾
+		bossbullets.remove_if([](std::unique_ptr<BossBullet>& Bossbullet)
+			{
+				return Bossbullet->DeathGetter();
+			});
+
+
+		//当たり判定
+
+		for (std::unique_ptr<Bullet>& bullet : bullets)
+		{
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				//当たり判定確認
+				if (enemy->DeathFlag == false)
+				{
+					if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
+					{
+						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
+						bullet->DeathFlag = true;
+						enemy->DeathFlag = true;
+						P->EXP += 1;
+					}
 				}
 			}
 		}
 
-		if (Boss->HP <= 0)
+		//コアと敵の当たり判定
+		//右
+		for (std::unique_ptr<Bullet>& CoreR_bullet : CoreR_bullets)
 		{
-			Boss->DeathFlag = true;
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				//当たり判定確認
+				if (enemy->DeathFlag == false)
+				{
+					if (CheckCollision(CoreR_bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
+					{
+						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
+						CoreR_bullet->DeathFlag = true;
+						enemy->DeathFlag = true;
+						P->EXP += 1;
+					}
+				}
+			}
 		}
-	}
 
-	//ボスの弾とプレイヤーの当たり判定
-	if (Boss)
-	{
-		for (std::unique_ptr<BossBullet>& bullet : bossbullets)
+		//左
+		for (std::unique_ptr<Bullet>& CoreL_bullet : CoreL_bullets)
+		{
+			for (std::unique_ptr<Enemy>& enemy : enemys)
+			{
+				//当たり判定確認
+				if (enemy->DeathFlag == false)
+				{
+					if (CheckCollision(CoreL_bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
+					{
+						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
+						CoreL_bullet->DeathFlag = true;
+						enemy->DeathFlag = true;
+						P->EXP += 1;
+					}
+				}
+			}
+		}
+
+		for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
 		{
 			//自機と敵の弾当たり判定確認
 			if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
 			{
+				Audio::GetInstance()->PlayWave("Damage.wav", 0.1f, false);
 				P->HP -= 1;
 				bullet->DeathFlag = true;
 			}
 		}
-	}
 
-	//天球更新
-	CelestialSphere->Update();
+		//プレイヤーの弾とボスの当たり判定
+		if (Boss)
+		{
+			if (Boss->DeathFlag == false)
+			{
+				for (std::unique_ptr<Bullet>& bullet : bullets)
+				{
+					if (CheckCollision(bullet->GetPosition(), Boss->GetPosition(), 2.0f, 6.0f) == true)
+					{
+						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
+						Boss->HP -= 1;
+						bullet->DeathFlag = true;
+					}
+				}
+			}
 
-	//レティクル更新
-	Reticle->Update(P->position_);
+			if (Boss->HP <= 0)
+			{
+				
+				Boss->DeathFlag = true;
+			}
+		}
 
-	//FBXオブジェクトの更新
-	//object1->Update();
-	
+		//ボスの弾とプレイヤーの当たり判定
+		if (Boss)
+		{
+			for (std::unique_ptr<BossBullet>& bullet : bossbullets)
+			{
+				//自機と敵の弾当たり判定確認
+				if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
+				{
+					if (Boss->HP == 1)
+					{
+						Audio::GetInstance()->PlayWave("BossDown.wav", 0.1f, false);
+					}
+					P->HP -= 1;
+					bullet->DeathFlag = true;
 
-	//スプライトの更新
+				}
+			}
+		}
 
-	UpdateSprite();
+		//天球更新
+		CelestialSphere->Update();
+
+		//レティクル更新
+		//Reticle->Update(P->position_);
+
+		//FBXオブジェクトの更新
+		//object1->Update();
 
 
-	//カメラの更新
-	camera->Update();
+		//スプライトの更新
 
+		UpdateSprite();
+
+
+		//カメラの更新
+		camera->Update();
+
+		//パーティクル更新
+		particle->Update();
+
+		UpdateInput();
+
+	//}
 
 	//Escキーでウィンドウを閉じる
 	if (Input::GetInstance()->TriggerKey(DIK_ESCAPE))	//ESCキーでウィンドウを閉じる
@@ -396,8 +571,11 @@ void GameScene::Draw()
 	
 	//3Dオブジェクトの描画前処理
 	Object3d::PreDraw();
+	/*Particle::PreDraw();*/
 
 	P->Draw();
+	
+	
 
 	if (Boss)
 	{
@@ -443,12 +621,25 @@ void GameScene::Draw()
 	//天球の描画
 	CelestialSphere->Draw();
 
+	//particle->Draw();
+
 	//レティクル描画
-	Reticle->Draw();
+	//Reticle->Draw();
 
 	//FBXオブジェクトの描画
 	//object1->Draw(cmdList);
 
+	//Particle::PostDraw();
+
+	if (P->Level >= 2)
+	{
+		CoreR->Draw();
+	}
+
+	if (P->Level >= 3)
+	{
+		CoreL->Draw();
+	}
 
 	//3Dオブジェクトの描画後処理
 	Object3d::PostDraw();
@@ -456,39 +647,47 @@ void GameScene::Draw()
 	////スプライトの共通コマンド
 	SpriteCommon::GetInstance()->PreDraw();
 	
-	UI->Draw();
+	//UI->Draw();
 
-	if (P->HP == 5)
+	if (Go->ComFlag_2 == true)
 	{
-		HP_5->Draw();
+		if (P->HP == 5)
+		{
+			HP_5->Draw();
+		}
+
+		if (P->HP == 4)
+		{
+			HP_4->Draw();
+		}
+
+		if (P->HP == 3)
+		{
+			HP_3->Draw();
+		}
+
+		if (P->HP == 2)
+		{
+			HP_2->Draw();
+		}
+
+		if (P->HP == 1)
+		{
+			HP_1->Draw();
+		}
+
+		if (P->HP == 0)
+		{
+			HP_0->Draw();
+		}
 	}
 
-	if (P->HP == 4)
-	{
-		HP_4->Draw();
-	}
-
-	if (P->HP == 3)
-	{
-		HP_3->Draw();
-	}
-
-	if (P->HP == 2)
-	{
-		HP_2->Draw();
-	}
-
-	if (P->HP == 1)
-	{
-		HP_1->Draw();
-	}
-
-	if (P->HP == 0)
-	{
-		HP_0->Draw();
-	}
-
-
+	Stage_1->Draw();
+	Go->Draw();/*
+	if (LoadFlag == false)
+	{*/
+		LoadBG->Draw();
+	//}
 
 	DrawSprite();
 
@@ -519,17 +718,28 @@ void GameScene::EnemyUpdate(XMFLOAT3 enemyPos)
 	
 }
 
-void GameScene::Attack()
+void GameScene::Attack(XMFLOAT3 StartPos)
 {
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE) || IsButtonPush(ButtonKind::Button_B))
 	{
+
 		//弾を生成し初期化
 		std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
-		newBullet = Bullet::Create(model_Bullet, camera, P->position_, Reticle->position_);
+		newBullet = Bullet::Create(model_Bullet, camera, StartPos, ReticlePos/*Reticle->position_*/);
 		
 		//弾を登録
 		bullets.push_back(std::move(newBullet));
 	}
+
+	//if (IsButtonPush(ButtonKind::Button_B))
+	//{
+	//	//弾を生成し初期化
+	//	std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
+	//	newBullet = Bullet::Create(model_Bullet, camera, StartPos, ReticlePos/*Reticle->position_*/);
+
+	//	//弾を登録
+	//	bullets.push_back(std::move(newBullet));
+	//}
 }
 
 void GameScene::EnemyAttack(XMFLOAT3 EnemyPos)
@@ -669,6 +879,28 @@ void GameScene::UpdateEnemyPopCommands()
 			break;
 		}
 
+		else if (word.find("EVENT_S") == 0)
+		{
+			getline(line_stream, word, ',');
+
+			BossFlag_S = true;
+		}
+
+		else if (word.find("EVENT_E") == 0)
+		{
+			getline(line_stream, word, ',');
+
+			BossFlag_E = true;
+			BossFlag_S = false;
+		}
+
+		else if (word.find("UI_FLAGDOWN") == 0)
+		{
+			getline(line_stream, word, ',');
+
+			BossUIDrawFlag = false;
+		}
+
 	}
 }
 
@@ -689,6 +921,15 @@ bool GameScene::CheckCollision(XMFLOAT3 Object1, XMFLOAT3 Object2, float R1, flo
 
 void GameScene::LoadSprite()
 {
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/BackGround.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(2, L"Resources/Image/Reticle.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(2, L"Resources/Image/Reticle.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(3, L"Resources/Image/HP_5.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(4, L"Resources/Image/HP_4.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(5, L"Resources/Image/HP_3.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(6, L"Resources/Image/HP_2.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(7, L"Resources/Image/HP_1.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(8, L"Resources/Image/HP_0.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(9, L"Resources/Image/BossHP/BossHP_0.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(10, L"Resources/Image/BossHP/BossHP_1.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(11, L"Resources/Image/BossHP/BossHP_2.png");
@@ -705,24 +946,68 @@ void GameScene::LoadSprite()
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(22, L"Resources/Image/BossHP/BossHP_13.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(23, L"Resources/Image/BossHP/BossHP_14.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(24, L"Resources/Image/BossHP/BossHP_15.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(25, L"Resources/Image/ExpBar/ExpUI_0.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(26, L"Resources/Image/ExpBar/ExpUI_1.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(27, L"Resources/Image/ExpBar/ExpUI_2.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(28, L"Resources/Image/ExpBar/ExpUI_3.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(29, L"Resources/Image/ExpBar/ExpUI_4.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(30, L"Resources/Image/ExpBar/ExpUI_5.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(31, L"Resources/Image/ExpBar/Level_1.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(32, L"Resources/Image/ExpBar/Level_2.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(33, L"Resources/Image/ExpBar/Level_3.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(34, L"Resources/Image/Stage_1.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(35, L"Resources/Image/Go.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(36, L"Resources/Image/Rule.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(37, L"Resources/Image/Warning_D.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(38, L"Resources/Image/Warning_U.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(39, L"Resources/Image/Warning.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(40, L"Resources/Image/LoadBG.png");
 
 
-	BossHP_0 = Sprite::Create(9, { 0, 0 }, false, false);
-	BossHP_1 = Sprite::Create(10, { 0, 0 }, false, false);
-	BossHP_2 = Sprite::Create(11, { 0, 0 }, false, false);
-	BossHP_3 = Sprite::Create(12, { 0, 0 }, false, false);
-	BossHP_4 = Sprite::Create(13, { 0, 0 }, false, false);
-	BossHP_5 = Sprite::Create(14, { 0, 0 }, false, false);
-	BossHP_6 = Sprite::Create(15, { 0, 0 }, false, false);
-	BossHP_7 = Sprite::Create(16, { 0, 0 }, false, false);
-	BossHP_8 = Sprite::Create(17, { 0, 0 }, false, false);
-	BossHP_9 = Sprite::Create(18, { 0, 0 }, false, false);
-	BossHP_10 = Sprite::Create(19, { 0, 0 }, false, false);
-	BossHP_11 = Sprite::Create(20, { 0, 0 }, false, false);
-	BossHP_12 = Sprite::Create(21, { 0, 0 }, false, false);
-	BossHP_13 = Sprite::Create(22, { 0, 0 }, false, false);
-	BossHP_14 = Sprite::Create(23, { 0, 0 }, false, false);
-	BossHP_15 = Sprite::Create(24, { 0, 0 }, false, false);
+	sprite = Sprite::Create(1, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	UI = Sprite::Create(2, { 1, 1, 1, 1 }, { 0.5, 0.5 }, false, false);
+	HP_0 = Sprite::Create(8, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	HP_1 = Sprite::Create(7, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	HP_2 = Sprite::Create(6, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	HP_3 = Sprite::Create(5, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	HP_4 = Sprite::Create(4, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	HP_5 = Sprite::Create(3, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_0 = Sprite::Create(9, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_1 = Sprite::Create(10, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_2 = Sprite::Create(11, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_3 = Sprite::Create(12, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_4 = Sprite::Create(13, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_5 = Sprite::Create(14, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_6 = Sprite::Create(15, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_7 = Sprite::Create(16, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_8 = Sprite::Create(17, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_9 = Sprite::Create(18, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_10 = Sprite::Create(19, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_11 = Sprite::Create(20, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_12 = Sprite::Create(21, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_13 = Sprite::Create(22, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_14 = Sprite::Create(23, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	BossHP_15 = Sprite::Create(24, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	ExpBar_0 = Sprite::Create(25, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	ExpBar_1 = Sprite::Create(26, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	ExpBar_2 = Sprite::Create(27, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	ExpBar_3 = Sprite::Create(28, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	ExpBar_4 = Sprite::Create(29, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	ExpBar_5 = Sprite::Create(30, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	Level_1 = Sprite::Create(31, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	Level_2 = Sprite::Create(32, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	Level_3 = Sprite::Create(33, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+
+	Stage_1 = Sprite::Create(34, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	Go = Sprite::Create(35, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	Rule = Sprite::Create(36, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+
+	BossUI_U = Sprite::Create(37, { 1, 1, 1, 0.2f }, { 0, 0 }, false, false);
+	BossUI_D = Sprite::Create(38, { 1, 1, 1, 0.5f }, { 0, 0 }, false, false);
+	BossUI_U_2 = Sprite::Create(37, { 1, 1, 1, 0.5f }, {0, 0}, false, false);
+	BossUI_D_2 = Sprite::Create(38, { 1, 1, 1, 0.5f }, { 0, 0 }, false, false);
+	Warning = Sprite::Create(39, { 1, 1, 1, 1.0 }, { 0, 0 }, false, false);
+	LoadBG = Sprite::Create(40, { 1, 1, 1, 1.0 }, { 0, 0 }, false, false);
 }
 
 void GameScene::UpdateSprite()
@@ -740,6 +1025,14 @@ void GameScene::UpdateSprite()
 	ExpBar_3->Update();
 	ExpBar_4->Update();
 	ExpBar_5->Update();
+
+	Stage_1->Update();
+	Go->Update();
+	BossUI_U->Update();
+	BossUI_D->Update();
+	BossUI_U_2->Update();
+	BossUI_D_2->Update();
+	Warning->Update();
 
 	if (Boss)
 	{
@@ -759,6 +1052,29 @@ void GameScene::UpdateSprite()
 		BossHP_13->Update();
 		BossHP_14->Update();
 		BossHP_15->Update();
+	}
+
+	if (BossFlag_S == true)
+	{
+		if (WarningFlag == false)
+		{
+			Warning->color_.w -= 0.01f;
+		}
+
+		if (Warning->color_.w <= 0.0)
+		{
+			WarningFlag = true;
+		}
+
+		if (WarningFlag == true)
+		{
+			Warning->color_.w += 0.01f;
+		}
+
+		if (Warning->color_.w >= 1.0)
+		{
+			WarningFlag = false;
+		}
 	}
 }
 
@@ -924,57 +1240,168 @@ void GameScene::DrawSprite()
 			BossHP_1->Draw();
 		}
 
-		if (Boss->HP == 0)
+		if (Boss->HP <= 0)
 		{
 			BossHP_0->Draw();
 		}
 	}
 	
 	//経験値UIの描画
-	if (P->EXP == 0)
+
+	if (Go->ComFlag_2 == true)
 	{
-		ExpBar_0->Draw();
+		if (P->EXP == 0)
+		{
+			ExpBar_0->Draw();
+		}
+
+		else if (P->EXP == 1)
+		{
+			ExpBar_1->Draw();
+		}
+
+		else if (P->EXP == 2)
+		{
+			ExpBar_2->Draw();
+		}
+
+		else if (P->EXP == 3)
+		{
+			ExpBar_3->Draw();
+		}
+
+		else if (P->EXP == 4)
+		{
+			ExpBar_4->Draw();
+		}
+
+		else if (P->EXP >= 5)
+		{
+			ExpBar_5->Draw();
+		}
+
+		//レベル
+		if (P->Level == 1)
+		{
+			Level_1->Draw();
+		}
+
+		else if (P->Level == 2)
+		{
+			Level_2->Draw();
+		}
+
+		else if (P->Level >= 3)
+		{
+			Level_3->Draw();
+		}
+
+		//ルールUI
+		Rule->Draw();
 	}
 
-	else if (P->EXP == 1)
+	//ボス演出UI
+	if (BossUIDrawFlag == true)
 	{
-		ExpBar_1->Draw();
+		BossUI_U->Draw();
+		BossUI_D->Draw();
+		BossUI_U_2->Draw();
+		BossUI_D_2->Draw();
+		Warning->Draw();
 	}
 
-	else if (P->EXP == 2)
+	if (BossFlag_S == true)
 	{
-		ExpBar_2->Draw();
+		BossUIDrawFlag = true;
+
+		BossUI_U->Vec.x = (BossUI_U->PointPos.x - BossUI_U->position_.x) / 100;
+		BossUI_U->position_.x += BossUI_U->Vec.x;
+		BossUI_U->Vec.y = (BossUI_U->PointPos.y - BossUI_U->position_.y) / 30;
+		BossUI_U->position_.y += BossUI_U->Vec.y;
+
+		BossUI_U_2->Vec.x = (BossUI_U_2->PointPos.x - BossUI_U_2->position_.x) / 100;
+		BossUI_U_2->position_.x += BossUI_U_2->Vec.x;
+		BossUI_U_2->Vec.y = (BossUI_U_2->PointPos.y - BossUI_U_2->position_.y) / 30;
+		BossUI_U_2->position_.y += BossUI_U_2->Vec.y;
+
+		BossUI_D->Vec.x = (BossUI_D->PointPos.x - BossUI_D->position_.x) / 100;
+		BossUI_D->position_.x += BossUI_D->Vec.x;
+		BossUI_D->Vec.y = (BossUI_D->PointPos.y - BossUI_D->position_.y) / 30;
+		BossUI_D->position_.y += BossUI_D->Vec.y;
+
+		BossUI_D_2->Vec.x = (BossUI_D_2->PointPos.x - BossUI_D_2->position_.x) / 100;
+		BossUI_D_2->position_.x += BossUI_D_2->Vec.x;
+		BossUI_D_2->Vec.y = (BossUI_D_2->PointPos.y - BossUI_D_2->position_.y) / 30;
+		BossUI_D_2->position_.y += BossUI_D_2->Vec.y;
+
 	}
 
-	else if (P->EXP == 3)
+	if (BossFlag_E == true)
 	{
-		ExpBar_3->Draw();
+		BossUI_U->PointPos.y = 100;
+		BossUI_U_2->PointPos.y = 100;
+		BossUI_D->PointPos.y = -100;
+		BossUI_D_2->PointPos.y = -100;
+
+		EndUIFlag = true;
 	}
 
-	else if (P->EXP == 4)
+	if (EndUIFlag == true)
 	{
-		ExpBar_4->Draw();
+
+		BossUI_U->Vec.y = (BossUI_U->PointPos.y - BossUI_U->position_.y) / 30;
+		BossUI_U->position_.y += BossUI_U->Vec.y;
+
+		BossUI_U_2->Vec.y = (BossUI_U_2->PointPos.y - BossUI_U_2->position_.y) / 30;
+		BossUI_U_2->position_.y += BossUI_U_2->Vec.y;
+
+		BossUI_D->Vec.y = (BossUI_D->PointPos.y - BossUI_D->position_.y) / 30;
+		BossUI_D->position_.y += BossUI_D->Vec.y;
+
+		BossUI_D_2->Vec.y = (BossUI_D_2->PointPos.y - BossUI_D_2->position_.y) / 30;
+		BossUI_D_2->position_.y += BossUI_D_2->Vec.y;
+	}
+}
+
+void GameScene::Start()
+{
+	//StartTimer += 1;
+	P->MoveCanFlag = false;
+	Stage_1->Vec.x = (Stage_1->PointPos.x - Stage_1->position_.x) / 30;
+	Stage_1->position_.x += Stage_1->Vec.x;
+
+	if (Stage_1->position_.x <= Stage_1->PointPos.x + 10)
+	{
+		Stage_1->PointPos.x = -400;
+		Stage_1->PointPos.y = 285;
 	}
 
-	else if (P->EXP == 5)
+	if (Stage_1->position_.x <= Stage_1->PointPos.x + 10)
 	{
-		ExpBar_5->Draw();
+		Go->Vec.y = (Go->PointPos.y - Go->position_.y) / 30;
+		Go->position_.y += Go->Vec.y;
+		Go->ComFlag = true;
 	}
 
-	//レベル
-	if (P->Level == 1)
+	if (Go->position_.y >= Go->PointPos.y - 10 && Go->ComFlag == true)
 	{
-		Level_1->Draw();
+		Go->PointPos.y = 720;
+
+		Go->Vec.y = (Go->PointPos.y - Go->position_.y) / 30;
+		Go->position_.y += Go->Vec.y;
+		Go->ComFlag_2 = true;
 	}
 
-	else if (P->Level == 2)
+	if (Go->position_.y >= Go->PointPos.y - 20 && Go->ComFlag_2 == true)
 	{
-		Level_2->Draw();
-	}
+		if (P->position_.z < 0)
+		{
+			P->position_.z += 3;
+		}
 
-	else if (P->Level == 3)
-	{
-		Level_3->Draw();
+
+		P->MoveCanFlag = true;
+
 	}
 
 }
