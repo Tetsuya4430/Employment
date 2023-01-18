@@ -18,7 +18,6 @@ ComPtr<ID3D12RootSignature> Particle::rootsignature;
 ComPtr<ID3D12PipelineState> Particle::pipelinestate;
 ComPtr<ID3D12DescriptorHeap> Particle::descHeap;
 ComPtr<ID3D12Resource> Particle::vertBuff;
-ComPtr<ID3D12Resource> Particle::indexBuff;
 ComPtr<ID3D12Resource> Particle::texBuff;
 CD3DX12_CPU_DESCRIPTOR_HANDLE Particle::cpuDescHandleSRV;
 CD3DX12_GPU_DESCRIPTOR_HANDLE Particle::gpuDescHandleSRV;
@@ -28,9 +27,7 @@ XMFLOAT3 Particle::eye = { 0, 0, -50.0f };
 XMFLOAT3 Particle::target = { 0, 0, 0 };
 XMFLOAT3 Particle::up = { 0, 1, 0};
 D3D12_VERTEX_BUFFER_VIEW Particle::vbView{};
-D3D12_INDEX_BUFFER_VIEW Particle::ibView{};
-Particle::VertexPosNormalUv Particle::vertices[vertexCount];
-unsigned short Particle::indices[indexCount];
+Particle::VertexPos Particle::vertices[vertexCount];
 
 bool Particle::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
 {
@@ -66,7 +63,7 @@ void Particle::PreDraw()
 	// ルートシグネチャの設定
 	cmdList->SetGraphicsRootSignature(rootsignature.Get());
 	// プリミティブ形状を設定
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
 }
 
 void Particle::PostDraw()
@@ -124,6 +121,7 @@ bool Particle::InitializeGraphicsPipeline()
 {
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
+	ComPtr<ID3DBlob> gsBlob; //ジオメトリシェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob;	// ピクセルシェーダオブジェクト
 	ComPtr<ID3DBlob> errorBlob; // エラーオブジェクト
 
@@ -136,6 +134,29 @@ bool Particle::InitializeGraphicsPipeline()
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
 		0,
 		&vsBlob, &errorBlob);
+	if (FAILED(result)) {
+		// errorBlobからエラー内容をstring型にコピー
+		std::string errstr;
+		errstr.resize(errorBlob->GetBufferSize());
+
+		std::copy_n((char*)errorBlob->GetBufferPointer(),
+			errorBlob->GetBufferSize(),
+			errstr.begin());
+		errstr += "\n";
+		// エラー内容を出力ウィンドウに表示
+		OutputDebugStringA(errstr.c_str());
+		exit(1);
+	}
+
+	// ジオメトリシェーダの読み込みとコンパイル
+	result = D3DCompileFromFile(
+		L"Resources/shaders/ParticleGS.hlsl",	// シェーダファイル名
+		nullptr,
+		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
+		"main", "gs_5_0",	// エントリーポイント名、シェーダーモデル指定
+		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+		0,
+		&gsBlob, &errorBlob);
 	if (FAILED(result)) {
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
@@ -180,21 +201,22 @@ bool Particle::InitializeGraphicsPipeline()
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
-		{ // 法線ベクトル(1行で書いたほうが見やすい)
-			"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-			D3D12_APPEND_ALIGNED_ELEMENT,
-			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
-		},
-		{ // uv座標(1行で書いたほうが見やすい)
-			"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
-			D3D12_APPEND_ALIGNED_ELEMENT,
-			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
-		},
+		//{ // 法線ベクトル(1行で書いたほうが見やすい)
+		//	"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
+		//	D3D12_APPEND_ALIGNED_ELEMENT,
+		//	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		//},
+		//{ // uv座標(1行で書いたほうが見やすい)
+		//	"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
+		//	D3D12_APPEND_ALIGNED_ELEMENT,
+		//	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		//},
 	};
 
 	// グラフィックスパイプラインの流れを設定
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
 	gpipeline.VS = CD3DX12_SHADER_BYTECODE(vsBlob.Get());
+	gpipeline.GS = CD3DX12_SHADER_BYTECODE(gsBlob.Get());
 	gpipeline.PS = CD3DX12_SHADER_BYTECODE(psBlob.Get());
 
 	// サンプルマスク
@@ -229,7 +251,7 @@ bool Particle::InitializeGraphicsPipeline()
 	gpipeline.InputLayout.NumElements = _countof(inputLayout);
 
 	// 図形の形状設定（三角形）
-	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 
 	gpipeline.NumRenderTargets = 1;	// 描画対象は1つ
 	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
@@ -352,27 +374,15 @@ void Particle::CreateModel()
 {
 	HRESULT result = S_FALSE;
 
-	std::vector<VertexPosNormalUv> realVertices;
+	std::vector<VertexPos> realVertices;
 	
-	//四角形の頂点データの設定
-	VertexPosNormalUv verticesSquare[] = {
-		{{-5.0f, -5.0f, 0.0f}, {0, 0, 1}, {0, 1}},//左下
-		{{-5.0f, +5.0f, 0.0f}, {0, 0, 1}, {0, 0}},//左上
-		{{+5.0f, -5.0f, 0.0f}, {0, 0, 1}, {1, 1}},//右下
-		{{+5.0f, +5.0f, 0.0f}, {0, 0, 1}, {1, 0}},//右上
+	//四角形の頂点データ
+	VertexPos verticesPoint[] = {
+		{{0.0f, 0.0f, 0.0f}}
 	};
 
 	//メンバ変数にコピー
-	std::copy(std::begin(verticesSquare), std::end(verticesSquare), vertices);
-
-	//四角形のインデックスデータの設定
-	unsigned short indicesSquare[] = {
-		0, 1, 2,//三角形1
-		2, 1, 3,//三角形2
-	};
-
-	//メンバ変数にコピー
-	std::copy(std::begin(indicesSquare), std::end(indicesSquare), indices);
+	std::copy(std::begin(verticesPoint), std::end(verticesPoint), vertices);
 
 	//頂点バッファ生成
 	result = device->CreateCommittedResource(
@@ -388,22 +398,8 @@ void Particle::CreateModel()
 		return;
 	}
 
-	//インデックスバッファ生成
-	result = device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
-		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(sizeof(indices)),
-		D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr,
-		IID_PPV_ARGS(&indexBuff));
-	if (FAILED(result))
-	{
-		assert(0);
-		return;
-	}
-
 	//頂点バッファへのデータ転送
-	VertexPosNormalUv* vertMap = nullptr;
+	VertexPos* vertMap = nullptr;
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
 	if (SUCCEEDED(result))
 	{
@@ -411,28 +407,10 @@ void Particle::CreateModel()
 		vertBuff->Unmap(0, nullptr);
 	}
 
-	//インデックスバッファへのデータ転送
-	unsigned short* indexMap = nullptr;
-	result = indexBuff->Map(0, nullptr, (void**)&indexMap);
-	if (SUCCEEDED(result))
-	{
-		//全インデックスに対して
-		for (int i = 0; i < _countof(indices); i++)
-		{
-			indexMap[i] = indices[i];	//インデックスコピー
-		}
-		indexBuff->Unmap(0, nullptr);
-	}
-
 	//頂点バッファビューの作成
 	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
 	vbView.SizeInBytes = sizeof(vertices);
 	vbView.StrideInBytes = sizeof(vertices[0]);
-
-	//インデックスバッファビューの作成
-	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
-	ibView.Format = DXGI_FORMAT_R16_UINT;
-	ibView.SizeInBytes = sizeof(indices);
 }
 
 bool Particle::Initialize()
@@ -470,7 +448,7 @@ void Particle::Update()
 	matWorld_ = XMMatrixIdentity(); // 変形をリセット
 	matWorld_ *= matScale; // ワールド行列にスケーリングを反映
 	matWorld_ *= matRot; // ワールド行列に回転を反映
-	matWorld_ *= camera_->GetBillBoardY();
+	//matWorld_ *= camera_->GetBillBoardY();
 	matWorld_ *= matTrans; // ワールド行列に平行移動を反映
 
 	// 親オブジェクトがあれば
@@ -484,7 +462,7 @@ void Particle::Update()
 	// 定数バッファへデータ転送
 	ConstBufferData* constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
-	constMap->color = color;
+	//constMap->color = color;
 	//constMap->mat = matWorld_ * matView * matProjection;	// 行列の合成
 	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
 	constBuff->Unmap(0, nullptr);
@@ -498,8 +476,8 @@ void Particle::Draw()
 
 	//頂点バッファの設定
 	cmdList->IASetVertexBuffers(0, 1, &vbView);
-	//インデックスバッファの設定
-	cmdList->IASetIndexBuffer(&ibView);
+	////インデックスバッファの設定
+	//cmdList->IASetIndexBuffer(&ibView);
 
 	//デスクリプタヒープの配列
 	ID3D12DescriptorHeap* ppHeaps[] = { descHeap.Get() };
@@ -510,5 +488,6 @@ void Particle::Draw()
 	//シェーダーリソースビューをセット
 	cmdList->SetGraphicsRootDescriptorTable(1, gpuDescHandleSRV);
 	//描画コマンド
-	cmdList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);
+	//cmdList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);
+	cmdList->DrawInstanced(_countof(vertices), 1, 0, 0);
 }
