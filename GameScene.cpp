@@ -82,7 +82,7 @@ void GameScene::Initialize()
 
 
 		//カメラ注視点をセット
-		camera->SetTarget({ 0, 20, 0 });
+		//camera->SetTarget({ 0, 20, 0 });
 
 
 	/*object1->PlayAnimation();*/
@@ -535,7 +535,29 @@ void GameScene::Update()
 
 		UpdateSprite();
 
-		
+		if (Input::GetInstance()->PushKey(DIK_J) || Input::GetInstance()->PushKey(DIK_L) || Input::GetInstance()->PushKey(DIK_I) || Input::GetInstance()->PushKey(DIK_K))
+		{
+			if (Input::GetInstance()->PushKey(DIK_J))
+			{
+				camera->CameraMoveEyeVector({ -1.0f, 0, 0 });
+			}
+
+			if (Input::GetInstance()->PushKey(DIK_L))
+			{
+				camera->CameraMoveEyeVector({ 1.0f, 0, 0 });
+			}
+
+			if (Input::GetInstance()->PushKey(DIK_I))
+			{
+				camera->CameraMoveEyeVector({ 0, 1.0f, 0 });
+			}
+
+			if (Input::GetInstance()->PushKey(DIK_K))
+			{
+				camera->CameraMoveEyeVector({ 0, -1.0f, 0 });
+			}
+		}
+
 		//カメラの更新
 		camera->Update();
 

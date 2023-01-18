@@ -114,6 +114,7 @@ private: // 静的メンバ変数
 	//頂点インデックス配列
 	static unsigned short indices[indexCount];
 
+
 	private:// 静的メンバ関数
 	//デスクリプタヒープの初期化
 	static bool InitializeDescriptorHeap();

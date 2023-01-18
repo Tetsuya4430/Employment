@@ -470,6 +470,7 @@ void Particle::Update()
 	matWorld_ = XMMatrixIdentity(); // 変形をリセット
 	matWorld_ *= matScale; // ワールド行列にスケーリングを反映
 	matWorld_ *= matRot; // ワールド行列に回転を反映
+	matWorld_ *= camera_->GetBillBoardY();
 	matWorld_ *= matTrans; // ワールド行列に平行移動を反映
 
 	// 親オブジェクトがあれば
