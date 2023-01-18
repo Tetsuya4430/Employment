@@ -167,6 +167,29 @@ void GameScene::Finalize()
 
 void GameScene::Update()
 {
+	//パーティクルの発生
+	for (int i = 0; i < 100; i++)
+	{
+		//X,Y,Z全て[-5.0f, +5.0f]でランダムに分布(座標)
+		const float md_width = 10.0f;
+		XMFLOAT3 pos{};
+		pos.x = (float)rand() / RAND_MAX * md_width - md_width / 2.0f;
+		pos.y = (float)rand() / RAND_MAX * md_width - md_width / 2.0f;
+		pos.z = (float)rand() / RAND_MAX * md_width - md_width / 2.0f;
+		//X,Y,Z全て[-5.0f, +5.0f]でランダムに分布(速度)
+		const float md_vel = 0.1f;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
+		XMFLOAT3 acc{};
+		const float md_acc = 0.001f;
+		acc.y = -(float)rand() / RAND_MAX * md_acc;
+
+		//追加
+		particle->AddParticle(60, pos, vel, acc);
+	}
 
 	if (!LoadBG->color_.w <= 0.0f)
 	{

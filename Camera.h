@@ -108,16 +108,13 @@ private:	//メンバ変数
 
 	XMFLOAT3 moveVec = { 0.0f, 0.0f, -2.0f };
 
-protected:
-	//ビルボード行列
-	static XMMATRIX matBillboard;
-
-	//Y軸回りビルボード行列
-	static XMMATRIX matBillboardY;
-
 public:
 	// ビュー行列
 	static XMMATRIX matView;
 	// 射影行列
 	static XMMATRIX matProjection;
+	//ビルボード行列
+	static XMMATRIX matBillboard;
+	//Y軸回りビルボード行列
+	static XMMATRIX matBillboardY;
 };

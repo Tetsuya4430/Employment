@@ -29,6 +29,17 @@ XMFLOAT3 Particle::up = { 0, 1, 0};
 D3D12_VERTEX_BUFFER_VIEW Particle::vbView{};
 Particle::VertexPos Particle::vertices[vertexCount];
 
+//XMFLOAT3同士の加算処理
+const DirectX::XMFLOAT3 operator+(const::DirectX::XMFLOAT3& lhs, const DirectX::XMFLOAT3& rhs)
+{
+	XMFLOAT3 result;
+	result.x = lhs.x + rhs.x;
+	result.y = lhs.y + rhs.y;
+	result.z = lhs.z + rhs.z;
+
+	return result;
+}
+
 bool Particle::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
 {
 	// nullptrチェック
@@ -227,14 +238,25 @@ bool Particle::InitializeGraphicsPipeline()
 	//gpipeline.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 	// デプスステンシルステート
 	gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	//デプスの書き込み禁止
+	gpipeline.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 
 	// レンダーターゲットのブレンド設定
 	D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
 	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;	// RBGA全てのチャンネルを描画
 	blenddesc.BlendEnable = true;
-	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+	//半透明合成
+	/*blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
 	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;*/
+	//加算合成
+	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+	blenddesc.SrcBlend = D3D12_BLEND_ONE;
+	blenddesc.DestBlend = D3D12_BLEND_ONE;
+	//減算合成
+	/*blenddesc.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
+	blenddesc.SrcBlend = D3D12_BLEND_ONE;
+	blenddesc.DestBlend = D3D12_BLEND_ONE;*/
 
 	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
@@ -303,7 +325,7 @@ bool Particle::LoadTexture()
 	ScratchImage scratchImg{};
 
 	result = LoadFromWICFile(
-		L"Resources/Image/tex1.png",
+		L"Resources/Image/effect1.png",
 		WIC_FLAGS_NONE,
 		&metadata, scratchImg
 	);
@@ -376,13 +398,13 @@ void Particle::CreateModel()
 
 	std::vector<VertexPos> realVertices;
 	
-	//四角形の頂点データ
-	VertexPos verticesPoint[] = {
-		{{0.0f, 0.0f, 0.0f}}
-	};
+	////四角形の頂点データ
+	//VertexPos verticesPoint[] = {
+	//	{{0.0f, 0.0f, 0.0f}}
+	//};
 
-	//メンバ変数にコピー
-	std::copy(std::begin(verticesPoint), std::end(verticesPoint), vertices);
+	////メンバ変数にコピー
+	//std::copy(std::begin(verticesPoint), std::end(verticesPoint), vertices);
 
 	//頂点バッファ生成
 	result = device->CreateCommittedResource(
@@ -451,10 +473,41 @@ void Particle::Update()
 	//matWorld_ *= camera_->GetBillBoardY();
 	matWorld_ *= matTrans; // ワールド行列に平行移動を反映
 
-	// 親オブジェクトがあれば
-	if (parent_ != nullptr) {
-		// 親オブジェクトのワールド行列を掛ける
-		matWorld_ *= parent_->matWorld_;
+	//寿命が尽きたパーティクルを全削除
+	particles.remove_if([](Particle_& x)
+		{
+			return x.frame >= x.num_frame;
+		}
+	);
+
+	//全パーティクル更新
+	for (std::forward_list<Particle_>::iterator it = particles.begin();
+		it != particles.end(); it++)
+	{
+		//経過フレーム数をカウント
+		it->frame++;
+		//速度に加速度を加算
+		it ->velocity = it->velocity + it->accel;
+		//速度による移動
+		it->position = it->position + it->velocity;
+	}
+
+	//頂点バッファへデータ転送
+	VertexPos* vertMap = nullptr;
+	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
+
+	if (SUCCEEDED(result))
+	{
+		//パーティクルの情報を1つずつ反映
+		for (std::forward_list<Particle_>::iterator it = particles.begin();
+			it != particles.end(); it++)
+		{
+			//座標
+			vertMap->pos = it->position;
+			//次の頂点へ
+			vertMap++;
+		}
+		vertBuff->Unmap(0, nullptr);
 	}
 
 	const XMMATRIX& matViewProjection = camera_->GetmatViewProjection();
@@ -462,9 +515,8 @@ void Particle::Update()
 	// 定数バッファへデータ転送
 	ConstBufferData* constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
-	//constMap->color = color;
-	//constMap->mat = matWorld_ * matView * matProjection;	// 行列の合成
 	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
+	constMap->matBillboard = camera_->matBillboard;
 	constBuff->Unmap(0, nullptr);
 }
 
@@ -489,5 +541,18 @@ void Particle::Draw()
 	cmdList->SetGraphicsRootDescriptorTable(1, gpuDescHandleSRV);
 	//描画コマンド
 	//cmdList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);
-	cmdList->DrawInstanced(_countof(vertices), 1, 0, 0);
+	cmdList->DrawInstanced((UINT)std::distance(particles.begin(), particles.end()), 1, 0, 0);
+}
+
+void Particle::AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel)
+{
+	//リストに要素を追加
+	particles.emplace_front();
+	//追加した要素の参照
+	Particle_& p = particles.front();
+	//値のセット
+	p.position = position;
+	p.velocity = velocity;
+	p.accel = accel;
+	p.num_frame = life;
 }

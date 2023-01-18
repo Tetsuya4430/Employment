@@ -32,8 +32,10 @@ void main(
 	//4点分回す
 	for (uint i = 0; i < vnum; i++)
 	{
-		//ワールド座標ベースでずらす
-		element.svpos = input[0].pos + offset_array[i];
+		//中心からからのオフセットをビルボード回転(モデル座標)
+		float4 offset = mul(matBillboard, offset_array[i]);
+		//オフセット分ずらす(ワールド座標)
+		element.svpos = input[0].pos + offset;
 		//ビュー、射影変換
 		element.svpos = mul(mat, element.svpos);
 		element.uv = uv_array[i];
