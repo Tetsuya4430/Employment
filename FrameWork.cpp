@@ -82,6 +82,7 @@ void FrameWork::Initialize()
 	Particle::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
 
+
 }
 
 void FrameWork::Finalize()

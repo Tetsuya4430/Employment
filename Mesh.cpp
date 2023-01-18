@@ -53,7 +53,6 @@ void Mesh::CreateBuffers()
 	//頂点バッファのデータ転送
 	VertexPosNormalUv* vertMap = nullptr;
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
-	vertBuff->Unmap(0, nullptr);
 
 	if (SUCCEEDED(result))
 	{

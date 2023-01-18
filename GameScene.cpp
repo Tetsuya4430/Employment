@@ -535,7 +535,7 @@ void GameScene::Update()
 
 		UpdateSprite();
 
-
+		
 		//カメラの更新
 		camera->Update();
 
@@ -571,7 +571,6 @@ void GameScene::Draw()
 	
 	//3Dオブジェクトの描画前処理
 	Object3d::PreDraw();
-	/*Particle::PreDraw();*/
 
 	P->Draw();
 	
@@ -621,8 +620,6 @@ void GameScene::Draw()
 	//天球の描画
 	CelestialSphere->Draw();
 
-	//particle->Draw();
-
 	//レティクル描画
 	//Reticle->Draw();
 
@@ -641,8 +638,17 @@ void GameScene::Draw()
 		CoreL->Draw();
 	}
 
+	//test->Draw();
+
 	//3Dオブジェクトの描画後処理
 	Object3d::PostDraw();
+
+	Particle::PreDraw();
+
+	particle->Draw();
+
+	Particle::PostDraw();
+
 
 	////スプライトの共通コマンド
 	SpriteCommon::GetInstance()->PreDraw();

@@ -1,6 +1,7 @@
 #include "DirectXCommon.h"
 #include <cassert>
 
+
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 
@@ -95,6 +96,16 @@ void DirectXCommon::Initialize(WinApp* winApp)
 			break;
 		}
 	}
+
+#ifdef _DEBUG
+	ComPtr<ID3D12InfoQueue> infoQueue;
+	if (SUCCEEDED(dev->QueryInterface(IID_PPV_ARGS(&infoQueue))))
+	{
+		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
+		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
+	}
+#endif
+
 #pragma endregion
 
 	//---コマンドリスト---//(GPUにまとめて命令を送る)

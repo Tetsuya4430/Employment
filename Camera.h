@@ -106,7 +106,7 @@ private:	//メンバ変数
 	//インプット
 	Input* input = nullptr;
 
-	XMFLOAT3 moveVec = { 2.0f, 0.0f, 0.0f };
+	XMFLOAT3 moveVec = { 0.0f, 0.0f, -2.0f };
 
 protected:
 	//ビルボード行列

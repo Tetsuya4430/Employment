@@ -149,6 +149,12 @@
     <FxCompile Include="Resources\shaders\FBXVS.hlsl" />
     <FxCompile Include="Resources\shaders\FBXPS.hlsl" />
     <FxCompile Include="Resources\shaders\BasicGeometryShader.hlsl" />
+    <FxCompile Include="Resources\shaders\ParticlePS.hlsl">
+      <Filter>リソース ファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\ParticleVS.hlsl">
+      <Filter>リソース ファイル</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Basic.hlsli">
@@ -159,6 +165,9 @@
     </None>
     <None Include="Resources\shaders\FBX.hlsli" />
     <None Include="Resources\shaders\Sprite.hlsli">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="Resources\shaders\Particle.hlsli">
       <Filter>リソース ファイル</Filter>
     </None>
   </ItemGroup>

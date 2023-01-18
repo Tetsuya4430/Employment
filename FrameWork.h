@@ -17,7 +17,6 @@
 #include "AbstractSceneFactory.h"
 #include "Particle.h"
 
-
 /// <summary>
 /// フレームワーク
 /// </summary>

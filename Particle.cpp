@@ -30,7 +30,7 @@ XMFLOAT3 Particle::up = { 0, 1, 0};
 D3D12_VERTEX_BUFFER_VIEW Particle::vbView{};
 D3D12_INDEX_BUFFER_VIEW Particle::ibView{};
 Particle::VertexPosNormalUv Particle::vertices[vertexCount];
-unsigned short Particle::indices[planeCount * 3];
+unsigned short Particle::indices[indexCount];
 
 bool Particle::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
 {
@@ -39,8 +39,6 @@ bool Particle::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList*
 
 	Particle::device = device;
 	Particle::cmdList = cmdList;
-
-	Particle::device = device;
 
 	//デスクリプタヒープの初期化
 	InitializeDescriptorHeap();
@@ -74,7 +72,7 @@ void Particle::PreDraw()
 void Particle::PostDraw()
 {
 	//コマンドリストを解除
-	Particle::cmdList = nullptr;
+	//Particle::cmdList = nullptr;
 }
 
 Particle* Particle::Create(Camera* camera)
@@ -131,7 +129,7 @@ bool Particle::InitializeGraphicsPipeline()
 
 	// 頂点シェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/shaders/OBJVS.hlsl",	// シェーダファイル名
+		L"Resources/shaders/ParticleVS.hlsl",	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "vs_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -154,7 +152,7 @@ bool Particle::InitializeGraphicsPipeline()
 
 	// ピクセルシェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/shaders/OBJPS.hlsl",	// シェーダファイル名
+		L"Resources/shaders/ParticlePS.hlsl",	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0",	// エントリーポイント名、シェーダーモデル指定
@@ -355,124 +353,26 @@ void Particle::CreateModel()
 	HRESULT result = S_FALSE;
 
 	std::vector<VertexPosNormalUv> realVertices;
-	//頂点座標の計算(重複あり)
-	{
-		realVertices.resize((division + 1) * 2);
-		int index = 0;
-		float zValue;
+	
+	//四角形の頂点データの設定
+	VertexPosNormalUv verticesSquare[] = {
+		{{-5.0f, -5.0f, 0.0f}, {0, 0, 1}, {0, 1}},//左下
+		{{-5.0f, +5.0f, 0.0f}, {0, 0, 1}, {0, 0}},//左上
+		{{+5.0f, -5.0f, 0.0f}, {0, 0, 1}, {1, 1}},//右下
+		{{+5.0f, +5.0f, 0.0f}, {0, 0, 1}, {1, 0}},//右上
+	};
 
-		//底面
-		zValue = prizmHeight / 2.0f;
-		for (int i = 0; i < division; i++)
-		{
-			XMFLOAT3 vertex;
-			vertex.x = radius * sinf(XM_2PI / division * i);
-			vertex.y = radius * cosf(XM_2PI / division * i);
-			vertex.z = zValue;
-			realVertices[index++].pos = vertex;
-		}
-		realVertices[index++].pos = XMFLOAT3(0, 0, zValue);	//底面の中心点
+	//メンバ変数にコピー
+	std::copy(std::begin(verticesSquare), std::end(verticesSquare), vertices);
 
-		//天面
-		zValue = -prizmHeight / 2.0f;
-		for (int i = 0; i < division; i++)
-		{
-			XMFLOAT3 vertex;
-			vertex.x = radius * sinf(XM_2PI / division * i);
-			vertex.y = radius * cosf(XM_2PI / division * i);
-			vertex.z = zValue;
-			realVertices[index++].pos = vertex;
-		}
-		realVertices[index++].pos = XMFLOAT3(0, 0, zValue);	//天面の中心点
-	}
+	//四角形のインデックスデータの設定
+	unsigned short indicesSquare[] = {
+		0, 1, 2,//三角形1
+		2, 1, 3,//三角形2
+	};
 
-	//頂点座標の計算
-	{
-		int index = 0;
-		//底面
-		for (int i = 0; i < division; i++)
-		{
-			unsigned short index0 = i + 1;
-			unsigned short index1 = i;
-			unsigned short index2 = division;
-
-			vertices[index++] = realVertices[index0];
-			vertices[index++] = realVertices[index1];
-			vertices[index++] = realVertices[index2];	//底面の中心点
-		}
-		//底面の最後の三角形の1番目のインデックスを0書き換え
-		vertices[index - 3] = realVertices[0];
-
-		int topStart = division + 1;
-		//天面
-		for (int i = 0; i < division; i++)
-		{
-			unsigned short index0 = topStart + i;
-			unsigned short index1 = topStart + i + 1;
-			unsigned short index2 = topStart + division;
-
-			vertices[index++] = realVertices[index0];
-			vertices[index++] = realVertices[index1];
-			vertices[index++] = realVertices[index2];	//天面の中心点
-		}
-		//天面の最後の三角形の1番目のインデックスを0に書き換え
-		vertices[index - 2] = realVertices[topStart];
-
-		//側面
-		for (int i = 0; i < division; i++)
-		{
-			unsigned short index0 = i + 1;
-			unsigned short index1 = topStart + i + 1;
-			unsigned short index2 = i;
-			unsigned short index3 = topStart + i;
-
-			if (i == division - 1)
-			{
-				index0 = 0;
-				index1 = topStart;
-			}
-
-			vertices[index++] = realVertices[index0];
-			vertices[index++] = realVertices[index1];
-			vertices[index++] = realVertices[index2];
-
-			vertices[index++] = realVertices[index2];
-			vertices[index++] = realVertices[index1];
-			vertices[index++] = realVertices[index3];
-		}
-	}
-
-	//頂点インデックスの設定
-	{
-		for (int i = 0; i < _countof(indices); i++)
-		{
-			indices[i] = i;
-		}
-	}
-
-	//法線方向の計算
-	for (int i = 0; i < _countof(indices) / 3; i++)
-	{//三角形1つごとに計算していく
-		//三角形のインデックスを取得
-		unsigned short index0 = indices[i * 3 + 0];
-		unsigned short index1 = indices[i * 3 + 1];
-		unsigned short index2 = indices[i * 3 + 2];
-		//三角形を構築する頂点座標をベクトルに代入
-		XMVECTOR p0 = XMLoadFloat3(&vertices[index0].pos);
-		XMVECTOR p1 = XMLoadFloat3(&vertices[index1].pos);
-		XMVECTOR p2 = XMLoadFloat3(&vertices[index2].pos);
-		//p0->p1ベクトル、p0->p2ベクトルを計算
-		XMVECTOR v1 = XMVectorSubtract(p1, p0);
-		XMVECTOR v2 = XMVectorSubtract(p2, p0);
-		//外積は両方から垂直なベクトル
-		XMVECTOR normal = XMVector3Cross(v1, v2);
-		//正規化(長さを1にする)
-		normal = XMVector3Normalize(normal);
-		//求めた法線を頂点データに代入
-		XMStoreFloat3(&vertices[index0].normal, normal);
-		XMStoreFloat3(&vertices[index1].normal, normal);
-		XMStoreFloat3(&vertices[index2].normal, normal);
-	}
+	//メンバ変数にコピー
+	std::copy(std::begin(indicesSquare), std::end(indicesSquare), indices);
 
 	//頂点バッファ生成
 	result = device->CreateCommittedResource(
@@ -583,7 +483,7 @@ void Particle::Update()
 	// 定数バッファへデータ転送
 	ConstBufferData* constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
-	//constMap->color = color;
+	constMap->color = color;
 	//constMap->mat = matWorld_ * matView * matProjection;	// 行列の合成
 	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
 	constBuff->Unmap(0, nullptr);
