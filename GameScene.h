@@ -90,7 +90,7 @@ public:
 	void UpdateEnemyPopCommands();
 
 	//パーティクル発生関数
-	void CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
+	//void CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
 
 	//円と円の当たり判定
 	bool CheckCollision(XMFLOAT3 Object1, XMFLOAT3 Object2, float R1, float R2);
@@ -172,6 +172,7 @@ private:
 
 	//パーティクル
 	Particle* particle = nullptr;
+	Particle* EnemyPart = nullptr;
 
 
 	//UI
@@ -275,11 +276,6 @@ private:
 
 	//ゲームスタート演出用
 	int StartTimer = 0;
-
-	//パーティクルタイマー
-	int PartTimer = 0;
-
-	int DamagePartTimer = 0;
 
 	public:
 	//弾の発射間隔

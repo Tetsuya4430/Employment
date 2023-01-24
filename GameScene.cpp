@@ -88,13 +88,11 @@ void GameScene::Initialize()
 	/*object1->PlayAnimation();*/
 
 	//パーティクル生成
-	particle = Particle::Create(camera);
+	particle = Particle::Create(L"Resources/Image/effect1.png", camera);
 	particle->Update();
 
-
-	// パーティクルマネージャ生成
-	//partMan = PartMan::Create(dxCommon->GetDevice(), camera);
-
+	EnemyPart = Particle::Create(L"Resources/Image/effect3.png", camera);
+	EnemyPart->Update();
 
 	//演出タイマー初期化
 	WaitTimer = 0;
@@ -412,7 +410,7 @@ void GameScene::Update()
 
 
 		//当たり判定
-
+		//プレイヤーの弾と敵の当たり判定
 		for (std::unique_ptr<Bullet>& bullet : bullets)
 		{
 			for (std::unique_ptr<Enemy>& enemy : enemys)
@@ -422,6 +420,8 @@ void GameScene::Update()
 				{
 					if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
 					{
+						//パーティクルを生成
+						EnemyPart->CreateParticleInfo(50, enemy->position, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						bullet->DeathFlag = true;
 						enemy->DeathFlag = true;
@@ -475,10 +475,11 @@ void GameScene::Update()
 			//自機と敵の弾当たり判定確認
 			if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
 			{
-				//パーティクル関数ここ
-				CreateParticleInfo(10, P->position_, 2.0f, 30, 2.0f, 0.0f);
-				//P->DamageFlag = true;
+				//パーティクルを生成
+				particle->CreateParticleInfo(10, P->position_, 2.0f, 30, 2.0f, 0.0f);
+				//ダメージSEを再生
 				Audio::GetInstance()->PlayWave("Damage.wav", 0.1f, false);
+				//プレイヤーのHPをデクリメントして敵の弾のデスフラグを上げる
 				P->HP -= 1;
 				bullet->DeathFlag = true;
 			}
@@ -569,6 +570,8 @@ void GameScene::Update()
 
 		//パーティクル更新
 		particle->Update();
+		
+		EnemyPart->Update();
 
 		UpdateInput();
 
@@ -654,8 +657,6 @@ void GameScene::Draw()
 	//FBXオブジェクトの描画
 	//object1->Draw(cmdList);
 
-	//Particle::PostDraw();
-
 	if (P->Level >= 2)
 	{
 		CoreR->Draw();
@@ -673,10 +674,11 @@ void GameScene::Draw()
 
 	Particle::PreDraw();
 
-	//if (P->DamageFlag == true)
-	{
-		particle->Draw();
-	}
+	
+	particle->Draw();
+
+	EnemyPart->Draw();
+	
 
 	Particle::PostDraw();
 
@@ -937,33 +939,6 @@ void GameScene::UpdateEnemyPopCommands()
 
 			BossUIDrawFlag = false;
 		}
-
-	}
-}
-
-void GameScene::CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale)
-{
-	for (int i = 0; i < PartNum; i++)
-	{
-		//X,Y,Z全て[-5.0f, +5.0f]でランダムに分布(座標)
-		const float md_width = 10.0f;
-		XMFLOAT3 pos{};
-		pos.x = Position.x;
-		pos.y = Position.y;
-		pos.z = Position.z;
-		//X,Y,Z全て[-5.0f, +5.0f]でランダムに分布(速度)
-		const float md_vel = Vel;
-		XMFLOAT3 vel{};
-		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
-		vel.y = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
-		vel.z = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
-		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
-		XMFLOAT3 acc{};
-		const float md_acc = 0.001f;
-		acc.y = -(float)rand() / RAND_MAX * md_acc;
-
-		//追加
-		particle->AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
 
 	}
 }

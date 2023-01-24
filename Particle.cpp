@@ -57,8 +57,8 @@ bool Particle::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList*
 	//パイプライン初期化
 	InitializeGraphicsPipeline();
 
-	//テクスチャ読み込み
-	LoadTexture();
+	////テクスチャ読み込み
+	//LoadTexture();
 
 	//モデル生成
 	CreateModel();
@@ -83,7 +83,7 @@ void Particle::PostDraw()
 	//Particle::cmdList = nullptr;
 }
 
-Particle* Particle::Create(Camera* camera)
+Particle* Particle::Create(const wchar_t* filename, Camera* camera)
 {
 	// 3Dオブジェクトのインスタンスを生成
 	Particle* particle = new Particle();
@@ -92,7 +92,7 @@ Particle* Particle::Create(Camera* camera)
 	}
 
 	// 初期化
-	if (!particle->Initialize()) {
+	if (!particle->Initialize(filename)) {
 		delete particle;
 		assert(0);
 		return nullptr;
@@ -312,7 +312,7 @@ bool Particle::InitializeGraphicsPipeline()
 	return true;
 }
 
-bool Particle::LoadTexture()
+bool Particle::LoadTexture(const wchar_t* filename)
 {
 	HRESULT result = S_FALSE;
 
@@ -321,7 +321,7 @@ bool Particle::LoadTexture()
 	ScratchImage scratchImg{};
 
 	result = LoadFromWICFile(
-		L"Resources/Image/effect1.png",
+		/*L"Resources/Image/effect1.png"*/filename,
 		WIC_FLAGS_NONE,
 		&metadata, scratchImg
 	);
@@ -431,7 +431,7 @@ void Particle::CreateModel()
 	vbView.StrideInBytes = sizeof(vertices[0]);
 }
 
-bool Particle::Initialize()
+bool Particle::Initialize(const wchar_t* filename)
 {
 	// nullptrチェック
 	assert(device);
@@ -445,6 +445,9 @@ bool Particle::Initialize()
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&constBuff));
+
+	//テクスチャ読み込み
+	LoadTexture(filename);
 
 	return true;
 }
@@ -561,4 +564,31 @@ void Particle::AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLO
 	//p.scale = start_scale;
 	p.scale_start = start_scale;
 	p.scale_end = end_scale;
+}
+
+void Particle::CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale)
+{
+	for (int i = 0; i < PartNum; i++)
+	{
+		//X,Y,Z全て[-5.0f, +5.0f]でランダムに分布(座標)
+		const float md_width = 10.0f;
+		XMFLOAT3 pos{};
+		pos.x = Position.x;
+		pos.y = Position.y;
+		pos.z = Position.z;
+		//X,Y,Z全て[-5.0f, +5.0f]でランダムに分布(速度)
+		const float md_vel = Vel;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
+		XMFLOAT3 acc{};
+		const float md_acc = 0.001f;
+		acc.y = -(float)rand() / RAND_MAX * md_acc;
+
+		//追加
+		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
+
+	}
 }

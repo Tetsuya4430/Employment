@@ -21,13 +21,6 @@ protected: // エイリアス
 	using XMMATRIX = DirectX::XMMATRIX;
 
 public:	//サブクラス
-	//頂点データ構造体
-	//struct VertexPosNormalUv
-	//{
-	//	XMFLOAT3 pos;	//xyz座標
-	//	XMFLOAT3 normal; //法線ベクトル
-	//	XMFLOAT2 uv;	//uv座標
-	//};
 
 	//頂点データ構造体
 	struct VertexPos
@@ -74,6 +67,8 @@ private: // 定数
 	static const int planeCount = division * 2 + division * 2;		// 面の数
 	static const int vertexCount = 1024;		// 頂点数
 
+	//テクスチャの最大枚数
+	static const int spriteSRVCount = 512;
 
 public: // 静的メンバ関数
 /// <summary>
@@ -101,7 +96,7 @@ public: // 静的メンバ関数
 	/// 3Dオブジェクト生成
 	/// </summary>
 	/// <returns></returns>
-	static Particle* Create(Camera* camera);
+	static Particle* Create(const wchar_t* filename, Camera* camera);
 
 private: // 静的メンバ変数
 	//デバイス
@@ -153,7 +148,7 @@ private: // 静的メンバ変数
 	static bool InitializeGraphicsPipeline();
 
 	//テクスチャ読み込み
-	static bool LoadTexture();
+	static bool LoadTexture(const wchar_t* filename);
 
 	/// <summary>
 	/// モデル作成
@@ -166,7 +161,7 @@ private: // 静的メンバ変数
 	//static void UpdateViewMatrix();
 
 public: //メンバ関数
-	bool Initialize();
+	bool Initialize(const wchar_t* filename);
 
 	/// <summary>
 /// 毎フレーム処理
@@ -209,6 +204,9 @@ public: //メンバ関数
 
 	//パーティクル追加
 	void AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale);
+
+	//パーティクル発生関数
+	void CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
 
 private:	//メンバ変数
 	//行列用定数バッファ
