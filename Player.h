@@ -227,5 +227,8 @@ public:
 
 		//移動可能フラグ
 		bool MoveCanFlag = false;
+
+		//ダメージフラグ
+		bool DamageFlag = false;
 };
 

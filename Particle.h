@@ -33,6 +33,7 @@ public:	//サブクラス
 	struct VertexPos
 	{
 		XMFLOAT3 pos;	//x,y,z座標
+		float scale;	//スケール
 	};
 
 	//パーティクル1粒
@@ -47,6 +48,12 @@ public:	//サブクラス
 		XMFLOAT3 velocity = {};
 		//加速度
 		XMFLOAT3 accel = {};
+		//スケール
+		float scale = 1.0f;
+		//スケール初期値
+		float scale_start = 1.0f;
+		//スケール最終値
+		float scale_end = 0.0f;
 		//現在フレーム
 		int frame = 0;
 		//終了フレーム
@@ -201,7 +208,7 @@ public: //メンバ関数
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
 	//パーティクル追加
-	void AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel);
+	void AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale);
 
 private:	//メンバ変数
 	//行列用定数バッファ

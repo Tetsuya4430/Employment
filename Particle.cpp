@@ -212,16 +212,12 @@ bool Particle::InitializeGraphicsPipeline()
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
-		//{ // 法線ベクトル(1行で書いたほうが見やすい)
-		//	"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-		//	D3D12_APPEND_ALIGNED_ELEMENT,
-		//	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
-		//},
-		//{ // uv座標(1行で書いたほうが見やすい)
-		//	"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0,
-		//	D3D12_APPEND_ALIGNED_ELEMENT,
-		//	D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
-		//},
+
+		{//スケール
+			"TEXCOORD", 0, DXGI_FORMAT_R32_FLOAT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
 	};
 
 	// グラフィックスパイプラインの流れを設定
@@ -486,10 +482,15 @@ void Particle::Update()
 	{
 		//経過フレーム数をカウント
 		it->frame++;
+		//進行度を0～1の範囲に換算
+		float f = (float)it->num_frame / it->frame;
 		//速度に加速度を加算
 		it ->velocity = it->velocity + it->accel;
 		//速度による移動
 		it->position = it->position + it->velocity;
+		//スケールの線形補間
+		it->scale = (it->scale_end - it->scale_start) / f;
+		it->scale += it->scale_start;
 	}
 
 	//頂点バッファへデータ転送
@@ -504,6 +505,8 @@ void Particle::Update()
 		{
 			//座標
 			vertMap->pos = it->position;
+			//スケール
+			vertMap->scale = it->scale;
 			//次の頂点へ
 			vertMap++;
 		}
@@ -544,7 +547,7 @@ void Particle::Draw()
 	cmdList->DrawInstanced((UINT)std::distance(particles.begin(), particles.end()), 1, 0, 0);
 }
 
-void Particle::AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel)
+void Particle::AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale)
 {
 	//リストに要素を追加
 	particles.emplace_front();
@@ -555,4 +558,7 @@ void Particle::AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLO
 	p.velocity = velocity;
 	p.accel = accel;
 	p.num_frame = life;
+	//p.scale = start_scale;
+	p.scale_start = start_scale;
+	p.scale_end = end_scale;
 }

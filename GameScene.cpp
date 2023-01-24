@@ -167,29 +167,8 @@ void GameScene::Finalize()
 
 void GameScene::Update()
 {
-	//パーティクルの発生
-	for (int i = 0; i < 100; i++)
-	{
-		//X,Y,Z全て[-5.0f, +5.0f]でランダムに分布(座標)
-		const float md_width = 10.0f;
-		XMFLOAT3 pos{};
-		pos.x = (float)rand() / RAND_MAX * md_width - md_width / 2.0f;
-		pos.y = (float)rand() / RAND_MAX * md_width - md_width / 2.0f;
-		pos.z = (float)rand() / RAND_MAX * md_width - md_width / 2.0f;
-		//X,Y,Z全て[-5.0f, +5.0f]でランダムに分布(速度)
-		const float md_vel = 0.1f;
-		XMFLOAT3 vel{};
-		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
-		vel.y = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
-		vel.z = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
-		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
-		XMFLOAT3 acc{};
-		const float md_acc = 0.001f;
-		acc.y = -(float)rand() / RAND_MAX * md_acc;
 
-		//追加
-		particle->AddParticle(60, pos, vel, acc);
-	}
+
 
 	if (!LoadBG->color_.w <= 0.0f)
 	{
@@ -496,11 +475,15 @@ void GameScene::Update()
 			//自機と敵の弾当たり判定確認
 			if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
 			{
+				//パーティクル関数ここ
+				CreateParticleInfo(10, P->position_, 2.0f, 30, 2.0f, 0.0f);
+				//P->DamageFlag = true;
 				Audio::GetInstance()->PlayWave("Damage.wav", 0.1f, false);
 				P->HP -= 1;
 				bullet->DeathFlag = true;
 			}
 		}
+
 
 		//プレイヤーの弾とボスの当たり判定
 		if (Boss)
@@ -690,7 +673,10 @@ void GameScene::Draw()
 
 	Particle::PreDraw();
 
-	particle->Draw();
+	//if (P->DamageFlag == true)
+	{
+		particle->Draw();
+	}
 
 	Particle::PostDraw();
 
@@ -951,6 +937,33 @@ void GameScene::UpdateEnemyPopCommands()
 
 			BossUIDrawFlag = false;
 		}
+
+	}
+}
+
+void GameScene::CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale)
+{
+	for (int i = 0; i < PartNum; i++)
+	{
+		//X,Y,Z全て[-5.0f, +5.0f]でランダムに分布(座標)
+		const float md_width = 10.0f;
+		XMFLOAT3 pos{};
+		pos.x = Position.x;
+		pos.y = Position.y;
+		pos.z = Position.z;
+		//X,Y,Z全て[-5.0f, +5.0f]でランダムに分布(速度)
+		const float md_vel = Vel;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.z = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
+		XMFLOAT3 acc{};
+		const float md_acc = 0.001f;
+		acc.y = -(float)rand() / RAND_MAX * md_acc;
+
+		//追加
+		particle->AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
 
 	}
 }
