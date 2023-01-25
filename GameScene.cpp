@@ -215,7 +215,7 @@ void GameScene::Update()
 			Audio::GetInstance()->PlayWave("Bullet.wav", 0.5f, false);
 		}
 
-		if (P->MoveCanFlag == true && (ButtonKind::Button_B))
+		if (P->MoveCanFlag == true && IsButtonDown(ButtonKind::Button_B))
 		{
 			Audio::GetInstance()->PlayWave("Bullet.wav", 0.5f, false);
 		}
@@ -442,6 +442,8 @@ void GameScene::Update()
 				{
 					if (CheckCollision(CoreR_bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
 					{
+						//パーティクルを生成
+						EnemyPart->CreateParticleInfo(50, enemy->position, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						CoreR_bullet->DeathFlag = true;
 						enemy->DeathFlag = true;
@@ -461,6 +463,8 @@ void GameScene::Update()
 				{
 					if (CheckCollision(CoreL_bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
 					{
+						//パーティクルを生成
+						EnemyPart->CreateParticleInfo(50, enemy->position, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						CoreL_bullet->DeathFlag = true;
 						enemy->DeathFlag = true;
@@ -495,8 +499,16 @@ void GameScene::Update()
 				{
 					if (CheckCollision(bullet->GetPosition(), Boss->GetPosition(), 2.0f, 6.0f) == true)
 					{
+						//パーティクルを生成
+						particle->CreateParticleInfo(10, Boss->position, 2.0f, 30, 1.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						Boss->HP -= 1;
+						if (Boss->HP <= 0)
+						{
+							Audio::GetInstance()->PlayWave("BossDown.wav", 0.1f, false);
+							//ボス撃破時はパーティクルを派手に演出
+							particle->CreateParticleInfo(50, Boss->position, 2.0f, 50, 5.0f, 0.0f);
+						}
 						bullet->DeathFlag = true;
 					}
 				}
@@ -504,7 +516,6 @@ void GameScene::Update()
 
 			if (Boss->HP <= 0)
 			{
-				
 				Boss->DeathFlag = true;
 			}
 		}
@@ -517,8 +528,10 @@ void GameScene::Update()
 				//自機と敵の弾当たり判定確認
 				if (CheckCollision(P->GetPosition(), bullet->GetPosition(), 2.0f, 2.0f) == true)
 				{
-					if (Boss->HP == 1)
+					if (P->HP == 1)
 					{
+						//ボス撃破時はパーティクルを派手に演出
+						particle->CreateParticleInfo(50, P->position_, 2.0f, 50, 5.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("BossDown.wav", 0.1f, false);
 					}
 					P->HP -= 1;
