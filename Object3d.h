@@ -2,6 +2,9 @@
 
 #include "Model.h"
 #include "Camera.h"
+#include "Input.h"
+#include "Controller.h"
+#include "Audio.h"
 
 #include <Windows.h>
 #include <wrl.h>
@@ -111,7 +114,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw();
+	virtual void Draw();
 
 	/// <summary>
 	/// 座標の取得
@@ -139,12 +142,19 @@ public: // メンバ関数
 
 	void SetScale(XMFLOAT3 scale) { this->scale_ = scale; }
 
+	const XMFLOAT3& GetScale() { return scale_; }
+
 	/// <summary>
 	/// setter
 	/// </summary>
 	void SetModel(Model* model) { model_ = model; }
 
 	void SetCamera(Camera* camera) { camera_ = camera; }
+
+
+	//getter
+	//デバイスの取得
+	const ID3D12Device* GetDevice() { return device; }
 
 protected: // メンバ変数
 	//3Dモデル(借りてくる)
@@ -163,5 +173,7 @@ protected: // メンバ変数
 	XMMATRIX matWorld_;
 	// 親オブジェクト
 	Object3d* parent_ = nullptr;
+	//オーディオ
+	Audio* audio = Audio::GetInstance();
 };
 

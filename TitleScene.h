@@ -35,5 +35,13 @@ private:
 
 	//ロードフラグ
 	bool LoadFlag = false;
+
+	//音量
+	float Decision_Vol = 0.3f;
+
+	float Title_Vol = 0.1f;
+
+	//後で消す
+	int Timer = 0;
 };
 

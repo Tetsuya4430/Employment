@@ -24,7 +24,7 @@ void TitleScene::Initialize(/*DirectXCommon* dxCommon*/)
 
 	Audio::GetInstance()->LoadWave("Decision.wav");
 
-	Audio::GetInstance()->PlayWave("Title.wav", 0.1f, true);
+	Audio::GetInstance()->PlayWave("Title.wav", Title_Vol, true);
 
 	InitInput();
 }
@@ -41,15 +41,24 @@ void TitleScene::Update()
 {
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE))
 	{
-		Audio::GetInstance()->PlayWave("Decision.wav", 0.3f, true);
+		Audio::GetInstance()->PlayWave("Decision.wav", Decision_Vol, true);
 		LoadFlag = true;
 	}
 
 	if (IsButtonDown(ButtonKind::Button_A))
 	{
-		Audio::GetInstance()->PlayWave("Decision.wav", 0.3f, true);
+		Audio::GetInstance()->PlayWave("Decision.wav", Decision_Vol, true);
 		LoadFlag = true;
 	}
+
+	////後で消す
+	//Timer++;
+
+	//if (Timer >= 180)
+	//{
+	//	Audio::GetInstance()->PlayWave("Decision.wav", Decision_Vol, false);
+	//	Timer = 0;
+	//}
 
 	//コントローラーの押下情報更新
 		UpdateInput();

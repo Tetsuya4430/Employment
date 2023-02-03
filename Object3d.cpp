@@ -18,11 +18,6 @@ ID3D12Device* Object3d::device = nullptr;
 ID3D12GraphicsCommandList* Object3d::cmdList = nullptr;
 ComPtr<ID3D12RootSignature> Object3d::rootsignature;
 ComPtr<ID3D12PipelineState> Object3d::pipelinestate;
-//XMMATRIX Object3d::matView{};
-//XMMATRIX Object3d::matProjection{};
-//XMFLOAT3 Object3d::eye = { 0, 0, -50.0f };
-//XMFLOAT3 Object3d::target = { 0, 0, 0 };
-//XMFLOAT3 Object3d::up = { 0, 1, 0 };
 
 bool Object3d::StaticInitialize(ID3D12Device * device, ID3D12GraphicsCommandList* cmdList,  int window_width, int window_height)
 {
@@ -334,9 +329,9 @@ void Object3d::Draw()
 	//モデルの紐づけがない場合は描画しない
 	if (model_ == nullptr)
 	{
+		assert(0);
 		return;
 	}
-
 
 	cmdList->SetGraphicsRootConstantBufferView(0, constBuffB0_->GetGPUVirtualAddress());
 

@@ -17,6 +17,7 @@
 #include "PostEffect.h"
 #include "Controller.h"
 #include "Particle.h"
+#include "Test.h"
 
 
 #include <list>
@@ -175,6 +176,11 @@ private:
 	Particle* EnemyPart = nullptr;
 
 
+	//test(プレイヤー)
+	Test* test = nullptr;
+	Test* Satellite_R = nullptr;
+	Test* Satellite_L = nullptr;
+
 	//UI
 	Sprite* sprite = nullptr;
 	Sprite* UI = nullptr;
@@ -298,5 +304,13 @@ private:
 
 	XMFLOAT2 BarSize = { 100, 200 };
 
+
+	//プレイヤー関係
+	XMFLOAT3 PlayerPos = { 0, 0, 0 };
+	XMFLOAT3 SatellitePos_R = { 0, 0, 0 };
+	XMFLOAT3 SatellitePos_L = { 0, 0, 0 };
+
+	//オーディオ音量
+	float Attack_Volume = 0.5f;
 };
 

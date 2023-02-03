@@ -217,7 +217,7 @@ public:
 		XMFLOAT3 rotation_ = { 0,0,0 };
 
 		//プレイヤーのHP
-		int HP = 5;
+		int HP = 999;
 
 		//プレイヤーのレベル
 		int Level = 1;
