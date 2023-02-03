@@ -67,15 +67,15 @@ void GameScene::Initialize()
 
 
 	//3Dオブジェクト生成
-	P = Player::Create(model_2, camera);
-	CoreR = Player::Create(model_reticle, camera);
-	CoreL = Player::Create(model_reticle, camera);
+	//P = Player::Create(model_2, camera);
+	//CoreR = Player::Create(model_reticle, camera);
+	//CoreL = Player::Create(model_reticle, camera);
 
-	test = Test::Create(model_2, camera);
-	Satellite_R = Test::Create(model_reticle, camera);
-	Satellite_L = Test::Create(model_reticle, camera);
+	player = Player::Create(model_2, camera);
+	Satellite_R = Player::Create(model_reticle, camera);
+	Satellite_L = Player::Create(model_reticle, camera);
 
-	PlayerPos = test->GetPosition();
+	PlayerPos = player->GetPosition();
 	SatellitePos_R = Satellite_R->GetPosition();
 	SatellitePos_L = Satellite_L->GetPosition();
 
@@ -144,7 +144,7 @@ void GameScene::Initialize()
 	LoadBG->color_.w = 1.0f;
 
 	//スケールのセット
-	test->Object3d::SetScale({ 0.5f, 0.5f, 0.5f });
+	player->Object3d::SetScale({ 0.5f, 0.5f, 0.5f });
 	Satellite_R->Object3d::SetScale({ 0.5f, 0.5f, 0.5f });
 	Satellite_L->Object3d::SetScale({ 0.5f, 0.5f, 0.5f });
 	//CoreR->SetScale({ 0.5f, 0.5f, 0.5f });
@@ -177,7 +177,7 @@ void GameScene::Finalize()
 void GameScene::Update()
 {
 	//プレイヤーの座標を取得
-	PlayerPos = test->GetPosition();
+	PlayerPos = player->GetPosition();
 
 
 	if (!LoadBG->color_.w <= 0.0f)
@@ -232,12 +232,12 @@ void GameScene::Update()
 		}
 
 		//攻撃時SE再生
-		if (test->MoveCanFlag == true && Input::GetInstance()->TriggerKey(DIK_SPACE))
+		if (player->MoveCanFlag == true && Input::GetInstance()->TriggerKey(DIK_SPACE))
 		{
 			Audio::GetInstance()->PlayWave("Bullet.wav", Attack_Volume, false);
 		}
 
-		if (test->MoveCanFlag == true && IsButtonDown(ButtonKind::Button_B))
+		if (player->MoveCanFlag == true && IsButtonDown(ButtonKind::Button_B))
 		{
 			Audio::GetInstance()->PlayWave("Bullet.wav", Attack_Volume, false);
 		}
@@ -287,7 +287,7 @@ void GameScene::Update()
 
 		//}
 
-		if (test->HP <= 0)
+		if (player->HP <= 0)
 		{
 			/*if (WaitTimer < 60)
 			{
@@ -313,12 +313,12 @@ void GameScene::Update()
 		//player->Update();
 
 		//プレイヤーの更新
-		P->Update();
-		CoreR->Update();
-		CoreL->Update();
+		//P->Update();
+		//CoreR->Update();
+		//CoreL->Update();
 
-		test->SetPosition(PlayerPos);
-		test->Update();
+		player->SetPosition(PlayerPos);
+		player->Update();
 
 		Satellite_R->SetPosition(SatellitePos_R);
 		Satellite_R->Update();
@@ -345,17 +345,17 @@ void GameScene::Update()
 		}*/
 
 
-		if (test->MoveCanFlag == true)
+		if (player->MoveCanFlag == true)
 		{
 			Attack(PlayerPos);
 		}
 
-		if (test->Level >= 2)
+		if (player->Level >= 2)
 		{
 			Attack(SatellitePos_R);
 		}
 
-		if (test->Level >= 3)
+		if (player->Level >= 3)
 		{
 			Attack(SatellitePos_L);
 		}
@@ -494,7 +494,7 @@ void GameScene::Update()
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						bullet->DeathFlag = true;
 						enemy->DeathFlag = true;
-						test->EXP += 1;
+						player->EXP += 1;
 					}
 				}
 			}
@@ -516,7 +516,7 @@ void GameScene::Update()
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						CoreR_bullet->DeathFlag = true;
 						enemy->DeathFlag = true;
-						test->EXP += 1;
+						player->EXP += 1;
 					}
 				}
 			}
@@ -537,7 +537,7 @@ void GameScene::Update()
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						CoreL_bullet->DeathFlag = true;
 						enemy->DeathFlag = true;
-						test->EXP += 1;
+						player->EXP += 1;
 					}
 				}
 			}
@@ -553,7 +553,7 @@ void GameScene::Update()
 				//ダメージSEを再生
 				Audio::GetInstance()->PlayWave("Damage.wav", 0.1f, false);
 				//プレイヤーのHPをデクリメントして敵の弾のデスフラグを上げる
-				test->HP -= 1;
+				player->HP -= 1;
 				bullet->DeathFlag = true;
 			}
 		}
@@ -597,13 +597,13 @@ void GameScene::Update()
 				//自機と敵の弾当たり判定確認
 				if (CheckCollision(PlayerPos, bullet->GetPosition(), 2.0f, 2.0f) == true)
 				{
-					if (test->HP == 1)
+					if (player->HP == 1)
 					{
 						//ボス撃破時はパーティクルを派手に演出
 						particle->CreateParticleInfo(50, PlayerPos, 2.0f, 50, 5.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("BossDown.wav", 0.1f, false);
 					}
-					test->HP -= 1;
+					player->HP -= 1;
 					bullet->DeathFlag = true;
 
 				}
@@ -739,17 +739,17 @@ void GameScene::Draw()
 	//FBXオブジェクトの描画
 	//object1->Draw(cmdList);
 
-	if (test->Level >= 2)
+	if (player->Level >= 2)
 	{
 		Satellite_R->Draw();
 	}
 
-	if (test->Level >= 3)
+	if (player->Level >= 3)
 	{
 		Satellite_L->Draw();
 	}
 
-	test->Draw();
+	player->Draw();
 
 	//3Dオブジェクトの描画後処理
 	Object3d::PostDraw();
@@ -772,32 +772,32 @@ void GameScene::Draw()
 
 	if (Go->ComFlag_2 == true)
 	{
-		if (test->HP == 5)
+		if (player->HP == 5)
 		{
 			HP_5->Draw();
 		}
 
-		if (test->HP == 4)
+		if (player->HP == 4)
 		{
 			HP_4->Draw();
 		}
 
-		if (test->HP == 3)
+		if (player->HP == 3)
 		{
 			HP_3->Draw();
 		}
 
-		if (test->HP == 2)
+		if (player->HP == 2)
 		{
 			HP_2->Draw();
 		}
 
-		if (test->HP == 1)
+		if (player->HP == 1)
 		{
 			HP_1->Draw();
 		}
 
-		if (test->HP == 0)
+		if (player->HP == 0)
 		{
 			HP_0->Draw();
 		}
@@ -1371,48 +1371,48 @@ void GameScene::DrawSprite()
 
 	if (Go->ComFlag_2 == true)
 	{
-		if (test->EXP == 0)
+		if (player->EXP == 0)
 		{
 			ExpBar_0->Draw();
 		}
 
-		else if (test->EXP == 1)
+		else if (player->EXP == 1)
 		{
 			ExpBar_1->Draw();
 		}
 
-		else if (test->EXP == 2)
+		else if (player->EXP == 2)
 		{
 			ExpBar_2->Draw();
 		}
 
-		else if (test->EXP == 3)
+		else if (player->EXP == 3)
 		{
 			ExpBar_3->Draw();
 		}
 
-		else if (test->EXP == 4)
+		else if (player->EXP == 4)
 		{
 			ExpBar_4->Draw();
 		}
 
-		else if (test->EXP >= 5)
+		else if (player->EXP >= 5)
 		{
 			ExpBar_5->Draw();
 		}
 
 		//レベル
-		if (test->Level == 1)
+		if (player->Level == 1)
 		{
 			Level_1->Draw();
 		}
 
-		else if (test->Level == 2)
+		else if (player->Level == 2)
 		{
 			Level_2->Draw();
 		}
 
-		else if (test->Level >= 3)
+		else if (player->Level >= 3)
 		{
 			Level_3->Draw();
 		}
@@ -1487,7 +1487,7 @@ void GameScene::DrawSprite()
 void GameScene::Start()
 {
 	//StartTimer += 1;
-	test->MoveCanFlag = false;
+	player->MoveCanFlag = false;
 	Stage_1->Vec.x = (Stage_1->PointPos.x - Stage_1->position_.x) / 30;
 	Stage_1->position_.x += Stage_1->Vec.x;
 
@@ -1519,13 +1519,13 @@ void GameScene::Start()
 		{
 			//P->position_.z += 3;
 			PlayerPos.z += 3;
-			test->SetPosition(PlayerPos);
+			player->SetPosition(PlayerPos);
 
 		}
 
 
 		//P->MoveCanFlag = true;
-		test->MoveCanFlag = true;
+		player->MoveCanFlag = true;
 
 	}
 

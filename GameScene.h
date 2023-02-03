@@ -4,6 +4,7 @@
 #include "DebugText.h"
 #include "Sprite.h"
 #include "Object3d.h"
+#include "Player.h"
 #include "Fbx3d.h"
 #include "Audio.h"
 #include "Input.h"
@@ -17,14 +18,13 @@
 #include "PostEffect.h"
 #include "Controller.h"
 #include "Particle.h"
-#include "Test.h"
 
 
 #include <list>
 #include <sstream>
 #include <fstream>
 
-class Player;
+//class Player;
 class Bullet;
 class EnemyBullet;
 class Enemy;
@@ -176,10 +176,10 @@ private:
 	Particle* EnemyPart = nullptr;
 
 
-	//test(ÉvÉåÉCÉÑÅ[)
-	Test* test = nullptr;
-	Test* Satellite_R = nullptr;
-	Test* Satellite_L = nullptr;
+	//Player
+	Player* player = nullptr;
+	Player* Satellite_R = nullptr;
+	Player* Satellite_L = nullptr;
 
 	//UI
 	Sprite* sprite = nullptr;
