@@ -10,7 +10,7 @@
 
 #include "Player.h"
 #include "Bullet.h"
-#include "Enemy.h"
+//#include "Enemy.h"
 
 #include <DirectXMath.h>
 
@@ -67,10 +67,6 @@ void GameScene::Initialize()
 
 
 	//3Dオブジェクト生成
-	//P = Player::Create(model_2, camera);
-	//CoreR = Player::Create(model_reticle, camera);
-	//CoreL = Player::Create(model_reticle, camera);
-
 	player = Player::Create(model_2, camera);
 	Satellite_R = Player::Create(model_reticle, camera);
 	Satellite_L = Player::Create(model_reticle, camera);
@@ -78,6 +74,8 @@ void GameScene::Initialize()
 	PlayerPos = player->GetPosition();
 	SatellitePos_R = Satellite_R->GetPosition();
 	SatellitePos_L = Satellite_L->GetPosition();
+
+	
 
 	//天球生成
 	CelestialSphere = Object3d::Create(model_sphere, camera);
@@ -180,6 +178,7 @@ void GameScene::Update()
 	PlayerPos = player->GetPosition();
 
 
+
 	if (!LoadBG->color_.w <= 0.0f)
 	{
 		LoadBG->color_.w -= 0.02f;
@@ -201,17 +200,7 @@ void GameScene::Update()
 		//UI->position_.x = Reticle->MousePosition.x;
 		//UI->position_.y = Reticle->MousePosition.y;
 
-		//プレイヤーコアの座標設定
-		/*CoreR->position_.x = PlayerPos.x + 6;
-		CoreR->position_.y = PlayerPos.y - 1;
-		CoreR->position_.z = PlayerPos.z;
-
-		CoreL->position_.x = PlayerPos.x - 6;
-		CoreL->position_.y = PlayerPos.y - 1;
-		CoreL->position_.z = PlayerPos.z;
-
-		CoreR->rotation_ = { 0.0f, 0.0f, 0.0f };
-		CoreL->rotation_ = { 0.0f, 0.0f, 0.0f };*/
+		
 
 	SatellitePos_R.x = PlayerPos.x + 6;
 	SatellitePos_R.y = PlayerPos.y - 1;
@@ -267,26 +256,6 @@ void GameScene::Update()
 			}
 		}
 		//プレイヤーのHPが0になったらゲームオーバー
-		//if (P->HP <= 0)
-		//{
-		//	/*if (WaitTimer < 60)
-		//	{
-		//		WaitTimer += 1;
-		//	}*/
-		//	if (WaitTimer < 60)
-		//	{
-		//		WaitTimer += 1;
-		//	}
-
-		//	if (WaitTimer >= 60)
-		//	{
-		//		WaitTimer = 0;
-		//		Audio::GetInstance()->StopWave("GameScene.wav");
-		//		SceneManager::GetInstance()->ChangeScene("GAMEOVER");
-		//	}
-
-		//}
-
 		if (player->HP <= 0)
 		{
 			/*if (WaitTimer < 60)
@@ -309,14 +278,6 @@ void GameScene::Update()
 
 
 		//3Dオブジェクトの更新
-
-		//player->Update();
-
-		//プレイヤーの更新
-		//P->Update();
-		//CoreR->Update();
-		//CoreL->Update();
-
 		player->SetPosition(PlayerPos);
 		player->Update();
 
@@ -327,23 +288,6 @@ void GameScene::Update()
 		Satellite_L->Update();
 
 		/*Reticle->Update();*/
-
-		////プレイヤーの攻撃関数
-		//if (P->MoveCanFlag == true)
-		//{
-		//	Attack(P->position_);
-		//}
-
-	/*	if (P->Level >= 2)
-		{
-			Attack(CoreR->position_);
-		}
-
-		if (P->Level >= 3)
-		{
-			Attack(CoreL->position_);
-		}*/
-
 
 		if (player->MoveCanFlag == true)
 		{
@@ -377,20 +321,24 @@ void GameScene::Update()
 		//敵の更新
 		for (std::unique_ptr<Enemy>& enemy : enemys)
 		{
-			if (enemy->DeathFlag == false)
+			if (enemy->GetDeathFlag() == false)
 			{
 				//EnemyUpdate(enemy->position);
+				TestPos = enemy->GetPosition();
 				enemy->Update();
 
+				EnemyFire = enemy->GetFireTime();
 
-				enemy->FireTime--;
+				EnemyFire--;
 
-				if (enemy->FireTime <= 0)
+				enemy->SetFireTime(EnemyFire);
+
+				if (enemy->GetFireTime() <= 0)
 				{
-					EnemyAttack(enemy->position);
+					EnemyAttack(TestPos);
 
 					//発射タイマーを初期化
-					enemy->FireTime = enemy->IntervalTime;
+					enemy->SetFireTime(enemy->GetIntervalTime());
 				}
 			}
 
@@ -484,16 +432,17 @@ void GameScene::Update()
 		{
 			for (std::unique_ptr<Enemy>& enemy : enemys)
 			{
+				TestPos = enemy->GetPosition();
 				//当たり判定確認
-				if (enemy->DeathFlag == false)
+				if (enemy->GetDeathFlag() == false)
 				{
 					if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
 					{
 						//パーティクルを生成
-						EnemyPart->CreateParticleInfo(50, enemy->position, 2.0f, 30, 2.0f, 0.0f);
+						EnemyPart->CreateParticleInfo(50, TestPos, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						bullet->DeathFlag = true;
-						enemy->DeathFlag = true;
+						enemy->SetDeathFlag(true);
 						player->EXP += 1;
 					}
 				}
@@ -506,16 +455,17 @@ void GameScene::Update()
 		{
 			for (std::unique_ptr<Enemy>& enemy : enemys)
 			{
+				TestPos = enemy->GetPosition();
 				//当たり判定確認
-				if (enemy->DeathFlag == false)
+				if (enemy->GetDeathFlag() == false)
 				{
 					if (CheckCollision(CoreR_bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
 					{
 						//パーティクルを生成
-						EnemyPart->CreateParticleInfo(50, enemy->position, 2.0f, 30, 2.0f, 0.0f);
+						EnemyPart->CreateParticleInfo(50, TestPos, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						CoreR_bullet->DeathFlag = true;
-						enemy->DeathFlag = true;
+						enemy->SetDeathFlag(true);
 						player->EXP += 1;
 					}
 				}
@@ -527,16 +477,17 @@ void GameScene::Update()
 		{
 			for (std::unique_ptr<Enemy>& enemy : enemys)
 			{
+				TestPos = enemy->GetPosition();
 				//当たり判定確認
-				if (enemy->DeathFlag == false)
+				if (enemy->GetDeathFlag() == false)
 				{
 					if (CheckCollision(CoreL_bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
 					{
 						//パーティクルを生成
-						EnemyPart->CreateParticleInfo(50, enemy->position, 2.0f, 30, 2.0f, 0.0f);
+						EnemyPart->CreateParticleInfo(50, TestPos, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						CoreL_bullet->DeathFlag = true;
-						enemy->DeathFlag = true;
+						enemy->SetDeathFlag(true);
 						player->EXP += 1;
 					}
 				}
@@ -684,8 +635,6 @@ void GameScene::Draw()
 	
 	//3Dオブジェクトの描画前処理
 	Object3d::PreDraw();
-
-	/*P->Draw();*/
 	
 	
 
@@ -706,7 +655,7 @@ void GameScene::Draw()
 	//敵の描画
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
-		if (enemy->DeathFlag == false)
+		if (enemy->GetDeathFlag() == false)
 		{
 			enemy->Draw();
 		}
@@ -821,7 +770,7 @@ void GameScene::EnemyInit()
 
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
-		enemy->FireTime = enemy->IntervalTime;
+		enemy->SetFireTime(enemy->GetIntervalTime());
 	}
 }
 
@@ -1522,9 +1471,6 @@ void GameScene::Start()
 			player->SetPosition(PlayerPos);
 
 		}
-
-
-		//P->MoveCanFlag = true;
 		player->MoveCanFlag = true;
 
 	}

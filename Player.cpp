@@ -42,8 +42,6 @@ bool Player::Initialize()
 
     //プレイヤー各種ステータス初期化
 	Object3d::SetPosition({ 0, -10, -50 });
-   /* Object3d::position_.z = -50;
-	Object3d::position_.y = 0;*/
     Level = 1;
     EXP = 0;
 

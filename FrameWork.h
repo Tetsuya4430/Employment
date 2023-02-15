@@ -16,6 +16,7 @@
 #include "SceneManager.h"
 #include "AbstractSceneFactory.h"
 #include "Particle.h"
+//#include "Test.h"
 
 /// <summary>
 /// フレームワーク

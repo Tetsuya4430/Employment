@@ -23,6 +23,7 @@ public:
 	/// </summary>
 	void Update();
 
+private:
 	//プレイヤーの移動スピード
 	float Speed = 0.5f;
 	float K = 0.5f;
@@ -85,13 +86,13 @@ public:
 
 public:
 	// ローカル座標
-	XMFLOAT3 position_ = { 0,0,0 };
+	//XMFLOAT3 position_ = { 0,0,0 };
 
 	//レティクル座標
 	XMFLOAT3 ReticlePos = { 0, 0, 0 };
 
 	// X,Y,Z軸回りのローカル回転角
-	XMFLOAT3 rotation_ = { 0,0,0 };
+	//XMFLOAT3 rotation_ = { 0,0,0 };
 
 	//プレイヤーのHP
 	int HP = 5;

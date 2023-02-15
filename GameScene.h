@@ -11,13 +11,14 @@
 #include "Bullet.h"
 //#include "Reticle.h"
 #include "EnemyBullet.h"
-#include "Enemy.h"
+//#include "Enemy.h"
 #include "St1_Boss.h"
 #include "BossBullet.h"
 #include "ObjectManager.h"
 #include "PostEffect.h"
 #include "Controller.h"
 #include "Particle.h"
+#include "Enemy.h"
 
 
 #include <list>
@@ -27,7 +28,6 @@
 //class Player;
 class Bullet;
 class EnemyBullet;
-class Enemy;
 
 /// <summary>
 /// ゲームプレイシーン
@@ -152,6 +152,8 @@ private:
 	
 	//敵
 	std::list<std::unique_ptr<Enemy>> enemys;
+
+	int EnemyFire = 0;
 
 	//敵発生コマンド
 	std::stringstream enemyPopCommands;
@@ -309,6 +311,9 @@ private:
 	XMFLOAT3 PlayerPos = { 0, 0, 0 };
 	XMFLOAT3 SatellitePos_R = { 0, 0, 0 };
 	XMFLOAT3 SatellitePos_L = { 0, 0, 0 };
+
+	//敵
+	XMFLOAT3 TestPos = { 0, 0, 0 };
 
 	//オーディオ音量
 	float Attack_Volume = 0.5f;

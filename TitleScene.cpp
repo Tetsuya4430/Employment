@@ -26,6 +26,7 @@ void TitleScene::Initialize(/*DirectXCommon* dxCommon*/)
 
 	Audio::GetInstance()->PlayWave("Title.wav", Title_Vol, true);
 
+
 	InitInput();
 }
 
@@ -50,15 +51,6 @@ void TitleScene::Update()
 		Audio::GetInstance()->PlayWave("Decision.wav", Decision_Vol, true);
 		LoadFlag = true;
 	}
-
-	////後で消す
-	//Timer++;
-
-	//if (Timer >= 180)
-	//{
-	//	Audio::GetInstance()->PlayWave("Decision.wav", Decision_Vol, false);
-	//	Timer = 0;
-	//}
 
 	//コントローラーの押下情報更新
 		UpdateInput();
