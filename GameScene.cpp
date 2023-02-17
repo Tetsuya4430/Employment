@@ -8,8 +8,8 @@
 #include "FrameWork.h"
 #include "Controller.h"
 
-#include "Player.h"
-#include "Bullet.h"
+//#include "Player.h"
+//#include "Bullet.h"
 //#include "Enemy.h"
 
 #include <DirectXMath.h>
@@ -324,7 +324,7 @@ void GameScene::Update()
 			if (enemy->GetDeathFlag() == false)
 			{
 				//EnemyUpdate(enemy->position);
-				TestPos = enemy->GetPosition();
+				EnemyPos = enemy->GetPosition();
 				enemy->Update();
 
 				EnemyFire = enemy->GetFireTime();
@@ -335,7 +335,7 @@ void GameScene::Update()
 
 				if (enemy->GetFireTime() <= 0)
 				{
-					EnemyAttack(TestPos);
+					EnemyAttack(EnemyPos);
 
 					//発射タイマーを初期化
 					enemy->SetFireTime(enemy->GetIntervalTime());
@@ -399,18 +399,18 @@ void GameScene::Update()
 		//プレイヤー弾
 		bullets.remove_if([](std::unique_ptr<Bullet>& bullet)
 			{
-				return bullet->DeathGetter();
+				return bullet->GetDeathFlag();
 			});
 
 		//コア弾
 		CoreR_bullets.remove_if([](std::unique_ptr<Bullet>& CoreR_bullet)
 			{
-				return CoreR_bullet->DeathGetter();
+				return CoreR_bullet->GetDeathFlag();
 			});
 
 		CoreL_bullets.remove_if([](std::unique_ptr<Bullet>& CoreL_bullet)
 			{
-				return CoreL_bullet->DeathGetter();
+				return CoreL_bullet->GetDeathFlag();
 			});
 
 		//敵弾
@@ -432,16 +432,17 @@ void GameScene::Update()
 		{
 			for (std::unique_ptr<Enemy>& enemy : enemys)
 			{
-				TestPos = enemy->GetPosition();
+				EnemyPos = enemy->GetPosition();
 				//当たり判定確認
 				if (enemy->GetDeathFlag() == false)
 				{
 					if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
 					{
 						//パーティクルを生成
-						EnemyPart->CreateParticleInfo(50, TestPos, 2.0f, 30, 2.0f, 0.0f);
+						EnemyPart->CreateParticleInfo(50, EnemyPos, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
-						bullet->DeathFlag = true;
+						//bullet->DeathFlag = true;
+						bullet->SetDeathFlag(true);
 						enemy->SetDeathFlag(true);
 						player->EXP += 1;
 					}
@@ -455,16 +456,17 @@ void GameScene::Update()
 		{
 			for (std::unique_ptr<Enemy>& enemy : enemys)
 			{
-				TestPos = enemy->GetPosition();
+				EnemyPos = enemy->GetPosition();
 				//当たり判定確認
 				if (enemy->GetDeathFlag() == false)
 				{
 					if (CheckCollision(CoreR_bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
 					{
 						//パーティクルを生成
-						EnemyPart->CreateParticleInfo(50, TestPos, 2.0f, 30, 2.0f, 0.0f);
+						EnemyPart->CreateParticleInfo(50, EnemyPos, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
-						CoreR_bullet->DeathFlag = true;
+						//CoreR_bullet->DeathFlag = true;
+						CoreR_bullet->SetDeathFlag(true);
 						enemy->SetDeathFlag(true);
 						player->EXP += 1;
 					}
@@ -477,16 +479,17 @@ void GameScene::Update()
 		{
 			for (std::unique_ptr<Enemy>& enemy : enemys)
 			{
-				TestPos = enemy->GetPosition();
+				EnemyPos = enemy->GetPosition();
 				//当たり判定確認
 				if (enemy->GetDeathFlag() == false)
 				{
 					if (CheckCollision(CoreL_bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
 					{
 						//パーティクルを生成
-						EnemyPart->CreateParticleInfo(50, TestPos, 2.0f, 30, 2.0f, 0.0f);
+						EnemyPart->CreateParticleInfo(50, EnemyPos, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
-						CoreL_bullet->DeathFlag = true;
+						//CoreL_bullet->DeathFlag = true;
+						CoreL_bullet->SetDeathFlag(true);
 						enemy->SetDeathFlag(true);
 						player->EXP += 1;
 					}
@@ -529,7 +532,8 @@ void GameScene::Update()
 							//ボス撃破時はパーティクルを派手に演出
 							particle->CreateParticleInfo(50, Boss->position, 2.0f, 50, 5.0f, 0.0f);
 						}
-						bullet->DeathFlag = true;
+						//bullet->DeathFlag = true;
+						bullet->SetDeathFlag(true);
 					}
 				}
 			}
@@ -556,7 +560,6 @@ void GameScene::Update()
 					}
 					player->HP -= 1;
 					bullet->DeathFlag = true;
-
 				}
 			}
 		}
@@ -792,7 +795,6 @@ void GameScene::Attack(XMFLOAT3 StartPos)
 {
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE) || IsButtonPush(ButtonKind::Button_B))
 	{
-
 		//弾を生成し初期化
 		std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
 		newBullet = Bullet::Create(model_Bullet, camera, StartPos, ReticlePos/*Reticle->position_*/);

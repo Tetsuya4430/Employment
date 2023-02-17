@@ -51,13 +51,6 @@ public:
 	const int& GetFireTime() { return FireTime; }
 
 private: // メンバ変数
-	// 親オブジェクト
-	Enemy* parent_ = nullptr;
-
-	Input* input = nullptr;
-
-	//ゲームシーン
-
 	//速度
 	float Speed = 0.4f;
 

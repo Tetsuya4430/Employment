@@ -93,9 +93,6 @@ Object3d * Object3d::Create(Model* model, Camera* camera)
 	{
 		object3d->SetCamera(camera);
 	}
-	//スケールをリセット
-	/*float scale_val = 20;
-	object3d->scale = { scale_val, scale_val , scale_val };*/
 
 	////シェアドポインタを生成してreturn
 	return object3d;

@@ -11,14 +11,14 @@
 #include "Bullet.h"
 //#include "Reticle.h"
 #include "EnemyBullet.h"
-//#include "Enemy.h"
+#include "Enemy.h"
 #include "St1_Boss.h"
 #include "BossBullet.h"
 #include "ObjectManager.h"
 #include "PostEffect.h"
 #include "Controller.h"
 #include "Particle.h"
-#include "Enemy.h"
+//#include "Test.h"
 
 
 #include <list>
@@ -26,7 +26,7 @@
 #include <fstream>
 
 //class Player;
-class Bullet;
+//class Bullet;
 class EnemyBullet;
 
 /// <summary>
@@ -147,6 +147,7 @@ private:
 	std::list<std::unique_ptr<Bullet>> CoreR_bullets;
 	std::list<std::unique_ptr<Bullet>> CoreL_bullets;
 
+
 	//ìGÇÃíe
 	std::list<std::unique_ptr<EnemyBullet>> enemybullets;
 	
@@ -169,7 +170,7 @@ private:
 	Player* CoreR = nullptr;
 	Player* CoreL = nullptr;
 	//Reticle* Reticle = nullptr;
-	Bullet* B = nullptr;
+	//Bullet* B = nullptr;
 
 	St1_Boss* Boss = nullptr;
 
@@ -313,7 +314,7 @@ private:
 	XMFLOAT3 SatellitePos_L = { 0, 0, 0 };
 
 	//ìG
-	XMFLOAT3 TestPos = { 0, 0, 0 };
+	XMFLOAT3 EnemyPos = { 0, 0, 0 };
 
 	//ÉIÅ[ÉfÉBÉIâπó 
 	float Attack_Volume = 0.5f;
