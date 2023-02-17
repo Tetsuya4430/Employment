@@ -416,7 +416,7 @@ void GameScene::Update()
 		//敵弾
 		enemybullets.remove_if([](std::unique_ptr<EnemyBullet>& Enemybullet)
 			{
-				return Enemybullet->DeathGetter();
+				return Enemybullet->GetDeathFlag();
 			});
 
 		//ボス弾
@@ -508,7 +508,7 @@ void GameScene::Update()
 				Audio::GetInstance()->PlayWave("Damage.wav", 0.1f, false);
 				//プレイヤーのHPをデクリメントして敵の弾のデスフラグを上げる
 				player->HP -= 1;
-				bullet->DeathFlag = true;
+				bullet->SetDeathFlag(true);
 			}
 		}
 
