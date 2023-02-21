@@ -12,14 +12,13 @@
 //#include "Reticle.h"
 #include "EnemyBullet.h"
 #include "Enemy.h"
-#include "St1_Boss.h"
+#include "Boss.h"
 #include "BossBullet.h"
 #include "ObjectManager.h"
 #include "PostEffect.h"
 #include "Controller.h"
 #include "Particle.h"
-//#include "Test.h"
-
+//#include "test.h"
 
 #include <list>
 #include <sstream>
@@ -172,8 +171,11 @@ private:
 	//Reticle* Reticle = nullptr;
 	//Bullet* B = nullptr;
 
-	St1_Boss* Boss = nullptr;
-
+	//ボス
+	//St1_Boss* Boss = nullptr;
+	Boss* Boss = nullptr;
+	int BossFire = 0;
+	
 	//パーティクル
 	Particle* particle = nullptr;
 	Particle* EnemyPart = nullptr;

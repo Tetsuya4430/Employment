@@ -148,6 +148,7 @@ void GameScene::Initialize()
 	//CoreR->SetScale({ 0.5f, 0.5f, 0.5f });
 	//CoreL->SetScale({ 0.5f, 0.5f, 0.5f });
 
+
 	//コントローラー初期化
 	InitInput();
 
@@ -176,6 +177,9 @@ void GameScene::Update()
 {
 	//プレイヤーの座標を取得
 	PlayerPos = player->GetPosition();
+
+	////ボスの発射タイマーセット
+	//BossFire = 0;
 
 
 
@@ -240,7 +244,7 @@ void GameScene::Update()
 		//敵のHPが0になったらゲームクリア
 		if (Boss)
 		{
-			if (Boss->HP <= 0 && BossTimer <= 0)
+			if (Boss->GetHP() <= 0 && BossTimer <= 0)
 			{
 				if (WaitTimer < 60)
 				{
@@ -308,7 +312,7 @@ void GameScene::Update()
 		//ボス更新
 		if (Boss)
 		{
-			if (Boss->DeathFlag == false)
+			if (Boss->GetDeathFlag() == false)
 			{
 				//ボスの更新
 				Boss->Update();
@@ -347,18 +351,20 @@ void GameScene::Update()
 		//ボスの更新
 		if (Boss)
 		{
-			if (Boss->DeathFlag == false)
+			if (Boss->GetDeathFlag() == false)
 			{
 				Boss->Update();
 
-				Boss->FireTime--;
+				//BossFire = Boss->GetFireTime();
 
-				if (Boss->FireTime <= 0)
+				BossFire--;
+
+				if (BossFire <= 0)
 				{
-					EnemyAttack(Boss->position);
+					EnemyAttack(Boss->GetPosition());
 
 					//発射タイマーを初期化
-					Boss->FireTime = Boss->IntervalTime;
+					BossFire = Boss->GetIntervalTime();
 				}
 
 			}
@@ -516,21 +522,21 @@ void GameScene::Update()
 		//プレイヤーの弾とボスの当たり判定
 		if (Boss)
 		{
-			if (Boss->DeathFlag == false)
+			if (Boss->GetDeathFlag() == false)
 			{
 				for (std::unique_ptr<Bullet>& bullet : bullets)
 				{
 					if (CheckCollision(bullet->GetPosition(), Boss->GetPosition(), 2.0f, 6.0f) == true)
 					{
 						//パーティクルを生成
-						particle->CreateParticleInfo(10, Boss->position, 2.0f, 30, 1.0f, 0.0f);
+						particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 30, 1.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
-						Boss->HP -= 1;
-						if (Boss->HP <= 0)
+						Boss->SetHP(Boss->GetHP()-1);
+						if (Boss->GetHP() <= 0)
 						{
 							Audio::GetInstance()->PlayWave("BossDown.wav", 0.1f, false);
 							//ボス撃破時はパーティクルを派手に演出
-							particle->CreateParticleInfo(50, Boss->position, 2.0f, 50, 5.0f, 0.0f);
+							particle->CreateParticleInfo(50, Boss->GetPosition(), 2.0f, 50, 5.0f, 0.0f);
 						}
 						//bullet->DeathFlag = true;
 						bullet->SetDeathFlag(true);
@@ -538,9 +544,9 @@ void GameScene::Update()
 				}
 			}
 
-			if (Boss->HP <= 0)
+			if (Boss->GetHP() <= 0)
 			{
-				Boss->DeathFlag = true;
+				Boss->SetDeathFlag(true);
 			}
 		}
 
@@ -643,7 +649,7 @@ void GameScene::Draw()
 
 	if (Boss)
 	{
-		if (Boss->DeathFlag == false)
+		if (Boss->GetDeathFlag() == false)
 		{
 			Boss->Draw();
 		}
@@ -782,7 +788,7 @@ void GameScene::BossInit()
 	//発射タイマーを初期化
 	//EnemyBulletTimer = BulletInterval;
 
-		Boss->FireTime = Boss->IntervalTime;
+		Boss->SetFireTime(Boss->GetIntervalTime());
 }
 
 void GameScene::EnemyUpdate(XMFLOAT3 enemyPos)
@@ -932,7 +938,7 @@ void GameScene::UpdateEnemyPopCommands()
 			XMFLOAT3 EnemyPos = { x, y, z };
 
 			//敵を発生させる
-			Boss = St1_Boss::Create(model_Boss, camera, EnemyPos);
+			Boss = Boss::Create(model_Boss, camera, EnemyPos);
 		}
 
 		//WAITコマンド
@@ -1237,82 +1243,82 @@ void GameScene::DrawSprite()
 	//ボス体力演出後の描画
 	if (Boss && BossTimer <= 0)
 	{
-		if (Boss->HP == 15)
+		if (Boss->GetHP() == 15)
 		{
 			BossHP_15->Draw();
 		}
 
-		if (Boss->HP == 14)
+		if (Boss->GetHP() == 14)
 		{
 			BossHP_14->Draw();
 		}
 
-		if (Boss->HP == 13)
+		if (Boss->GetHP() == 13)
 		{
 			BossHP_13->Draw();
 		}
 
-		if (Boss->HP == 12)
+		if (Boss->GetHP() == 12)
 		{
 			BossHP_12->Draw();
 		}
 
-		if (Boss->HP == 11)
+		if (Boss->GetHP() == 11)
 		{
 			BossHP_11->Draw();
 		}
 
-		if (Boss->HP == 10)
+		if (Boss->GetHP() == 10)
 		{
 			BossHP_10->Draw();
 		}
 
-		if (Boss->HP == 9)
+		if (Boss->GetHP() == 9)
 		{
 			BossHP_9->Draw();
 		}
 
-		if (Boss->HP == 8)
+		if (Boss->GetHP() == 8)
 		{
 			BossHP_8->Draw();
 		}
 
-		if (Boss->HP == 7)
+		if (Boss->GetHP() == 7)
 		{
 			BossHP_7->Draw();
 		}
 
-		if (Boss->HP == 6)
+		if (Boss->GetHP() == 6)
 		{
 			BossHP_6->Draw();
 		}
 
-		if (Boss->HP == 5)
+		if (Boss->GetHP() == 5)
 		{
 			BossHP_5->Draw();
 		}
 
-		if (Boss->HP == 4)
+		if (Boss->GetHP() == 4)
 		{
 			BossHP_4->Draw();
 		}
 
-		if (Boss->HP == 3)
+		if (Boss->GetHP() == 3)
 		{
 			BossHP_3->Draw();
 		}
 
-		if (Boss->HP == 2)
+		if (Boss->GetHP() == 2)
 		{
 			BossHP_2->Draw();
 		}
 
-		if (Boss->HP == 1)
+		if (Boss->GetHP() == 1)
 		{
 			BossHP_1->Draw();
 		}
 
-		if (Boss->HP <= 0)
+		if (Boss->GetHP() <= 0)
 		{
 			BossHP_0->Draw();
 		}

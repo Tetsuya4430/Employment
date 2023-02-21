@@ -8,7 +8,7 @@
 #include "Bullet.h"
 #include "EnemyBullet.h"
 #include "Reticle.h"
-#include "St1_Boss.h"
+#include "Boss.h"
 #include "FbxLoader.h"
 #include "Sprite.h"
 #include "DebugText.h"
@@ -16,7 +16,7 @@
 #include "SceneManager.h"
 #include "AbstractSceneFactory.h"
 #include "Particle.h"
-//#include "Test.h"
+//#include "test.h"
 
 /// <summary>
 /// フレームワーク
