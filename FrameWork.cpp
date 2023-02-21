@@ -74,7 +74,8 @@ void FrameWork::Initialize()
 	//ステージ1のボスオブジェクトの静的初期化
 	Boss::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
-	
+	//ボス弾
+	BossBullet::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
 	//FBXローダーの初期化処理
 	FbxLoader::GetInstance()->Initialize(dxCommon->GetDev());

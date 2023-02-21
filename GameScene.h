@@ -18,7 +18,7 @@
 #include "PostEffect.h"
 #include "Controller.h"
 #include "Particle.h"
-//#include "test.h"
+//#include "Test.h"
 
 #include <list>
 #include <sstream>
@@ -26,7 +26,7 @@
 
 //class Player;
 //class Bullet;
-class EnemyBullet;
+//class EnemyBullet;
 
 /// <summary>
 /// ゲームプレイシーン
@@ -159,8 +159,8 @@ private:
 	std::stringstream enemyPopCommands;
 
 	//ボスの弾
+	//std::list<std::unique_ptr<BossBullet>> bossbullets;
 	std::list<std::unique_ptr<BossBullet>> bossbullets;
-
 
 	Object3d* CelestialSphere = nullptr;
 
