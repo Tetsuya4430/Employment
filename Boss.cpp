@@ -38,7 +38,9 @@ bool Boss::Initialize(XMFLOAT3 pos)
 	
 
 	IntervalTime = 70;
-	Speed = 0.5;
+	Speed = 1.0;
+
+	phase_ = Phase::Approach;
 
 	Object3d::Initialize();
 
@@ -56,7 +58,12 @@ void Boss::Update()
 	if (HP <= 8)
 	{
 		IntervalTime = 35;
-		Speed = 1.0;
+		Speed = 1.5f;
+	}
+
+	if (HP <= 0)
+	{
+		phase_ = Phase::Death;
 	}
 
 	switch (phase_)
@@ -75,12 +82,12 @@ void Boss::Update()
 		break;
 
 	case Phase::MoveR:
-		if (Object3d::position_.x < 50)
+		if (Object3d::position_.x < 50 && HP > 0)
 		{
 			Object3d::position_.x += Speed;
 		}
 
-		if (Object3d::position_.x >= 50)
+		if (Object3d::position_.x >= 50 && HP > 0)
 		{
 			phase_ = Phase::MoveL;
 		}
@@ -88,15 +95,33 @@ void Boss::Update()
 		break;
 
 	case Phase::MoveL:
-		if (Object3d::position_.x > -50)
+		if (Object3d::position_.x > -50 && HP > 0)
 		{
 			Object3d::position_.x -= Speed;
 		}
 
-		if (Object3d::position_.x <= -50)
+		if (Object3d::position_.x <= -50 && HP > 0)
 		{
 			phase_ = Phase::MoveR;
 		}
+
+		break;
+
+	case Phase::Death:
+
+		DownTimer += 1;
+
+		if (DownTimer <= 60)
+		{
+			//Object3d::position_.y -= 0.2f;
+		}
+
+		if (DownTimer % 2 == 0)
+		{
+			Object3d::position_.x += Shake;
+			Shake *= -1.0f;
+		}
+
 
 		break;
 	}

@@ -10,6 +10,7 @@ public:
 		Approach,	//接近
 		MoveR,		//移動(右)
 		MoveL,		//移動(左)
+		Death,		//死亡
 	};
 
 	/// <summary>
@@ -35,11 +36,13 @@ public:
 	//setter
 	void SetHP(int hp) { this->HP = hp; }
 	void SetDeathFlag(bool deathFlag) { this->DeathFlag = deathFlag; }
+	void SetDeathEffect(bool deathEffect) { this->DeathEffect = deathEffect; }
 	void SetFireTime(bool fireTime) { this->FireTime = fireTime; }
 
 	//getter
 	const int& GetHP() { return HP; }
 	const bool& GetDeathFlag() { return DeathFlag; }
+	const bool& GetDeathEffect() { return DeathEffect; }
 	const int& GetIntervalTime() { return IntervalTime; }
 	const int& GetFireTime() { return FireTime; }
 
@@ -50,11 +53,17 @@ private:
 	//フェーズ
 	Phase phase_ = Phase::Approach;
 
-	int DeathFlag = false;
+	bool DeathFlag = false;
+
+	bool DeathEffect = false;
 
 	int IntervalTime = 70;
 
+	float Shake = 0.5f;
+
 	int FireTime = 0;
+
+	int DownTimer = 0;
 
 	//ボスの体力
 	int HP = 15;

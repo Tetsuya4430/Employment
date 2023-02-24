@@ -18,6 +18,7 @@
 #include "PostEffect.h"
 #include "Controller.h"
 #include "Particle.h"
+#include "DefenceObject.h"
 //#include "Test.h"
 
 #include <list>
@@ -107,6 +108,18 @@ public:
 	//スタート演出
 	void Start();
 
+	//ダメージエフェクト
+	void Damage();
+
+	//ゲームオーバー演出
+	void GameOver();
+
+	//隕石の挙動
+	void MeteorMove();
+
+	//ボスの死亡エフェクト
+	void BossDeath();
+
 private:
 	//定数
 	const int MAX_Object = 10;
@@ -127,6 +140,11 @@ private:
 	Model* model_Enemy = nullptr;
 	Model* model_Boss = nullptr;
 	Model* model_sphere = nullptr;
+	Model* model_Moon = nullptr;
+	Model* model_Wall = nullptr;
+	Model* model_Meteor = nullptr;
+	Model* model_Station = nullptr;
+	Model* model_SpaceStation = nullptr;
 	Model* model_reticle = nullptr;
 
 	FbxModel* model1 = nullptr;
@@ -134,7 +152,17 @@ private:
 
 	Input* input = nullptr;
 
+	//カメラ
 	Camera* camera = nullptr;
+
+	XMFLOAT3 CameraDefault = { 0, 0, -50.0f };
+
+	//揺れ幅
+	XMFLOAT3 Shake = { 2.0f, 0.0f, 0.0f };
+
+	int ShakeTimer = 0;
+
+
 	PostEffect* postEffect = nullptr;
 
 	Audio* audio = Audio::GetInstance();
@@ -155,6 +183,8 @@ private:
 
 	int EnemyFire = 0;
 
+	std::list<std::unique_ptr<DefenceObject>> objects;
+
 	//敵発生コマンド
 	std::stringstream enemyPopCommands;
 
@@ -162,7 +192,12 @@ private:
 	//std::list<std::unique_ptr<BossBullet>> bossbullets;
 	std::list<std::unique_ptr<BossBullet>> bossbullets;
 
+	//3Dオブジェクト
 	Object3d* CelestialSphere = nullptr;
+	Object3d* Moon = nullptr;
+	Object3d* Wall = nullptr;
+	Object3d* Station = nullptr;
+	Object3d* SpaceStation = nullptr;
 
 	//プレイヤー
 	Player* P = nullptr;
@@ -199,6 +234,7 @@ private:
 	Sprite* Go = nullptr;
 	Sprite* Rule = nullptr;
 	Sprite* LoadBG = nullptr;
+	Sprite* DamageEffect = nullptr;
 
 	//ボスHPスプライト
 	Sprite* BossHP_0 = nullptr;
@@ -228,6 +264,7 @@ private:
 	Sprite* Level_1 = nullptr;
 	Sprite* Level_2 = nullptr;
 	Sprite* Level_3 = nullptr;
+	
 
 	//ボス登場演出UI
 	Sprite* BossUI_U = nullptr;
@@ -235,6 +272,12 @@ private:
 	Sprite* BossUI_D = nullptr;
 	Sprite* BossUI_D_2 = nullptr;
 	Sprite* Warning = nullptr;
+
+	//プレイヤーのヒットフラグ
+	bool HitFlag = false;
+
+	//連射タイマー
+	int ShotTimer = 0;
 
 
 	//敵の座標
@@ -279,6 +322,10 @@ private:
 	//ボスの待機タイマー
 	int BossTimer = 128;
 
+	//ボス死亡演出のパーティクルの発生カウント
+	int BossPartTimer = 0;
+	int PartCount = 0;
+
 	//csvファイルから敵の座標格納用変数
 	XMFLOAT3 Num = {0, 0, 0};
 
@@ -287,6 +334,18 @@ private:
 
 	//ゲームスタート演出用
 	int StartTimer = 0;
+
+	//3dオブジェクト用変数
+	XMFLOAT3 MoonPos = { 0, 0, 0 };
+	XMFLOAT3 MoonRot = { 0, 0, 0 };
+
+	XMFLOAT3 StationPos = { 0, 0, 0 };
+	XMFLOAT3 StationRot = { 0, 0, 0 };
+
+	float VY = 0.0f;	//Y方向の速度
+	const float gravity = -9.8f / 60.0f;	//重力
+
+	bool DamageEffectflag = false;
 
 	public:
 	//弾の発射間隔
@@ -312,11 +371,17 @@ private:
 
 	//プレイヤー関係
 	XMFLOAT3 PlayerPos = { 0, 0, 0 };
+	XMFLOAT3 PlayerRot = { 0, 0, 0 };
 	XMFLOAT3 SatellitePos_R = { 0, 0, 0 };
 	XMFLOAT3 SatellitePos_L = { 0, 0, 0 };
 
 	//敵
 	XMFLOAT3 EnemyPos = { 0, 0, 0 };
+
+	//隕石発生タイマー
+	int MeteorTimer = 0;
+
+	XMFLOAT3 MeteorPos = { 0, 0, 0 };
 
 	//オーディオ音量
 	float Attack_Volume = 0.5f;

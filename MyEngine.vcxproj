@@ -99,6 +99,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="DebugText.cpp" />
+    <ClCompile Include="DefenceObject.cpp" />
     <ClCompile Include="DirectXCommon.cpp" />
     <ClCompile Include="Easing.cpp" />
     <ClCompile Include="Enemy.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="DebugText.h" />
+    <ClInclude Include="DefenceObject.h" />
     <ClInclude Include="DirectXCommon.h" />
     <ClInclude Include="Easing.h" />
     <ClInclude Include="Enemy.h" />

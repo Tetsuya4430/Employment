@@ -83,6 +83,7 @@ void FrameWork::Initialize()
 	//パーティクル初期化
 	Particle::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
+	DefenceObject::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 }
 
 void FrameWork::Finalize()

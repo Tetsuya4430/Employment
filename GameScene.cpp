@@ -8,12 +8,7 @@
 #include "FrameWork.h"
 #include "Controller.h"
 
-//#include "Player.h"
-//#include "Bullet.h"
-//#include "Enemy.h"
-
 #include <DirectXMath.h>
-
 #include <iomanip>
 
 using namespace std;
@@ -41,13 +36,16 @@ void GameScene::Initialize()
 	//postEffect = PostEffect::Create(100, { 0, 0 }, false, false);
 
 	//OBJからモデルデータを読み込む
-	//model_1 = Model::LoadFromObj("triangle_mat");
 	model_2 = Model::LoadFromObj("Player");
 	model_Bullet = Model::LoadFromObj("Bullet");
 	model_EnemyBullet = Model::LoadFromObj("EnemyBullet");
 	model_Enemy = Model::LoadFromObj("Enemy_1");
 	model_Boss = Model::LoadFromObj("Boss");
 	model_sphere = Model::LoadFromObj("CelestialSphere");
+	model_Moon = Model::LoadFromObj("Moon");
+	model_Meteor = Model::LoadFromObj("Meteor");
+	model_Station = Model::LoadFromObj("Station");
+	model_SpaceStation = Model::LoadFromObj("SpaceStation");
 	model_reticle = Model::LoadFromObj("Box");
 
 	Audio::GetInstance()->Initialize();
@@ -79,17 +77,23 @@ void GameScene::Initialize()
 
 	//天球生成
 	CelestialSphere = Object3d::Create(model_sphere, camera);
-	CelestialSphere->SetScale({100, 100, 100});
+	CelestialSphere->SetScale({900, 900, 900});
+
+	Moon = Object3d::Create(model_Moon, camera);
+	Moon->SetScale({60, 60, 60 });
+	Moon->SetPosition({ 350, 150, 400 });
+
+	Station = Object3d::Create(model_Station, camera);
+	Station->SetScale({ 50, 50, 50 });
+	Station->SetPosition({ -300, -50, 500 });
+	StationRot.x = -60;
+
+	SpaceStation = Object3d::Create(model_SpaceStation, camera);
+	SpaceStation->SetRotation({ 90, 0, 0 });
 
 	//レティクル生成
 	//Reticle = Reticle::Create(model_reticle, camera);
 	//Reticle->SetScale({ 0.5, 0.5, 0.5 });
-
-
-
-		//カメラ注視点をセット
-		//camera->SetTarget({ 0, 20, 0 });
-
 
 	/*object1->PlayAnimation();*/
 
@@ -145,9 +149,9 @@ void GameScene::Initialize()
 	player->Object3d::SetScale({ 0.5f, 0.5f, 0.5f });
 	Satellite_R->Object3d::SetScale({ 0.5f, 0.5f, 0.5f });
 	Satellite_L->Object3d::SetScale({ 0.5f, 0.5f, 0.5f });
-	//CoreR->SetScale({ 0.5f, 0.5f, 0.5f });
-	//CoreL->SetScale({ 0.5f, 0.5f, 0.5f });
 
+	//ボスのパーティクルの発生カウントをリセット
+	//PartCount = 0;
 
 	//コントローラー初期化
 	InitInput();
@@ -178,10 +182,7 @@ void GameScene::Update()
 	//プレイヤーの座標を取得
 	PlayerPos = player->GetPosition();
 
-	////ボスの発射タイマーセット
-	//BossFire = 0;
-
-
+	PlayerRot = player->GetRotation();
 
 	if (!LoadBG->color_.w <= 0.0f)
 	{
@@ -190,10 +191,6 @@ void GameScene::Update()
 		LoadBG->Update();
 	}
 
-	/*if (LoadBG->color_.w <= 0.0f)
-	{
-		LoadFlag = true;
-	}*/
 
 	if (LoadBG->color_.w <= 0.0f)
 	{
@@ -244,14 +241,14 @@ void GameScene::Update()
 		//敵のHPが0になったらゲームクリア
 		if (Boss)
 		{
-			if (Boss->GetHP() <= 0 && BossTimer <= 0)
+			if (Boss->GetDeathFlag() == true && BossTimer <= 0)
 			{
-				if (WaitTimer < 60)
+				if (WaitTimer < 120)
 				{
 					WaitTimer += 1;
 				}
 
-				if (WaitTimer >= 60)
+				if (WaitTimer >= 120)
 				{
 					WaitTimer = 0;
 					Audio::GetInstance()->StopWave("GameScene.wav");
@@ -262,16 +259,17 @@ void GameScene::Update()
 		//プレイヤーのHPが0になったらゲームオーバー
 		if (player->HP <= 0)
 		{
-			/*if (WaitTimer < 60)
-			{
-				WaitTimer += 1;
-			}*/
-			if (WaitTimer < 60)
+			particle->CreateParticleInfo(10, PlayerPos, 2.0f, 30, 2.0f, 0.0f);
+			particle->DeathParticle(10, PlayerPos, 2.0f, 30, 5.0f, 0.0f);
+
+			GameOver();
+
+			if (WaitTimer < 100)
 			{
 				WaitTimer += 1;
 			}
 
-			if (WaitTimer >= 60)
+			if (WaitTimer >= 100)
 			{
 				WaitTimer = 0;
 				Audio::GetInstance()->StopWave("GameScene.wav");
@@ -283,6 +281,7 @@ void GameScene::Update()
 
 		//3Dオブジェクトの更新
 		player->SetPosition(PlayerPos);
+		player->SetRotation(PlayerRot);
 		player->Update();
 
 		Satellite_R->SetPosition(SatellitePos_R);
@@ -295,30 +294,41 @@ void GameScene::Update()
 
 		if (player->MoveCanFlag == true)
 		{
+			MoonRot = Moon->GetRotation();
+			MoonPos = Moon->GetPosition();
+
+			MoonPos.z -= 0.05f;
+
+			Moon->SetPosition(MoonPos);
+
+			StationRot = Station->GetRotation();
+			StationPos = Station->GetPosition();
+
+			StationPos.z -= 0.1f;
+
+			Station->SetPosition(StationPos);
+
 			Attack(PlayerPos);
-		}
 
-		if (player->Level >= 2)
-		{
-			Attack(SatellitePos_R);
-		}
-
-		if (player->Level >= 3)
-		{
-			Attack(SatellitePos_L);
-		}
-
-
-		//ボス更新
-		if (Boss)
-		{
-			if (Boss->GetDeathFlag() == false)
+			if (player->Level >= 2)
 			{
-				//ボスの更新
-				Boss->Update();
+				Attack(SatellitePos_R);
+			}
+
+			if (player->Level >= 3)
+			{
+				Attack(SatellitePos_L);
 			}
 		}
 
+
+		MeteorTimer += 1;
+
+		if (MeteorTimer >= 20)
+		{
+			MeteorMove();
+			MeteorTimer = 0;
+		}
 
 		UpdateEnemyPopCommands();
 
@@ -327,7 +337,6 @@ void GameScene::Update()
 		{
 			if (enemy->GetDeathFlag() == false)
 			{
-				//EnemyUpdate(enemy->position);
 				EnemyPos = enemy->GetPosition();
 				enemy->Update();
 
@@ -351,13 +360,14 @@ void GameScene::Update()
 		//ボスの更新
 		if (Boss)
 		{
+			Boss->Update();
+
 			if (Boss->GetDeathFlag() == false)
 			{
-				Boss->Update();
-
-				//BossFire = Boss->GetFireTime();
-
-				BossFire--;
+				if (Boss->GetDeathEffect() == false)
+				{
+					BossFire--;
+				}
 
 				if (BossFire <= 0)
 				{
@@ -431,6 +441,23 @@ void GameScene::Update()
 				return Bossbullet->DeathGetter();
 			});
 
+		//オブジェクト
+		for (std::unique_ptr<DefenceObject>& object : objects)
+		{
+			float speed = 50.0f;
+
+			//発射タイマーを初期化
+			for (std::unique_ptr<DefenceObject>& object : objects)
+			{
+				if (MeteorPos.z < -10)
+				{
+					object->SetDeathFlag(true);
+				}
+			}
+
+			object->Update(speed);
+		}
+
 
 		//当たり判定
 		//プレイヤーの弾と敵の当たり判定
@@ -447,7 +474,6 @@ void GameScene::Update()
 						//パーティクルを生成
 						EnemyPart->CreateParticleInfo(50, EnemyPos, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
-						//bullet->DeathFlag = true;
 						bullet->SetDeathFlag(true);
 						enemy->SetDeathFlag(true);
 						player->EXP += 1;
@@ -471,7 +497,6 @@ void GameScene::Update()
 						//パーティクルを生成
 						EnemyPart->CreateParticleInfo(50, EnemyPos, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
-						//CoreR_bullet->DeathFlag = true;
 						CoreR_bullet->SetDeathFlag(true);
 						enemy->SetDeathFlag(true);
 						player->EXP += 1;
@@ -494,7 +519,6 @@ void GameScene::Update()
 						//パーティクルを生成
 						EnemyPart->CreateParticleInfo(50, EnemyPos, 2.0f, 30, 2.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
-						//CoreL_bullet->DeathFlag = true;
 						CoreL_bullet->SetDeathFlag(true);
 						enemy->SetDeathFlag(true);
 						player->EXP += 1;
@@ -508,6 +532,9 @@ void GameScene::Update()
 			//自機と敵の弾当たり判定確認
 			if (CheckCollision(PlayerPos, bullet->GetPosition(), 2.0f, 2.0f) == true)
 			{
+				HitFlag = true;
+				DamageEffectflag = true;
+
 				//パーティクルを生成
 				particle->CreateParticleInfo(10, PlayerPos, 2.0f, 30, 2.0f, 0.0f);
 				//ダメージSEを再生
@@ -535,10 +562,7 @@ void GameScene::Update()
 						if (Boss->GetHP() <= 0)
 						{
 							Audio::GetInstance()->PlayWave("BossDown.wav", 0.1f, false);
-							//ボス撃破時はパーティクルを派手に演出
-							particle->CreateParticleInfo(50, Boss->GetPosition(), 2.0f, 50, 5.0f, 0.0f);
 						}
-						//bullet->DeathFlag = true;
 						bullet->SetDeathFlag(true);
 					}
 				}
@@ -546,7 +570,22 @@ void GameScene::Update()
 
 			if (Boss->GetHP() <= 0)
 			{
-				Boss->SetDeathFlag(true);
+				BossPartTimer += 1;
+
+				if (BossPartTimer >= 20 && Boss->GetDeathFlag() == false)
+				{
+					BossPartTimer = 0;
+					PartCount += 1;
+					particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 50, 8.0f, 0.0f);
+				}
+
+				if (PartCount >= 5)
+				{
+					particle->CreateParticleInfo(60, Boss->GetPosition(), 4.0f, 50, 15.0f, 0.0f);
+					PartCount = 0;
+					Boss->SetDeathFlag(true);
+				}
+
 			}
 		}
 
@@ -570,8 +609,46 @@ void GameScene::Update()
 			}
 		}
 
+		if (HitFlag == true)
+		{ 
+			ShakeTimer++;
+
+			if (ShakeTimer < 5)
+			{
+				camera->CameraMoveEyeVector(Shake);
+				Shake.x *= -1.0f;
+			}
+
+			if (ShakeTimer >= 5)
+			{
+				HitFlag = false;
+				ShakeTimer = 0;
+				camera->SetEye(CameraDefault);
+			}
+		}
+
+		if (DamageEffectflag == true)
+		{
+			Damage();
+		}
 		//天球更新
 		CelestialSphere->Update();
+
+		MoonRot.y += 0.2f;
+
+		Moon->SetRotation(MoonRot);
+
+
+		Moon->Update();
+
+		//StationRot.y += 0.03f;
+
+		Station->SetRotation(StationRot);
+
+		Station->Update();
+		SpaceStation->Update();
+
+		
 
 		//レティクル更新
 		//Reticle->Update(P->position_);
@@ -649,6 +726,7 @@ void GameScene::Draw()
 
 	if (Boss)
 	{
+
 		if (Boss->GetDeathFlag() == false)
 		{
 			Boss->Draw();
@@ -688,8 +766,17 @@ void GameScene::Draw()
 		bullet->Draw();
 	}
 
+	for (std::unique_ptr<DefenceObject>& object : objects)
+	{
+		object->Draw();
+	}
+
 	//天球の描画
 	CelestialSphere->Draw();
+
+	Moon->Draw();
+	Station->Draw();
+	//SpaceStation->Draw();
 
 	//レティクル描画
 	//Reticle->Draw();
@@ -728,45 +815,46 @@ void GameScene::Draw()
 	
 	//UI->Draw();
 
-	if (Go->ComFlag_2 == true)
-	{
-		if (player->HP == 5)
-		{
-			HP_5->Draw();
-		}
-
-		if (player->HP == 4)
-		{
-			HP_4->Draw();
-		}
-
-		if (player->HP == 3)
-		{
-			HP_3->Draw();
-		}
-
-		if (player->HP == 2)
-		{
-			HP_2->Draw();
-		}
-
-		if (player->HP == 1)
-		{
-			HP_1->Draw();
-		}
-
-		if (player->HP == 0)
-		{
-			HP_0->Draw();
-		}
-	}
+	
 
 	Stage_1->Draw();
-	Go->Draw();/*
-	if (LoadFlag == false)
-	{*/
-		LoadBG->Draw();
-	//}
+	Go->Draw();
+	LoadBG->Draw();
+	
+
+
+		if (Go->ComFlag_2 == true)
+		{
+			if (player->HP == 5)
+			{
+				HP_5->Draw();
+			}
+
+			if (player->HP == 4)
+			{
+				HP_4->Draw();
+			}
+
+			if (player->HP == 3)
+			{
+				HP_3->Draw();
+			}
+
+			if (player->HP == 2)
+			{
+				HP_2->Draw();
+			}
+
+			if (player->HP == 1)
+			{
+				HP_1->Draw();
+			}
+
+			if (player->HP == 0)
+			{
+				HP_0->Draw();
+			}
+		}
 
 	DrawSprite();
 
@@ -775,8 +863,6 @@ void GameScene::Draw()
 void GameScene::EnemyInit()
 {
 	//発射タイマーを初期化
-	//EnemyBulletTimer = BulletInterval;
-
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		enemy->SetFireTime(enemy->GetIntervalTime());
@@ -785,10 +871,7 @@ void GameScene::EnemyInit()
 
 void GameScene::BossInit()
 {
-	//発射タイマーを初期化
-	//EnemyBulletTimer = BulletInterval;
-
-		Boss->SetFireTime(Boss->GetIntervalTime());
+	Boss->SetFireTime(Boss->GetIntervalTime());
 }
 
 void GameScene::EnemyUpdate(XMFLOAT3 enemyPos)
@@ -808,6 +891,7 @@ void GameScene::Attack(XMFLOAT3 StartPos)
 		//弾を登録
 		bullets.push_back(std::move(newBullet));
 	}
+
 
 	//if (IsButtonPush(ButtonKind::Button_B))
 	//{
@@ -941,6 +1025,32 @@ void GameScene::UpdateEnemyPopCommands()
 			Boss = Boss::Create(model_Boss, camera, EnemyPos);
 		}
 
+		//POPコマンド
+		else if (word.find("OBJECT_POP") == 0)
+		{
+			//x座標
+			getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			//y座標
+			getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			//z座標
+			getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+
+			//取得したx,y,z座標を格納
+			XMFLOAT3 EnemyPos = { x, y, z };
+
+			//敵を発生させる
+			std::unique_ptr<DefenceObject> newObject = std::make_unique<DefenceObject>();
+			newObject = DefenceObject::Create(model_Meteor, camera, EnemyPos);
+
+			objects.push_back(std::move(newObject));
+		}
+
 		//WAITコマンド
 		else if (word.find("WAIT") == 0)
 		{
@@ -1040,7 +1150,7 @@ void GameScene::LoadSprite()
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(38, L"Resources/Image/Warning_U.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(39, L"Resources/Image/Warning.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(40, L"Resources/Image/LoadBG.png");
-
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(41, L"Resources/Image/DamageEffect.png");
 
 	sprite = Sprite::Create(1, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
 	UI = Sprite::Create(2, { 1, 1, 1, 1 }, { 0.5, 0.5 }, false, false);
@@ -1086,6 +1196,7 @@ void GameScene::LoadSprite()
 	BossUI_D_2 = Sprite::Create(38, { 1, 1, 1, 0.5f }, { 0, 0 }, false, false);
 	Warning = Sprite::Create(39, { 1, 1, 1, 1.0 }, { 0, 0 }, false, false);
 	LoadBG = Sprite::Create(40, { 1, 1, 1, 1.0 }, { 0, 0 }, false, false);
+	DamageEffect = Sprite::Create(41, { 1, 1, 1, 1.0 }, { 0, 0 }, false, false);
 }
 
 void GameScene::UpdateSprite()
@@ -1111,6 +1222,7 @@ void GameScene::UpdateSprite()
 	BossUI_U_2->Update();
 	BossUI_D_2->Update();
 	Warning->Update();
+	DamageEffect->Update();
 
 	if (Boss)
 	{
@@ -1158,6 +1270,11 @@ void GameScene::UpdateSprite()
 
 void GameScene::DrawSprite()
 {
+	if (DamageEffectflag == true)
+	{
+		DamageEffect->Draw();
+	}
+
 	//体力演出中の描画
 
 	if (BossTimer < 128 && BossTimer > 120)
@@ -1445,7 +1562,7 @@ void GameScene::Start()
 {
 	//StartTimer += 1;
 	player->MoveCanFlag = false;
-	Stage_1->Vec.x = (Stage_1->PointPos.x - Stage_1->position_.x) / 30;
+	Stage_1->Vec.x = (Stage_1->PointPos.x - Stage_1->position_.x) / 20;
 	Stage_1->position_.x += Stage_1->Vec.x;
 
 	if (Stage_1->position_.x <= Stage_1->PointPos.x + 10)
@@ -1456,7 +1573,7 @@ void GameScene::Start()
 
 	if (Stage_1->position_.x <= Stage_1->PointPos.x + 10)
 	{
-		Go->Vec.y = (Go->PointPos.y - Go->position_.y) / 30;
+		Go->Vec.y = (Go->PointPos.y - Go->position_.y) / 20;
 		Go->position_.y += Go->Vec.y;
 		Go->ComFlag = true;
 	}
@@ -1483,6 +1600,62 @@ void GameScene::Start()
 
 	}
 
+}
+
+void GameScene::Damage()
+{
+	DamageEffectflag = true;
+
+	DamageEffect->color_.w -= 0.05f;
+	
+	if (DamageEffect->color_.w <= 0)
+	{
+		DamageEffect->color_.w = 1;
+		DamageEffectflag = false;
+	}	
+}
+
+void GameScene::GameOver()
+{
+	VY += gravity;
+
+	PlayerPos.x += 0.5f;
+	PlayerPos.y += VY * 0.2f;
+
+	PlayerRot.x += 0.5f;
+}
+
+void GameScene::MeteorMove()
+{
+	float MeteorX = rand()%(100 - (-100) + 1) + (-100);
+	float MeteorY = rand() % (50 - (-50) + 1) + (-50);
+	float MeteorZ = 200;
+
+	MeteorPos = { MeteorX, MeteorY, MeteorZ };
+
+	std::unique_ptr<DefenceObject> newObject = std::make_unique<DefenceObject>();
+	newObject = DefenceObject::Create(model_Meteor, camera, MeteorPos);
+
+	objects.push_back(std::move(newObject));
+}
+
+void GameScene::BossDeath()
+{
+	BossPartTimer += 1;
+
+	if (BossPartTimer >= 20 && Boss->GetDeathFlag() == false)
+	{
+		BossPartTimer = 0;
+		PartCount += 1;
+		particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 50, 8.0f, 0.0f);
+	}
+
+	if (PartCount >= 5)
+	{
+		particle->CreateParticleInfo(60, Boss->GetPosition(), 4.0f, 50, 15.0f, 0.0f);
+		PartCount = 0;
+		Boss->SetDeathFlag(true);
+	}
 }
 
 

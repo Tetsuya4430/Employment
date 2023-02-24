@@ -63,6 +63,8 @@ public:	//メンバ関数
 	static void UpdateViewMatrix();
 
 
+	void CameraShake(XMFLOAT3 move);
+
 	/// <summary>
 	/// 射影行列の取得
 	/// </summary>
@@ -107,6 +109,8 @@ private:	//メンバ変数
 	Input* input = nullptr;
 
 	XMFLOAT3 moveVec = { 0.0f, 0.0f, -2.0f };
+
+	int ShakeTimer = 0;
 
 public:
 	// ビュー行列

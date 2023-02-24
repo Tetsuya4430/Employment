@@ -208,6 +208,9 @@ public: //メンバ関数
 	//パーティクル発生関数
 	void CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
 
+	//死亡パーティクル
+	void DeathParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
+
 private:	//メンバ変数
 	//行列用定数バッファ
 	ComPtr<ID3D12Resource> constBuff;

@@ -17,6 +17,7 @@
 #include "SceneManager.h"
 #include "AbstractSceneFactory.h"
 #include "Particle.h"
+#include "DefenceObject.h"
 //#include "Test.h"
 
 /// <summary>

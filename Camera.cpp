@@ -254,6 +254,35 @@ void Camera::UpdateViewMatrix()
 	matBillboardY.r[3] = XMVectorSet(0, 0, 0, 1);
 }
 
+void Camera::CameraShake(XMFLOAT3 move)
+{
+	ShakeTimer++;
+
+	if (ShakeTimer < 30)
+	{
+		XMFLOAT3 eye_moved = GetEye();
+		XMFLOAT3 target_moved = GetTarget();
+
+
+		eye_moved.x += move.x;
+		eye_moved.y += move.y;
+		eye_moved.z += move.z;
+
+		target_moved.x += move.x;
+		target_moved.y += move.y;
+		target_moved.z += move.z;
+
+		SetEye(eye_moved);
+		SetTarget(target_moved);
+
+	}
+
+	if (ShakeTimer >= 30)
+	{
+		ShakeTimer = 0;
+	}
+}
+
 void Camera::Update()
 {
 	// ビュープロジェクションの合成
