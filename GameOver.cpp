@@ -19,6 +19,7 @@ void GameOver::Initialize(/*DirectXCommon* dxCommon*/)
 	LoadBG->color_.w = 1.0f;
 
 	Audio::GetInstance()->LoadWave("GameOver.wav");
+	Audio::GetInstance()->LoadWave("Decision.wav");
 
 	Audio::GetInstance()->PlayWave("GameOver.wav", 0.3f, true);
 
@@ -64,7 +65,7 @@ void GameOver::Update()
 	{
 		Audio::GetInstance()->StopWave("GameOver.wav");
 		//シーン切り替え
-		SceneManager::GetInstance()->ChangeScene("TITLE");
+		SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 	}
 
 	//スプライトの更新

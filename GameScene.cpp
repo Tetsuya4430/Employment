@@ -45,8 +45,10 @@ void GameScene::Initialize()
 	model_Moon = Model::LoadFromObj("Moon");
 	model_Meteor = Model::LoadFromObj("Meteor");
 	model_Station = Model::LoadFromObj("Station");
-	model_SpaceStation = Model::LoadFromObj("SpaceStation");
+	//model_SpaceStation = Model::LoadFromObj("SpaceStation");
 	model_reticle = Model::LoadFromObj("Box");
+	model_Shooting = Model::LoadFromObj("Shooting");
+	model_Force = Model::LoadFromObj("Force");
 
 	Audio::GetInstance()->Initialize();
 
@@ -77,19 +79,27 @@ void GameScene::Initialize()
 
 	//天球生成
 	CelestialSphere = Object3d::Create(model_sphere, camera);
-	CelestialSphere->SetScale({900, 900, 900});
+	CelestialSphere->SetScale(ShereScale);
 
 	Moon = Object3d::Create(model_Moon, camera);
-	Moon->SetScale({60, 60, 60 });
-	Moon->SetPosition({ 350, 150, 400 });
+	Moon->SetScale(MoonScale);
+	Moon->SetPosition(MoonPosition);
 
 	Station = Object3d::Create(model_Station, camera);
-	Station->SetScale({ 50, 50, 50 });
-	Station->SetPosition({ -300, -50, 500 });
-	StationRot.x = -60;
+	Station->SetScale(StationScale);
+	Station->SetPosition(StationPosition);
+	StationRot.x = -StationRotation.x;
 
-	SpaceStation = Object3d::Create(model_SpaceStation, camera);
-	SpaceStation->SetRotation({ 90, 0, 0 });
+	//SpaceStation = Object3d::Create(model_SpaceStation, camera);
+	//SpaceStation->SetRotation({ 90, 0, 0 });
+
+	Shooting = Object3d::Create(model_Shooting, camera);
+	Shooting->SetScale({ 8, 8, 8 });
+	Shooting->SetPosition({ -20, 10, 0 });
+
+	Force = Object3d::Create(model_Force, camera);
+	Force->SetScale({ 8, 8, 8 });
+	Force->SetPosition({ 0, 0, 0 });
 
 	//レティクル生成
 	//Reticle = Reticle::Create(model_reticle, camera);
@@ -191,10 +201,26 @@ void GameScene::Update()
 		LoadBG->Update();
 	}
 
+	//テキストの座標を取得
+	ShootingPos = Shooting->GetPosition();
+
+	ForcePos = Force->GetPosition();
+
+	Force->SetPosition(ForcePos);
 
 	if (LoadBG->color_.w <= 0.0f)
 	{
 		LoadBG->color_.w = 0.0f;
+	}
+
+	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && GameStart == false)
+	{
+		GameStart = true;
+	}
+
+	if (GameStart == true)
+	{
+		MoveTitle();
 		Start();
 	}
 
@@ -203,12 +229,12 @@ void GameScene::Update()
 
 		
 
-	SatellitePos_R.x = PlayerPos.x + 6;
-	SatellitePos_R.y = PlayerPos.y - 1;
+	SatellitePos_R.x = PlayerPos.x + SatelliteRange.x;
+	SatellitePos_R.y = PlayerPos.y - SatelliteRange.y;
 	SatellitePos_R.z = PlayerPos.z;
 
-	SatellitePos_L.x = PlayerPos.x - 6;
-	SatellitePos_L.y = PlayerPos.y - 1;
+	SatellitePos_L.x = PlayerPos.x - SatelliteRange.x;
+	SatellitePos_L.y = PlayerPos.y - SatelliteRange.y;
 	SatellitePos_L.z = PlayerPos.z;
 
 	
@@ -330,7 +356,10 @@ void GameScene::Update()
 			MeteorTimer = 0;
 		}
 
-		UpdateEnemyPopCommands();
+		if (GameStart == true)
+		{
+			UpdateEnemyPopCommands();
+		}
 
 		//敵の更新
 		for (std::unique_ptr<Enemy>& enemy : enemys)
@@ -646,7 +675,9 @@ void GameScene::Update()
 		Station->SetRotation(StationRot);
 
 		Station->Update();
-		SpaceStation->Update();
+		//SpaceStation->Update();
+		Shooting->Update();
+		Force->Update();
 
 		
 
@@ -777,6 +808,8 @@ void GameScene::Draw()
 	Moon->Draw();
 	Station->Draw();
 	//SpaceStation->Draw();
+	Shooting->Draw();
+	Force->Draw();
 
 	//レティクル描画
 	//Reticle->Draw();
@@ -1151,6 +1184,7 @@ void GameScene::LoadSprite()
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(39, L"Resources/Image/Warning.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(40, L"Resources/Image/LoadBG.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(41, L"Resources/Image/DamageEffect.png");
+	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(42, L"Resources/Image/GameStart.png");
 
 	sprite = Sprite::Create(1, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
 	UI = Sprite::Create(2, { 1, 1, 1, 1 }, { 0.5, 0.5 }, false, false);
@@ -1197,6 +1231,11 @@ void GameScene::LoadSprite()
 	Warning = Sprite::Create(39, { 1, 1, 1, 1.0 }, { 0, 0 }, false, false);
 	LoadBG = Sprite::Create(40, { 1, 1, 1, 1.0 }, { 0, 0 }, false, false);
 	DamageEffect = Sprite::Create(41, { 1, 1, 1, 1.0 }, { 0, 0 }, false, false);
+
+	//タイトルUI
+	StartUI = Sprite::Create(42, { 1, 1, 1, 1.0 }, { 0, 0 }, false, false);
+	StartUI->SetSize({ 100,100 });
+	StartUI->SetPosition({ 500, 500, 0 });
 }
 
 void GameScene::UpdateSprite()
@@ -1265,6 +1304,11 @@ void GameScene::UpdateSprite()
 		{
 			WarningFlag = false;
 		}
+	}
+
+	if (GameStart == false)
+	{
+		StartUI->Update();
 	}
 }
 
@@ -1556,6 +1600,12 @@ void GameScene::DrawSprite()
 		BossUI_D_2->Vec.y = (BossUI_D_2->PointPos.y - BossUI_D_2->position_.y) / 30;
 		BossUI_D_2->position_.y += BossUI_D_2->Vec.y;
 	}
+
+	//タイトルUI
+	if (GameStart == false)
+	{
+		StartUI->Draw();
+	}
 }
 
 void GameScene::Start()
@@ -1656,6 +1706,19 @@ void GameScene::BossDeath()
 		PartCount = 0;
 		Boss->SetDeathFlag(true);
 	}
+}
+
+void GameScene::MoveTitle()
+{
+	float ShootingTarget = -120.0f;
+	float ForceTarget = 70.0f;
+	float Easing = 0.03f;
+
+	ShootingPos.x += (ShootingTarget - ShootingPos.x) * Easing;
+	ForcePos.x += (ForceTarget - ForcePos.x) * Easing;
+
+	Shooting->SetPosition(ShootingPos);
+	Force->SetPosition(ForcePos);
 }
 
 

@@ -20,6 +20,7 @@ void GameClear::Initialize(/*DirectXCommon* dxCommon*/)
 	LoadBG->color_.w = 1.0f;
 
 	Audio::GetInstance()->LoadWave("GameClear.wav");
+	Audio::GetInstance()->LoadWave("Decision.wav");
 
 	Audio::GetInstance()->PlayWave("GameClear.wav", 0.3f, true);
 
@@ -65,7 +66,7 @@ void GameClear::Update()
 	{
 		Audio::GetInstance()->StopWave("GameClear.wav");
 		//シーン切り替え
-		SceneManager::GetInstance()->ChangeScene("TITLE");
+		SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
 	}
 
 	//スプライトの更新

@@ -120,6 +120,9 @@ public:
 	//ボスの死亡エフェクト
 	void BossDeath();
 
+	//タイトル演出
+	void MoveTitle();
+
 private:
 	//定数
 	const int MAX_Object = 10;
@@ -146,6 +149,8 @@ private:
 	Model* model_Station = nullptr;
 	Model* model_SpaceStation = nullptr;
 	Model* model_reticle = nullptr;
+	Model* model_Shooting = nullptr;
+	Model* model_Force = nullptr;
 
 	FbxModel* model1 = nullptr;
 	Fbx3d* object1 = nullptr;
@@ -198,6 +203,8 @@ private:
 	Object3d* Wall = nullptr;
 	Object3d* Station = nullptr;
 	Object3d* SpaceStation = nullptr;
+	Object3d* Shooting = nullptr;
+	Object3d* Force = nullptr;
 
 	//プレイヤー
 	Player* P = nullptr;
@@ -221,6 +228,8 @@ private:
 	Player* Satellite_R = nullptr;
 	Player* Satellite_L = nullptr;
 
+	XMFLOAT3 SatelliteRange = { 6.0, 1.0, 0.0 };
+
 	//UI
 	Sprite* sprite = nullptr;
 	Sprite* UI = nullptr;
@@ -235,6 +244,7 @@ private:
 	Sprite* Rule = nullptr;
 	Sprite* LoadBG = nullptr;
 	Sprite* DamageEffect = nullptr;
+	Sprite* StartUI = nullptr;
 
 	//ボスHPスプライト
 	Sprite* BossHP_0 = nullptr;
@@ -342,6 +352,22 @@ private:
 	XMFLOAT3 StationPos = { 0, 0, 0 };
 	XMFLOAT3 StationRot = { 0, 0, 0 };
 
+	//天球スケール
+	XMFLOAT3 ShereScale = { 900, 900, 900 };
+
+	//月スケール
+	XMFLOAT3 MoonScale = { 60, 60, 60 };
+	//月座標
+	XMFLOAT3 MoonPosition = { 350, 150, 400 };
+
+	//宇宙ステーションスケール
+	XMFLOAT3 StationScale = { 50, 50, 50 };
+	//宇宙ステーション座標
+	XMFLOAT3 StationPosition = { -300, -50, 500 };
+	//宇宙ステーション回転
+	XMFLOAT3 StationRotation = { -60, 0, 0 };
+
+
 	float VY = 0.0f;	//Y方向の速度
 	const float gravity = -9.8f / 60.0f;	//重力
 
@@ -385,5 +411,16 @@ private:
 
 	//オーディオ音量
 	float Attack_Volume = 0.5f;
+
+	//ゲームスタートフラグ
+	bool GameStart = false;
+
+	//タイトルテキスト用座標
+	XMFLOAT3 ShootingPos = { 0, 0, 0 };
+
+	XMFLOAT3 ForcePos = { 0, 0, 0 };
+
+	int Count = 0;
+	float Move_F = 0.0f;
 };
 
