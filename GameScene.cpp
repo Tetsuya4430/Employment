@@ -94,12 +94,12 @@ void GameScene::Initialize()
 	//SpaceStation->SetRotation({ 90, 0, 0 });
 
 	Shooting = Object3d::Create(model_Shooting, camera);
-	Shooting->SetScale({ 8, 8, 8 });
-	Shooting->SetPosition({ -20, 10, 0 });
+	Shooting->SetScale(DefaultShootingScale);
+	Shooting->SetPosition(DefaultShootingPos);
 
 	Force = Object3d::Create(model_Force, camera);
-	Force->SetScale({ 8, 8, 8 });
-	Force->SetPosition({ 0, 0, 0 });
+	Force->SetScale(DefaultForceScale);
+	Force->SetPosition(DefaultForcePos);
 
 	//レティクル生成
 	//Reticle = Reticle::Create(model_reticle, camera);
@@ -115,50 +115,50 @@ void GameScene::Initialize()
 	EnemyPart->Update();
 
 	//演出タイマー初期化
-	WaitTimer = 0;
-	BossTimer = 128;
+	WaitTimer = TimerReset;
+	BossTimer = DefaultBossTimer;
 
 	//ステージスタート時UIの初期化
-	Stage_1->position_.x = 1280;
-	Stage_1->position_.y = 285;
-	Go->position_.y = -720;
+	Stage_1->position_.x = DefaultStage1Pos.x;
+	Stage_1->position_.y = DefaultStage1Pos.y;
+	Go->position_.y = DefaultGoPos.y;
 
-	BossUI_U->SetColor({ 1, 1, 1, 0.7f });
-	BossUI_U_2->SetColor({ 1, 1, 1, 0.7f });
-	BossUI_D->SetColor({ 1, 1, 1, 0.7f });
-	BossUI_D_2->SetColor({ 1, 1, 1, 0.7f });
+	BossUI_U->SetColor(BossUIColor);
+	BossUI_U_2->SetColor(BossUIColor);
+	BossUI_D->SetColor(BossUIColor);
+	BossUI_D_2->SetColor(BossUIColor);
 
-	BossUI_U->position_.x = 0;
-	BossUI_U->position_.y = 100;
-	BossUI_U_2->position_.x = -1280;
-	BossUI_U_2->position_.y = 100;
+	BossUI_U->position_.x = BossUIPos_1.x;
+	BossUI_U->position_.y = BossUIPos_1.y;
+	BossUI_U_2->position_.x = -BossUIPos_2.x;
+	BossUI_U_2->position_.y = BossUIPos_2.y;
 
-	BossUI_D->position_.x = 0;
-	BossUI_D->position_.y = -100;
-	BossUI_D_2->position_.x = 1280;
-	BossUI_D_2->position_.y = -100;
+	BossUI_D->position_.x = BossUIPos_1.x;
+	BossUI_D->position_.y = -BossUIPos_1.y;
+	BossUI_D_2->position_.x = BossUIPos_2.x;
+	BossUI_D_2->position_.y = -BossUIPos_2.y;
 
 	//最初の目的座標
-	Stage_1->PointPos.x = 460;
-	Stage_1->PointPos.y = 285;
-	Go->PointPos.y = 0;
+	Stage_1->PointPos.x = Stage1PointPos.x;
+	Stage_1->PointPos.y = Stage1PointPos.y;
+	Go->PointPos.y = GOPointPos.y;
 
-	BossUI_U->PointPos.x = 1280;
-	BossUI_U->PointPos.y = 0;
-	BossUI_U_2->PointPos.x = 0;
-	BossUI_U_2->PointPos.y = 0;
+	BossUI_U->PointPos.x = BossUIPointPos_1.x;
+	BossUI_U->PointPos.y = BossUIPointPos_1.y;
+	BossUI_U_2->PointPos.x = BossUIPointPos_2.x;
+	BossUI_U_2->PointPos.y = BossUIPointPos_2.y;
 
-	BossUI_D->PointPos.x = -1280;
-	BossUI_D->PointPos.y = 0;
-	BossUI_D_2->PointPos.x = 0;
-	BossUI_D_2->PointPos.y = 0;
+	BossUI_D->PointPos.x = -BossUIPointPos_1.x;
+	BossUI_D->PointPos.y = BossUIPointPos_1.y;
+	BossUI_D_2->PointPos.x = BossUIPointPos_2.x;
+	BossUI_D_2->PointPos.y = BossUIPointPos_2.y;
 
-	LoadBG->color_.w = 1.0f;
+	LoadBG->color_.w = DefaultAlpha_Max;
 
 	//スケールのセット
-	player->Object3d::SetScale({ 0.5f, 0.5f, 0.5f });
-	Satellite_R->Object3d::SetScale({ 0.5f, 0.5f, 0.5f });
-	Satellite_L->Object3d::SetScale({ 0.5f, 0.5f, 0.5f });
+	player->Object3d::SetScale(PlayerScale);
+	Satellite_R->Object3d::SetScale(PlayerScale);
+	Satellite_L->Object3d::SetScale(PlayerScale);
 
 	//ボスのパーティクルの発生カウントをリセット
 	//PartCount = 0;

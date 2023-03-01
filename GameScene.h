@@ -367,6 +367,29 @@ private:
 	//宇宙ステーション回転
 	XMFLOAT3 StationRotation = { -60, 0, 0 };
 
+	//テキスト座標(Shooting)
+	XMFLOAT3 DefaultShootingScale = { 8, 8, 8 };
+	XMFLOAT3 DefaultShootingPos = { -20, 10, 0 };
+	//テキスト座標(Force)
+	XMFLOAT3 DefaultForceScale = { 8, 8, 8 };
+	XMFLOAT3 DefaultForcePos = { 0, 0, 0 };
+
+	//スタート演出UI用変数(Stage1)
+	XMFLOAT2 DefaultStage1Pos = { 1280, 285 };
+
+	//スタート演出UI用変数(Go)
+	XMFLOAT2 DefaultGoPos = { 0, -720 };
+
+	//ボス登場時UIのカラー変数
+	XMFLOAT4 BossUIColor = { 1, 1, 1, 0.7f };
+	//ボス登場時UI用座標
+	XMFLOAT2 BossUIPos_1 = { 0, 100 };
+	XMFLOAT2 BossUIPos_2 = { 1280, 100 };
+
+	//タイマーリセット用変数
+	int TimerReset = 0;
+	//ボスタイマーリセット
+	int DefaultBossTimer = 128;
 
 	float VY = 0.0f;	//Y方向の速度
 	const float gravity = -9.8f / 60.0f;	//重力
