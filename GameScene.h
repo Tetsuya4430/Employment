@@ -228,6 +228,7 @@ private:
 	Player* Satellite_R = nullptr;
 	Player* Satellite_L = nullptr;
 
+	XMFLOAT3 PlayerScale = { 0.5f, 0.5f, 0.5f };
 	XMFLOAT3 SatelliteRange = { 6.0, 1.0, 0.0 };
 
 	//UI
@@ -376,20 +377,34 @@ private:
 
 	//スタート演出UI用変数(Stage1)
 	XMFLOAT2 DefaultStage1Pos = { 1280, 285 };
+	//目的座標変数
+	XMFLOAT3 Stage1PointPos = { 460, 285 , 0};
 
 	//スタート演出UI用変数(Go)
 	XMFLOAT2 DefaultGoPos = { 0, -720 };
+	//目的座標変数
+	XMFLOAT3 GOPointPos = { 0, 0, 0};
 
 	//ボス登場時UIのカラー変数
 	XMFLOAT4 BossUIColor = { 1, 1, 1, 0.7f };
 	//ボス登場時UI用座標
 	XMFLOAT2 BossUIPos_1 = { 0, 100 };
 	XMFLOAT2 BossUIPos_2 = { 1280, 100 };
+	//ボス登場時UI用目的座標
+	XMFLOAT3 BossUIPointPos_1 = { 1280, 0, 0 };
+	XMFLOAT3 BossUIPointPos_2 = { 0, 0, 0 };
 
 	//タイマーリセット用変数
 	int TimerReset = 0;
 	//ボスタイマーリセット
 	int DefaultBossTimer = 128;
+
+	//ステージUI移動からゲームスタートUI移動までのレンジタイム
+	int RangeTime = 0;
+
+	//初期アルファ値
+	//MAX
+	float DefaultAlpha_Max = 1.0f;
 
 	float VY = 0.0f;	//Y方向の速度
 	const float gravity = -9.8f / 60.0f;	//重力

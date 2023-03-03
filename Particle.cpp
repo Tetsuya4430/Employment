@@ -617,3 +617,30 @@ void Particle::DeathParticle(int PartNum, XMFLOAT3 Position, float Vel, int Part
 
 	}
 }
+
+void Particle::FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale)
+{
+	for (int i = 0; i < PartNum; i++)
+	{
+		//引数の値を貰う
+		const float md_width = 10.0f;
+		XMFLOAT3 pos{};
+		pos.x = Position.x;
+		pos.y = Position.y;
+		pos.z = Position.z + 10;
+		//パーティクルの速度
+		const float md_vel = Vel;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.y = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.z -= 2;
+		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
+		XMFLOAT3 acc{};
+		const float md_acc = 0.001f;
+		acc.y = -(float)rand() / RAND_MAX * md_acc;
+
+		//追加
+		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
+
+	}
+}

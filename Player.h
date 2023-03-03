@@ -78,6 +78,12 @@ private:
 	//滑る時間
 	int Timer = 0;
 
+	//プレイヤーの傾き上限値
+	float RotLimit = 15.0f;
+
+	//回転量
+	float RotValue = 1.0f;
+
 	//移動方向
 	bool moveR = false;
 	bool moveL = false;

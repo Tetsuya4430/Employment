@@ -88,7 +88,7 @@ void Player::Update()
 		//キーボード
 		if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 		{
-
+			MoveFlag = 1;
 			K = 0.5f;
 
 			if (MoveCanFlag == true)
@@ -141,8 +141,6 @@ void Player::Update()
 					moveD = false;
 				}
 
-
-				MoveFlag = 1;
 				if (Input::GetInstance()->PushKey(DIK_D))
 				{
 					moveR = true;
@@ -150,6 +148,11 @@ void Player::Update()
 					{
 						Object3d::position_.x += Speed * Mag;
 						Old.x = Speed * Mag;
+					}
+
+					if (Object3d::rotation_.z > -RotLimit)
+					{
+						//Object3d::rotation_.z -= RotValue;
 					}
 				}
 
@@ -161,6 +164,11 @@ void Player::Update()
 					{
 						Object3d::position_.x -= Speed * Mag;
 						Old.x = -Speed * Mag;
+					}
+
+					if (Object3d::rotation_.z < RotLimit)
+					{
+						//Object3d::rotation_.z += RotValue;
 					}
 				}
 
@@ -185,26 +193,20 @@ void Player::Update()
 					}
 				}
 
-				else
-				{
-					MoveFlag = 0;
-				}
 			}
+
 
 			//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
 			if (MoveFlag == 0)
 			{
-				if (Avoidanceflag_X == false && Avoidanceflag_Y == false)
+				if (Object3d::rotation_.z > 0)
 				{
-					/*if (rotation_.z > 0)
-					{
-						rotation_.z -= 0.5f;
-					}
+					Object3d::rotation_.z -= 1.0f;
+				}
 
-					if (rotation_.z < 0)
-					{
-						rotation_.z += 0.5f;
-					}*/
+				if (Object3d::rotation_.z < 0)
+				{
+					Object3d::rotation_.z += 1.0f;
 				}
 			}
 
@@ -242,13 +244,13 @@ void Player::Update()
 				}
 			}
 
-			else
-			{
-				MoveFlag = 0;
-			}
-
 
 			//}
+		}
+
+		else
+		{
+			MoveFlag = 0;
 		}
 
 

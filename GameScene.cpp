@@ -117,6 +117,7 @@ void GameScene::Initialize()
 	//演出タイマー初期化
 	WaitTimer = TimerReset;
 	BossTimer = DefaultBossTimer;
+	RangeTime = TimerReset;
 
 	//ステージスタート時UIの初期化
 	Stage_1->position_.x = DefaultStage1Pos.x;
@@ -221,7 +222,13 @@ void GameScene::Update()
 	if (GameStart == true)
 	{
 		MoveTitle();
-		Start();
+
+		RangeTime++;
+
+		if (RangeTime > 100)
+		{
+			Start();
+		}
 	}
 
 		//UI->position_.x = Reticle->MousePosition.x;
@@ -920,7 +927,9 @@ void GameScene::Attack(XMFLOAT3 StartPos)
 		//弾を生成し初期化
 		std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
 		newBullet = Bullet::Create(model_Bullet, camera, StartPos, ReticlePos/*Reticle->position_*/);
-		
+
+		particle->FireParticle(30, StartPos, 2.0f, 10, 1.0f, 0.0f);
+
 		//弾を登録
 		bullets.push_back(std::move(newBullet));
 	}
