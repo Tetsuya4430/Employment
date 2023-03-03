@@ -60,6 +60,11 @@ public:	//サブクラス
 		XMMATRIX matBillboard;	//ビルボード行列
 	};
 
+	static Particle* GetInstance();
+
+	//テクスチャの最大枚数
+	static const int MaxTexture = 512;
+
 private: // 定数
 	static const int division = 50;					// 分割数
 	static const float radius;				// 底面の半径
@@ -92,11 +97,21 @@ public: // 静的メンバ関数
 	/// </summary>
 	static void PostDraw();
 
+	//テクスチャ読み込み
+	void LoadTexture(UINT texnumber, const wchar_t* filename);
+
 	/// <summary>
 	/// 3Dオブジェクト生成
 	/// </summary>
 	/// <returns></returns>
-	static Particle* Create(const wchar_t* filename, Camera* camera);
+	static Particle* Create(UINT texnumber, Camera* camera);
+
+	/// <summary>
+	/// ルートデスクリプタテーブルの設定
+	/// </summary>
+	/// <param name="rootParameterIndex">ルートパラメータ番号</param>
+	/// <param name="texnumber">テクスチャ番号</param>
+	void SetGraphicsRootDescriptorTable(UINT rootParameterIndex, UINT texnumber);
 
 private: // 静的メンバ変数
 	//デバイス
@@ -114,7 +129,7 @@ private: // 静的メンバ変数
 	//頂点バッファ
 	static ComPtr<ID3D12Resource> vertBuff;
 	//テクスチャバッファ
-	static ComPtr<ID3D12Resource> texBuff;
+	static ComPtr<ID3D12Resource> texBuff[MaxTexture];
 	//シェーダーリソースビューのハンドル(CPU)
 	static CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV;
 	//シェーダーリソースビューのハンドル(GPU)
@@ -147,9 +162,6 @@ private: // 静的メンバ変数
 	/// <returns>成否</returns>
 	static bool InitializeGraphicsPipeline();
 
-	//テクスチャ読み込み
-	static bool LoadTexture(const wchar_t* filename);
-
 	/// <summary>
 	/// モデル作成
 	/// </summary>
@@ -161,7 +173,7 @@ private: // 静的メンバ変数
 	//static void UpdateViewMatrix();
 
 public: //メンバ関数
-	bool Initialize(const wchar_t* filename);
+	bool Initialize(UINT texnumber);
 
 	/// <summary>
 /// 毎フレーム処理
@@ -229,6 +241,8 @@ private:	//メンバ変数
 	XMFLOAT3 position_ = { 0,0,0 };
 	// ローカルワールド変換行列
 	XMMATRIX matWorld_;
+	//テクスチャ番号
+	UINT texNumber = 0;
 
 };
 

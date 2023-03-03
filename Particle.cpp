@@ -18,7 +18,7 @@ ComPtr<ID3D12RootSignature> Particle::rootsignature;
 ComPtr<ID3D12PipelineState> Particle::pipelinestate;
 ComPtr<ID3D12DescriptorHeap> Particle::descHeap;
 ComPtr<ID3D12Resource> Particle::vertBuff;
-ComPtr<ID3D12Resource> Particle::texBuff;
+ComPtr<ID3D12Resource> Particle::texBuff[MaxTexture];
 CD3DX12_CPU_DESCRIPTOR_HANDLE Particle::cpuDescHandleSRV;
 CD3DX12_GPU_DESCRIPTOR_HANDLE Particle::gpuDescHandleSRV;
 XMMATRIX Particle::matView{};
@@ -40,6 +40,13 @@ const DirectX::XMFLOAT3 operator+(const::DirectX::XMFLOAT3& lhs, const DirectX::
 	return result;
 }
 
+Particle* Particle::GetInstance()
+{
+	static Particle instance;
+
+	return &instance;
+}
+
 bool Particle::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList* cmdList, int window_width, int window_height)
 {
 	// nullptrチェック
@@ -56,9 +63,6 @@ bool Particle::StaticInitialize(ID3D12Device* device, ID3D12GraphicsCommandList*
 
 	//パイプライン初期化
 	InitializeGraphicsPipeline();
-
-	////テクスチャ読み込み
-	//LoadTexture();
 
 	//モデル生成
 	CreateModel();
@@ -83,7 +87,7 @@ void Particle::PostDraw()
 	//Particle::cmdList = nullptr;
 }
 
-Particle* Particle::Create(const wchar_t* filename, Camera* camera)
+Particle* Particle::Create(UINT texnumber, Camera* camera)
 {
 	// 3Dオブジェクトのインスタンスを生成
 	Particle* particle = new Particle();
@@ -92,7 +96,7 @@ Particle* Particle::Create(const wchar_t* filename, Camera* camera)
 	}
 
 	// 初期化
-	if (!particle->Initialize(filename)) {
+	if (!particle->Initialize(texnumber)) {
 		delete particle;
 		assert(0);
 		return nullptr;
@@ -106,6 +110,17 @@ Particle* Particle::Create(const wchar_t* filename, Camera* camera)
 	return particle;
 }
 
+void Particle::SetGraphicsRootDescriptorTable(UINT rootParameterIndex, UINT texnumber)
+{
+	cmdList->SetGraphicsRootDescriptorTable(rootParameterIndex,
+		CD3DX12_GPU_DESCRIPTOR_HANDLE(
+			descHeap->GetGPUDescriptorHandleForHeapStart(),
+			texnumber,
+			device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV)
+		)
+	);
+}
+
 bool Particle::InitializeDescriptorHeap()
 {
 	HRESULT result = S_FALSE;
@@ -114,7 +129,7 @@ bool Particle::InitializeDescriptorHeap()
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	descHeapDesc.NumDescriptors = 1;	//シェーダーリソースビュー1つ
+	descHeapDesc.NumDescriptors = MaxTexture;	//シェーダーリソースビュー1つ
 	result = device->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));
 	if (FAILED(result))
 	{
@@ -312,23 +327,19 @@ bool Particle::InitializeGraphicsPipeline()
 	return true;
 }
 
-bool Particle::LoadTexture(const wchar_t* filename)
+void Particle::LoadTexture(UINT texnumber, const wchar_t* filename)
 {
-	HRESULT result = S_FALSE;
+	HRESULT result;
 
 	//WICテクスチャのロード
 	TexMetadata metadata{};
 	ScratchImage scratchImg{};
 
 	result = LoadFromWICFile(
-		/*L"Resources/Image/effect1.png"*/filename,
+		filename,
 		WIC_FLAGS_NONE,
 		&metadata, scratchImg
 	);
-	if (FAILED(result))
-	{
-		return result;
-	}
 
 	const Image* img = scratchImg.GetImage(0, 0, 0);	//生データ抽出
 
@@ -348,44 +359,39 @@ bool Particle::LoadTexture(const wchar_t* filename)
 		&textureDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,	//テクスチャ用指定
 		nullptr,
-		IID_PPV_ARGS(&texBuff));
+		IID_PPV_ARGS(&texBuff[texnumber] ));
 
-	if (FAILED(result))
-	{
-		return result;
-	}
+	
 
 	//テクスチャバッファに転送
-	result = texBuff->WriteToSubresource(
+	result = texBuff[texnumber]->WriteToSubresource(
 		0,
 		nullptr,
 		img->pixels,
 		(UINT)img->rowPitch,		//1ラインサイズ
 		(UINT)img->slicePitch	//全サイズ
 	);
-	if (FAILED(result))
-	{
-		return result;
-	}
 
-	//シェーダーリソースビュー作成
-	cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), 0, descriptorHandleIncrementSize);
-	gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), 0, descriptorHandleIncrementSize);
+
+	//シェーダーリソースビュー設定
+	//cpuDescHandleSRV = CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), 0, descriptorHandleIncrementSize);
+	//gpuDescHandleSRV = CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), 0, descriptorHandleIncrementSize);
+
+	//D3D12_RESOURCE_DESC resDesc = texBuff[texnumber]->GetDesc();
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};	//設定構造体
-	D3D12_RESOURCE_DESC resDesc = texBuff->GetDesc();
-
-	srvDesc.Format = resDesc.Format;
+	srvDesc.Format = metadata.format;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;	//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = 1;
 
-	device->CreateShaderResourceView(texBuff.Get(),		//ビューと関連付けるバッファ
+	//ヒープのtexnumberにシェーダーリソースビューを作成
+	device->CreateShaderResourceView(texBuff[texnumber].Get(),		//ビューと関連付けるバッファ
 		&srvDesc,	//テクスチャ情報
-		cpuDescHandleSRV
+		CD3DX12_CPU_DESCRIPTOR_HANDLE(descHeap->GetCPUDescriptorHandleForHeapStart(), texnumber,
+			device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV))
 	);
 
-	return true;
 }
 
 void Particle::CreateModel()
@@ -431,10 +437,20 @@ void Particle::CreateModel()
 	vbView.StrideInBytes = sizeof(vertices[0]);
 }
 
-bool Particle::Initialize(const wchar_t* filename)
+bool Particle::Initialize(UINT texnumber)
 {
 	// nullptrチェック
 	assert(device);
+
+	//テクスチャ番号を書き込む
+	texNumber = texnumber;
+
+	//指定番号の画像が読み込み済みなら
+	if (texBuff[texNumber])
+	{
+		//テクスチャ情報を取得
+		D3D12_RESOURCE_DESC resDesc = texBuff[texNumber]->GetDesc();
+	}
 
 	HRESULT result;
 	// 定数バッファの生成
@@ -447,7 +463,7 @@ bool Particle::Initialize(const wchar_t* filename)
 		IID_PPV_ARGS(&constBuff));
 
 	//テクスチャ読み込み
-	LoadTexture(filename);
+	//LoadTexture(texnumber, filename);
 
 	return true;
 }
@@ -544,7 +560,7 @@ void Particle::Draw()
 	//定数バッファビューをセット
 	cmdList->SetGraphicsRootConstantBufferView(0, constBuff->GetGPUVirtualAddress());
 	//シェーダーリソースビューをセット
-	cmdList->SetGraphicsRootDescriptorTable(1, gpuDescHandleSRV);
+	SetGraphicsRootDescriptorTable(1, texNumber/*gpuDescHandleSRV*/);
 	//描画コマンド
 	//cmdList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);
 	cmdList->DrawInstanced((UINT)std::distance(particles.begin(), particles.end()), 1, 0, 0);

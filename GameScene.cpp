@@ -108,10 +108,12 @@ void GameScene::Initialize()
 	/*object1->PlayAnimation();*/
 
 	//パーティクル生成
-	particle = Particle::Create(L"Resources/Image/effect1.png", camera);
+	Particle::GetInstance()->LoadTexture(1, L"Resources/Image/effect1.png");
+	particle = Particle::Create(1, camera);
 	particle->Update();
 
-	EnemyPart = Particle::Create(L"Resources/Image/effect3.png", camera);
+	Particle::GetInstance()->LoadTexture(2, L"Resources/Image/effect3.png");
+	EnemyPart = Particle::Create(2, camera);
 	EnemyPart->Update();
 
 	//演出タイマー初期化
