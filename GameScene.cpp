@@ -43,6 +43,8 @@ void GameScene::Initialize()
 	model_Boss = Model::LoadFromObj("Boss");
 	model_sphere = Model::LoadFromObj("CelestialSphere");
 	model_Moon = Model::LoadFromObj("Moon");
+	model_Mars = Model::LoadFromObj("Mars");
+	model_Neptune = Model::LoadFromObj("Neptune");
 	model_Meteor = Model::LoadFromObj("Meteor");
 	model_Station = Model::LoadFromObj("Station");
 	//model_SpaceStation = Model::LoadFromObj("SpaceStation");
@@ -85,6 +87,14 @@ void GameScene::Initialize()
 	Moon->SetScale(MoonScale);
 	Moon->SetPosition(MoonPosition);
 
+	Mars = Object3d::Create(model_Mars, camera);
+	Mars->SetScale(MarsScale);
+	Mars->SetPosition(MarsPosition);
+
+	Neptune = Object3d::Create(model_Neptune, camera);
+	Neptune->SetScale(NeptuneScale);
+	Neptune->SetPosition(NeptunePosition);
+
 	Station = Object3d::Create(model_Station, camera);
 	Station->SetScale(StationScale);
 	Station->SetPosition(StationPosition);
@@ -101,6 +111,16 @@ void GameScene::Initialize()
 	Force->SetScale(DefaultForceScale);
 	Force->SetPosition(DefaultForcePos);
 
+	CameraObject = Object3d::Create(model_reticle, camera);
+	CameraObject->SetScale(DefaultCameraObjScale);
+
+	CameraObject->SetPosition(CameraPos);
+
+	//test = Object3d::Create(model_reticle, camera);
+	//test->SetParent(CameraObject);
+	//test->SetScale({1, 1 ,1});
+	//test->SetPosition({CameraPos.x, CameraPos.y, CameraPos.z + 50});
+
 	//レティクル生成
 	//Reticle = Reticle::Create(model_reticle, camera);
 	//Reticle->SetScale({ 0.5, 0.5, 0.5 });
@@ -108,13 +128,11 @@ void GameScene::Initialize()
 	/*object1->PlayAnimation();*/
 
 	//パーティクル生成
-	Particle::GetInstance()->LoadTexture(1, L"Resources/Image/effect1.png");
+	Particle::GetInstance()->LoadTexture(1, L"Resources/Image/ShotTexture.png");
 	particle = Particle::Create(1, camera);
-	particle->Update();
 
 	Particle::GetInstance()->LoadTexture(2, L"Resources/Image/effect3.png");
 	EnemyPart = Particle::Create(2, camera);
-	EnemyPart->Update();
 
 	//演出タイマー初期化
 	WaitTimer = TimerReset;
@@ -169,6 +187,8 @@ void GameScene::Initialize()
 	//コントローラー初期化
 	InitInput();
 
+	//親子関係を結ぶ
+	//player->SetParent(CameraObject);
 
 	Audio::GetInstance()->PlayWave("GameScene.wav", 0.1f, true);
 }
@@ -192,6 +212,7 @@ void GameScene::Finalize()
 
 void GameScene::Update()
 {
+
 	//プレイヤーの座標を取得
 	PlayerPos = player->GetPosition();
 
@@ -294,8 +315,8 @@ void GameScene::Update()
 		//プレイヤーのHPが0になったらゲームオーバー
 		if (player->HP <= 0)
 		{
-			particle->CreateParticleInfo(10, PlayerPos, 2.0f, 30, 2.0f, 0.0f);
-			particle->DeathParticle(10, PlayerPos, 2.0f, 30, 5.0f, 0.0f);
+			EnemyPart->CreateParticleInfo(10, PlayerPos, 2.0f, 30, 2.0f, 0.0f);
+			EnemyPart->DeathParticle(10, PlayerPos, 2.0f, 30, 5.0f, 0.0f);
 
 			GameOver();
 
@@ -329,12 +350,34 @@ void GameScene::Update()
 
 		if (player->MoveCanFlag == true)
 		{
+			/*CameraPos.z += 1;
+			CameraObject->SetPosition(CameraPos);
+			camera->SetEye(CameraPos);
+			camera->SetTarget({ 0, 0, CameraPos.z + 50 });*/
+
 			MoonRot = Moon->GetRotation();
 			MoonPos = Moon->GetPosition();
 
-			MoonPos.z -= 0.05f;
+			MoonPos.z -= 0.1f;
 
-			Moon->SetPosition(MoonPos);
+			//Moon->SetPosition(MoonPos);
+
+			MarsRot = Mars->GetRotation();
+			MarsPos = Mars->GetPosition();
+
+			MarsPosition.z -= 0.5;
+
+			Mars->SetPosition(MarsPosition);
+
+
+
+			NeptuneRot = Neptune->GetRotation();
+			NeptunePos = Neptune->GetPosition();
+
+			NeptunePosition.z -= 0.2;
+
+			Neptune->SetPosition(NeptunePosition);
+
 
 			StationRot = Station->GetRotation();
 			StationPos = Station->GetPosition();
@@ -422,6 +465,7 @@ void GameScene::Update()
 		//弾更新
 		for (std::unique_ptr<Bullet>& bullet : bullets)
 		{
+			particle->FireParticle(2, bullet->GetPosition(), 2.0f, 30, 2.0f, 0.0f);
 			bullet->Update(PlayerPos);
 		}
 
@@ -574,7 +618,7 @@ void GameScene::Update()
 				DamageEffectflag = true;
 
 				//パーティクルを生成
-				particle->CreateParticleInfo(10, PlayerPos, 2.0f, 30, 2.0f, 0.0f);
+				EnemyPart->CreateParticleInfo(10, PlayerPos, 2.0f, 30, 2.0f, 0.0f);
 				//ダメージSEを再生
 				Audio::GetInstance()->PlayWave("Damage.wav", 0.1f, false);
 				//プレイヤーのHPをデクリメントして敵の弾のデスフラグを上げる
@@ -594,7 +638,7 @@ void GameScene::Update()
 					if (CheckCollision(bullet->GetPosition(), Boss->GetPosition(), 2.0f, 6.0f) == true)
 					{
 						//パーティクルを生成
-						particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 30, 1.0f, 0.0f);
+						EnemyPart->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 30, 1.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						Boss->SetHP(Boss->GetHP()-1);
 						if (Boss->GetHP() <= 0)
@@ -614,12 +658,12 @@ void GameScene::Update()
 				{
 					BossPartTimer = 0;
 					PartCount += 1;
-					particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 50, 8.0f, 0.0f);
+					EnemyPart->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 50, 8.0f, 0.0f);
 				}
 
 				if (PartCount >= 5)
 				{
-					particle->CreateParticleInfo(60, Boss->GetPosition(), 4.0f, 50, 15.0f, 0.0f);
+					EnemyPart->CreateParticleInfo(60, Boss->GetPosition(), 4.0f, 50, 15.0f, 0.0f);
 					PartCount = 0;
 					Boss->SetDeathFlag(true);
 				}
@@ -637,8 +681,8 @@ void GameScene::Update()
 				{
 					if (player->HP == 1)
 					{
-						//ボス撃破時はパーティクルを派手に演出
-						particle->CreateParticleInfo(50, PlayerPos, 2.0f, 50, 5.0f, 0.0f);
+						
+						EnemyPart->CreateParticleInfo(50, PlayerPos, 2.0f, 50, 5.0f, 0.0f);
 						Audio::GetInstance()->PlayWave("BossDown.wav", 0.1f, false);
 					}
 					player->HP -= 1;
@@ -676,8 +720,21 @@ void GameScene::Update()
 
 		Moon->SetRotation(MoonRot);
 
+		MarsRot.y -= 0.4f;
+
+		Mars->SetRotation(MarsRot);
+
+
+		NeptuneRot.y -= 0.4f;
+
+		Neptune->SetRotation(MarsRot);
+
 
 		Moon->Update();
+
+		Mars->Update();
+
+		Neptune->Update();
 
 		//StationRot.y += 0.03f;
 
@@ -687,6 +744,10 @@ void GameScene::Update()
 		//SpaceStation->Update();
 		Shooting->Update();
 		Force->Update();
+
+		CameraObject->Update();
+
+		//test->Update();
 
 		
 
@@ -731,6 +792,7 @@ void GameScene::Update()
 		particle->Update();
 		
 		EnemyPart->Update();
+
 
 		UpdateInput();
 
@@ -815,6 +877,8 @@ void GameScene::Draw()
 	CelestialSphere->Draw();
 
 	Moon->Draw();
+	Mars->Draw();
+	Neptune->Draw();
 	Station->Draw();
 	//SpaceStation->Draw();
 	Shooting->Draw();
@@ -838,6 +902,8 @@ void GameScene::Draw()
 
 	player->Draw();
 
+	//test->Draw();
+
 	//3Dオブジェクトの描画後処理
 	Object3d::PostDraw();
 
@@ -847,6 +913,7 @@ void GameScene::Draw()
 	particle->Draw();
 
 	EnemyPart->Draw();
+
 	
 
 	Particle::PostDraw();
@@ -929,8 +996,6 @@ void GameScene::Attack(XMFLOAT3 StartPos)
 		//弾を生成し初期化
 		std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
 		newBullet = Bullet::Create(model_Bullet, camera, StartPos, ReticlePos/*Reticle->position_*/);
-
-		particle->FireParticle(30, StartPos, 2.0f, 10, 1.0f, 0.0f);
 
 		//弾を登録
 		bullets.push_back(std::move(newBullet));
@@ -1708,12 +1773,12 @@ void GameScene::BossDeath()
 	{
 		BossPartTimer = 0;
 		PartCount += 1;
-		particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 50, 8.0f, 0.0f);
+		EnemyPart->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 50, 8.0f, 0.0f);
 	}
 
 	if (PartCount >= 5)
 	{
-		particle->CreateParticleInfo(60, Boss->GetPosition(), 4.0f, 50, 15.0f, 0.0f);
+		EnemyPart->CreateParticleInfo(60, Boss->GetPosition(), 4.0f, 50, 15.0f, 0.0f);
 		PartCount = 0;
 		Boss->SetDeathFlag(true);
 	}

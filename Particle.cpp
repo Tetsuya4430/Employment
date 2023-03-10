@@ -443,7 +443,7 @@ bool Particle::Initialize(UINT texnumber)
 	assert(device);
 
 	//テクスチャ番号を書き込む
-	texNumber = texnumber;
+	this->texNumber = texnumber;
 
 	//指定番号の画像が読み込み済みなら
 	if (texBuff[texNumber])
@@ -647,8 +647,8 @@ void Particle::FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int Parti
 		//パーティクルの速度
 		const float md_vel = Vel;
 		XMFLOAT3 vel{};
-		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
-		vel.y = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.x = 0;
+		vel.y = 0;
 		vel.z -= 2;
 		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
 		XMFLOAT3 acc{};

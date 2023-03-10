@@ -151,6 +151,8 @@ public: // メンバ関数
 
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
+	void SetParent(Object3d* parent) { parent_ = parent; }
+
 
 	//getter
 	//デバイスの取得

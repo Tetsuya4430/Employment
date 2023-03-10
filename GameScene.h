@@ -144,6 +144,8 @@ private:
 	Model* model_Boss = nullptr;
 	Model* model_sphere = nullptr;
 	Model* model_Moon = nullptr;
+	Model* model_Mars = nullptr;
+	Model* model_Neptune = nullptr;
 	Model* model_Wall = nullptr;
 	Model* model_Meteor = nullptr;
 	Model* model_Station = nullptr;
@@ -200,11 +202,16 @@ private:
 	//3Dオブジェクト
 	Object3d* CelestialSphere = nullptr;
 	Object3d* Moon = nullptr;
+	Object3d* Mars = nullptr;
+	Object3d* Neptune = nullptr;
 	Object3d* Wall = nullptr;
 	Object3d* Station = nullptr;
 	Object3d* SpaceStation = nullptr;
 	Object3d* Shooting = nullptr;
 	Object3d* Force = nullptr;
+	Object3d* CameraObject = nullptr;
+
+	Object3d* test = nullptr;
 
 	//プレイヤー
 	Player* P = nullptr;
@@ -221,6 +228,7 @@ private:
 	//パーティクル
 	Particle* particle = nullptr;
 	Particle* EnemyPart = nullptr;
+	Particle* ShotPart = nullptr;
 
 
 	//Player
@@ -350,6 +358,12 @@ private:
 	XMFLOAT3 MoonPos = { 0, 0, 0 };
 	XMFLOAT3 MoonRot = { 0, 0, 0 };
 
+	XMFLOAT3 MarsPos = { 0, 0, 0 };
+	XMFLOAT3 MarsRot = { 0, 0, 0 };
+
+	XMFLOAT3 NeptunePos = { 0, 0, 0 };
+	XMFLOAT3 NeptuneRot = { 0, 0, 0 };
+
 	XMFLOAT3 StationPos = { 0, 0, 0 };
 	XMFLOAT3 StationRot = { 0, 0, 0 };
 
@@ -360,6 +374,16 @@ private:
 	XMFLOAT3 MoonScale = { 60, 60, 60 };
 	//月座標
 	XMFLOAT3 MoonPosition = { 350, 150, 400 };
+
+	//火星スケール
+	XMFLOAT3 MarsScale = { 20, 20, 20 };
+	//火星座標
+	XMFLOAT3 MarsPosition = { 100, -100, 500 };
+
+	//海王星スケール
+	XMFLOAT3 NeptuneScale = { 30, 30, 30 };
+	//海王星座標
+	XMFLOAT3 NeptunePosition = { -200, 150, 600 };
 
 	//宇宙ステーションスケール
 	XMFLOAT3 StationScale = { 50, 50, 50 };
@@ -393,6 +417,10 @@ private:
 	//ボス登場時UI用目的座標
 	XMFLOAT3 BossUIPointPos_1 = { 1280, 0, 0 };
 	XMFLOAT3 BossUIPointPos_2 = { 0, 0, 0 };
+
+	//カメラオブジェクト用変数
+	XMFLOAT3 DefaultCameraObjPos = { 0, 0, -50.0f };
+	XMFLOAT3 DefaultCameraObjScale = { 1, 1, 1 };
 
 	//タイマーリセット用変数
 	int TimerReset = 0;
@@ -460,5 +488,7 @@ private:
 
 	int Count = 0;
 	float Move_F = 0.0f;
+
+	XMFLOAT3 CameraPos = { 0, 0, -50.0f };
 };
 
