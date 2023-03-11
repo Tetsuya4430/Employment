@@ -21,9 +21,8 @@ GameScene::GameScene()
 GameScene::~GameScene()
 {
 	//delete(object1);
-	delete(model1);
-	delete(postEffect);
-	delete(P);
+	//delete(postEffect);
+	delete(player);
 	delete(Boss);
 }
 
@@ -924,7 +923,7 @@ void GameScene::Draw()
 	
 	//UI->Draw();
 
-	
+	DebagText();
 
 	Stage_1->Draw();
 	Go->Draw();
@@ -1612,7 +1611,7 @@ void GameScene::DrawSprite()
 		}
 
 		//ルールUI
-		Rule->Draw();
+		//Rule->Draw();
 	}
 
 	//ボス演出UI
@@ -1795,6 +1794,19 @@ void GameScene::MoveTitle()
 
 	Shooting->SetPosition(ShootingPos);
 	Force->SetPosition(ForcePos);
+}
+
+void GameScene::DebagText()
+{
+		//プレイヤーの座標
+		std::ostringstream PlayerPosition;
+		PlayerPosition << "PlayerPosition("
+			<< std::fixed << std::setprecision(5)
+			<< PlayerPos.x << ","
+			<< PlayerPos.y << ","
+			<< PlayerPos.z << ")";
+
+		DebugText::GetInstance()->Print(PlayerPosition.str(), 0, 0, 2.0f);
 }
 
 

@@ -123,6 +123,9 @@ public:
 	//タイトル演出
 	void MoveTitle();
 
+	//デバッグテキスト描画用関数
+	void DebagText();
+
 private:
 	//定数
 	const int MAX_Object = 10;
