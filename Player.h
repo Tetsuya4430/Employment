@@ -23,6 +23,17 @@ public:
 	/// </summary>
 	void Update();
 
+	//setter
+	void SetLelelflag(bool Lelelflag) { this->LevelFlag = Lelelflag; }
+
+	//レベルフラグのゲッター
+	const bool& GetLelelflag() { return  LevelFlag; }
+
+	//HPのゲッター
+	const float& GetHP() { return  HP; }
+
+	const float& GetMAXHP() { return  MAX_HP; }
+
 private:
 	//プレイヤーの移動スピード
 	float Speed = 0.5f;
@@ -100,8 +111,11 @@ public:
 	// X,Y,Z軸回りのローカル回転角
 	//XMFLOAT3 rotation_ = { 0,0,0 };
 
+	//プレイヤーの最大HP
+	float MAX_HP = 10;
+
 	//プレイヤーのHP
-	int HP = 5;
+	float HP = 10;
 
 	//プレイヤーのレベル
 	int Level = 1;
@@ -114,5 +128,8 @@ public:
 
 	//ダメージフラグ
 	bool DamageFlag = false;
+
+	//レベルアップフラグ
+	bool LevelFlag = false;
 };
 

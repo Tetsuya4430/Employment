@@ -25,7 +25,8 @@ public:	//メンバ関数
 	ID3D12Device* GetDev() { return dev.Get(); }
 	//コマンドリスト取得getter
 	ID3D12GraphicsCommandList* GetCmdList() { return cmdList.Get(); }
-
+	//バックバッファの数を取得
+	size_t GetBackBufferCount() const { return backBuffers.size(); }
 
 private:	//メンバ変数
 	ComPtr<ID3D12CommandAllocator> cmdAllocator;
@@ -44,6 +45,7 @@ private:	//メンバ変数
 
 	//WindowsAPI
 	WinApp* winApp = nullptr;
+
 	
 
 	DirectXCommon() = default;

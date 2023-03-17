@@ -32,12 +32,15 @@ class Bullet :
 	//デスフラグのゲッター
 	const bool& GetDeathFlag() { return DeathFlag; }
 
+	//弾速のゲッター
+	const XMFLOAT3 GetSpeed() { return Speed; }
+
 private:
 	//弾の寿命
 	static const int LifeTimer = 60 * 2;
 
 	//速度
-	XMFLOAT3 Speed = { 0.0f, 0.0f, 0.0f };
+	XMFLOAT3 Speed = { 0.0f, 0.0f, 5.0f };
 
 	//カウント
 	float Count = 50;

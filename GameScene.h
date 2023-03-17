@@ -20,6 +20,7 @@
 #include "Particle.h"
 #include "DefenceObject.h"
 //#include "Test.h"
+#include "ImGuiManager.h"
 
 #include <list>
 #include <sstream>
@@ -126,6 +127,10 @@ public:
 	//デバッグテキスト描画用関数
 	void DebagText();
 
+	void HpBarMove();
+
+	void Easing(XMFLOAT2 Position, XMFLOAT2 pointPos, XMFLOAT2 Vec);
+
 private:
 	//定数
 	const int MAX_Object = 10;
@@ -230,8 +235,9 @@ private:
 	
 	//パーティクル
 	Particle* particle = nullptr;
-	Particle* EnemyPart = nullptr;
-	Particle* ShotPart = nullptr;
+	//Particle* EnemyPart = nullptr;
+	//Particle* ShotPart = nullptr;
+	Particle* particle_Red = nullptr;
 
 
 	//Player
@@ -257,6 +263,12 @@ private:
 	Sprite* LoadBG = nullptr;
 	Sprite* DamageEffect = nullptr;
 	Sprite* StartUI = nullptr;
+	Sprite* HPBar = nullptr;
+	Sprite* EmpBar = nullptr;
+	Sprite* BossHPBar = nullptr;
+	Sprite* PlayerFrame = nullptr;
+	Sprite* BossFrame = nullptr;
+	Sprite* EmpBossBar = nullptr;
 
 	//ボスHPスプライト
 	Sprite* BossHP_0 = nullptr;
@@ -294,6 +306,9 @@ private:
 	Sprite* BossUI_D = nullptr;
 	Sprite* BossUI_D_2 = nullptr;
 	Sprite* Warning = nullptr;
+
+	//ImGui
+	ImGuiManager* Imgui = nullptr;
 
 	//プレイヤーのヒットフラグ
 	bool HitFlag = false;
@@ -463,6 +478,16 @@ private:
 
 	XMFLOAT2 BarSize = { 100, 200 };
 
+	XMFLOAT2 PlayerHPSize = {800, 30};
+	float HPdiv = 0.0f;
+	XMFLOAT2 PlayerNowHP = {1, PlayerHPSize.y};
+
+	XMFLOAT2 BossHPSize = { 800, 30 };
+	float BossHPdiv = 0.0f;
+	XMFLOAT2 BossNowHP = { 1, BossHPSize.y };
+
+	//フレーム
+	XMFLOAT2 FrameSize = { 820, 50 };
 
 	//プレイヤー関係
 	XMFLOAT3 PlayerPos = { 0, 0, 0 };

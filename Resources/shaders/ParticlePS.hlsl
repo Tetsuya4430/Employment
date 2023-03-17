@@ -11,5 +11,5 @@ float4 main(GSOutput input) : SV_TARGET
 	//float brightness = diffuse + 0.3f;	//アンビエント項を0.3として計算
 	//float4 texcolor = float4(tex.Sample(smp, input.uv));
 
-	return tex.Sample(smp, input.uv);
+	return tex.Sample(smp, input.uv) * input.color;
 }

@@ -31,6 +31,9 @@ public:
 	//デスフラグのゲッター
 	const bool& GetDeathFlag() { return DeathFlag; }
 
+	//弾速のゲッター
+	const XMFLOAT3& GetSpeed() { return Speed; }
+
 private:
 	//弾の寿命
 	static const int LifeTimer = 60 * 2;

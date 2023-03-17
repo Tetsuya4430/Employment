@@ -785,6 +785,7 @@ void Player::Update()
 			Audio::GetInstance()->PlayWave("LevelUp.wav", 0.3f, false);
 			//経験値をリセットして、レベルを1上昇
 			EXP = 0;
+ 			LevelFlag = true;
 			Level += 1;
 		}
 	}

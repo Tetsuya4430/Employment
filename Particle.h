@@ -27,6 +27,8 @@ public:	//サブクラス
 	{
 		XMFLOAT3 pos;	//x,y,z座標
 		float scale;	//スケール
+		XMFLOAT4 color;	//色
+		XMFLOAT3 rotation;	//回転
 	};
 
 	//パーティクル1粒
@@ -37,6 +39,8 @@ public:	//サブクラス
 
 		//座標
 		XMFLOAT3 position = {};
+		//ローテーション
+		XMFLOAT3 rotation = {};
 		//速度
 		XMFLOAT3 velocity = {};
 		//加速度
@@ -47,6 +51,8 @@ public:	//サブクラス
 		float scale_start = 1.0f;
 		//スケール最終値
 		float scale_end = 0.0f;
+		//色
+		XMFLOAT4 color = {};
 		//現在フレーム
 		int frame = 0;
 		//終了フレーム
@@ -58,6 +64,8 @@ public:	//サブクラス
 	{
 		XMMATRIX mat;	//3D変換行列
 		XMMATRIX matBillboard;	//ビルボード行列
+		XMFLOAT4 color;
+		XMFLOAT3 rotation;	//回転
 	};
 
 	static Particle* GetInstance();
@@ -224,7 +232,13 @@ public: //メンバ関数
 	void DeathParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
 
 	//弾発射パーティクル
-	void FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
+	void FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed);
+
+	//敵弾発射パーティクル
+	void EnemyFireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed);
+
+	//レベルアップ演出パーティクル
+	void LevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
 
 private:	//メンバ変数
 	//行列用定数バッファ
@@ -232,7 +246,7 @@ private:	//メンバ変数
 	//カメラ
 	Camera* camera_ = nullptr;
 	//色
-	XMFLOAT4 color = { 1, 1, 1, 1 };
+	XMFLOAT4 color_ = { 1, 0.1, 1, 1 };
 	// ローカルスケール
 	XMFLOAT3 scale_ = { 1,1,1 };
 	// X,Y,Z軸回りのローカル回転角

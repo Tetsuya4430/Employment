@@ -18,6 +18,7 @@
 #include "AbstractSceneFactory.h"
 #include "Particle.h"
 #include "DefenceObject.h"
+#include "ImGuiManager.h"
 //#include "Test.h"
 
 /// <summary>
@@ -64,5 +65,6 @@ protected:
 	DebugText* debugText = nullptr;
 	SpriteCommon* spriteCommon = nullptr;
 	AbstractSceneFactory* sceneFactory_ = nullptr;
+	ImGuiManager* ImGui = nullptr;
 };
 

@@ -34,9 +34,9 @@ bool Bullet::Initialize(XMFLOAT3 pos, XMFLOAT3 PointPos)
 {
     Object3d::position_ = pos;
 
-    Speed.x = (PointPos.x - Object3d::position_.x) / Count;
-    Speed.y = (PointPos.y - Object3d::position_.y) / Count;
-    Speed.z = ((PointPos.z + 30.0f) - Object3d::position_.z) / Count;
+    //Speed.x = (PointPos.x - Object3d::position_.x) / Count;
+    //Speed.y = (PointPos.y - Object3d::position_.y) / Count;
+    //Speed.z = ((PointPos.z + 30.0f) - Object3d::position_.z) / Count;
 
     Object3d::Initialize();
 
@@ -58,5 +58,5 @@ void Bullet::Update(XMFLOAT3 pos)
     position_B.y += Speed.y;
     position_B.z += Speed.z;*/
 
-    Object3d::position_.z += 5.0f;
+    Object3d::position_.z += Speed.z;
 }

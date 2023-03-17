@@ -319,7 +319,6 @@ void DirectXCommon::PreDraw()
 
 void DirectXCommon::PostDraw()
 {
-	
 
 	//バックバッファの番号を取得
 	UINT bbIndex = swapchain->GetCurrentBackBufferIndex();

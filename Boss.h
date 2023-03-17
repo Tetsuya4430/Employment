@@ -40,11 +40,12 @@ public:
 	void SetFireTime(bool fireTime) { this->FireTime = fireTime; }
 
 	//getter
-	const int& GetHP() { return HP; }
+	const float& GetHP() { return HP; }
 	const bool& GetDeathFlag() { return DeathFlag; }
 	const bool& GetDeathEffect() { return DeathEffect; }
 	const int& GetIntervalTime() { return IntervalTime; }
 	const int& GetFireTime() { return FireTime; }
+	const float& GetMAXHP() { return MAXHP; }
 
 private:
 	//速度
@@ -66,7 +67,10 @@ private:
 	int DownTimer = 0;
 
 	//ボスの体力
-	int HP = 15;
+	float HP = 15;
+
+	//ボスの体力上限値
+	float MAXHP = 15;
 };
 
 

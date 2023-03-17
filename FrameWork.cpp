@@ -1,4 +1,5 @@
 #include "FrameWork.h"
+#include "imgui.h"
 
 void FrameWork::Run()
 {
@@ -54,6 +55,10 @@ void FrameWork::Initialize()
 	audio = Audio::GetInstance();
 	audio->Initialize();
 
+	//ImGuiの初期化
+	ImGui = ImGuiManager::GetInstance();
+	ImGui->Initialize(winApp, dxCommon);
+
 	//3Dオブジェクトの静的初期化
 	Object3d::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
@@ -104,6 +109,9 @@ void FrameWork::Finalize()
 	audio->Finalize();
 
 
+	//ImGuiの解放
+	ImGui->Finalize();
+
 	//DirectX解放
 	//delete dxCommon;
 
@@ -135,14 +143,17 @@ void FrameWork::Draw()
 {
 	//描画前処理
 	dxCommon->PreDraw();
-
+	//ImGuiの更新
+	ImGui->GetInstance()->ImGuiManager::Begin();
 	SceneManager::GetInstance()->Draw();
 
 	//デバッグテキスト描画
 	debugText->DrawAll();
-
+	//ImGui::Text("Hello, world %d", 123);
 
 	//4,描画コマンドここまで
-
+	//ImGuiの描画
+	ImGui->GetInstance()->ImGuiManager::End();
+	ImGui->GetInstance()->ImGuiManager::Draw();
 	dxCommon->PostDraw();
 }

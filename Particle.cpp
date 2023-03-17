@@ -233,6 +233,18 @@ bool Particle::InitializeGraphicsPipeline()
 			D3D12_APPEND_ALIGNED_ELEMENT,
 			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		},
+
+		{//色
+			"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
+
+		{//回転
+			"ROTATION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
+			D3D12_APPEND_ALIGNED_ELEMENT,
+			D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
+		},
 	};
 
 	// グラフィックスパイプラインの流れを設定
@@ -257,9 +269,9 @@ bool Particle::InitializeGraphicsPipeline()
 	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;	// RBGA全てのチャンネルを描画
 	blenddesc.BlendEnable = true;
 	//半透明合成
-	/*blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
-	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;*/
+	//blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+	//blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	//blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
 	//加算合成
 	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
 	blenddesc.SrcBlend = D3D12_BLEND_ONE;
@@ -510,6 +522,10 @@ void Particle::Update()
 		//スケールの線形補間
 		it->scale = (it->scale_end - it->scale_start) / f;
 		it->scale += it->scale_start;
+		//色の値を渡す
+		it->color = color_;
+		//回転の値を渡す
+		it->rotation = rotation_;
 	}
 
 	//頂点バッファへデータ転送
@@ -526,6 +542,10 @@ void Particle::Update()
 			vertMap->pos = it->position;
 			//スケール
 			vertMap->scale = it->scale;
+			//色
+			vertMap->color = it->color;
+			//回転
+			vertMap->rotation = it->rotation;
 			//次の頂点へ
 			vertMap++;
 		}
@@ -537,6 +557,7 @@ void Particle::Update()
 	// 定数バッファへデータ転送
 	ConstBufferData* constMap = nullptr;
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
+	//constMap->color = color_;
 	constMap->mat = matWorld_ * matViewProjection;	// 行列の合成
 	constMap->matBillboard = camera_->matBillboard;
 	constBuff->Unmap(0, nullptr);
@@ -603,6 +624,8 @@ void Particle::CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int
 		const float md_acc = 0.001f;
 		acc.y = -(float)rand() / RAND_MAX * md_acc;
 
+		XMFLOAT3 rot{};
+
 		//追加
 		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
 
@@ -628,13 +651,44 @@ void Particle::DeathParticle(int PartNum, XMFLOAT3 Position, float Vel, int Part
 		const float md_acc = 0.001f;
 		acc.y = -(float)rand() / RAND_MAX * md_acc;
 
+		XMFLOAT3 rot{};
+
 		//追加
 		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
 
 	}
 }
 
-void Particle::FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale)
+void Particle::FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed)
+{
+	for (int i = 0; i < PartNum; i++)
+	{
+		//引数の値を貰う
+		const float md_width = 10.0f;
+		XMFLOAT3 pos{};
+		pos.x = Position.x/* +(float)rand() / RAND_MAX * md_width - md_width/ 2.0f*/;
+		pos.y = Position.y/* + (float)rand() / RAND_MAX * md_width - md_width / 2.0f*/;
+		pos.z = Position.z + 10;
+		//パーティクルの速度
+		const float md_vel = Vel;
+		XMFLOAT3 vel{};
+		vel.x = Speed.x;
+		vel.y = Speed.y;
+		vel.z -= Speed.z / 10;
+		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
+		XMFLOAT3 acc{};
+		//const float md_acc = 0.001f;
+		//acc.y = -(float)rand() / RAND_MAX * md_acc;
+
+		XMFLOAT3 rot{};
+
+		//追加
+		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
+
+	}
+}
+
+void Particle::EnemyFireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed)
 {
 	for (int i = 0; i < PartNum; i++)
 	{
@@ -643,13 +697,51 @@ void Particle::FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int Parti
 		XMFLOAT3 pos{};
 		pos.x = Position.x;
 		pos.y = Position.y;
-		pos.z = Position.z + 10;
+		pos.z = Position.z;
 		//パーティクルの速度
 		const float md_vel = Vel;
 		XMFLOAT3 vel{};
-		vel.x = 0;
-		vel.y = 0;
-		vel.z -= 2;
+		vel.x += Speed.x / 10;
+		vel.y += Speed.y / 10;
+		vel.z -= Speed.z / 10;
+		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
+		XMFLOAT3 acc{};
+		const float md_acc = 0.001f;
+		acc.y = -(float)rand() / RAND_MAX * md_acc;
+
+		XMFLOAT3 rot{};
+
+		//追加
+		AddParticle(ParticleLife, pos, vel, rot, StartScale, EndScale);
+
+	}
+}
+
+void Particle::LevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale)
+{
+	for (int i = 0; i < PartNum; i++)
+	{
+		//中心座標
+		XMFLOAT3 Center{};
+		//半径
+		float Radius;
+		//角度
+		float angle;
+		//半径の長さ
+		float Length;
+
+		//引数の値を貰う
+		const float md_width = 10.0f;
+		XMFLOAT3 pos{};
+		pos.x = Position.x;
+		pos.y = Position.y;
+		pos.z = Position.z;
+		//パーティクルの速度
+		const float md_vel = Vel;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.y = 0.5f;
+		vel.z = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
 		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
 		XMFLOAT3 acc{};
 		const float md_acc = 0.001f;

@@ -103,7 +103,7 @@ public:
 	UINT texNumber_ = 0;
 
 	//大きさ
-	DirectX::XMFLOAT2 size_ = { BarSize.x, BarSize.y };
+	DirectX::XMFLOAT2 size_ = { 100, 100};
 
 	//アンカーポイント
 	DirectX::XMFLOAT2 anchorpoint_ = { 1.0f, 1.0f };
@@ -118,7 +118,7 @@ public:
 	DirectX::XMFLOAT2 texLeftTop_ = { 0, 0 };
 
 	//テクスチャ切り出しサイズ
-	DirectX::XMFLOAT2 texSize_ = { 200, 200 };
+	DirectX::XMFLOAT2 texSize_ = { 100, 100 };
 
 	//非表示
 	bool isInvisible_ = false;
