@@ -129,7 +129,7 @@ public:
 
 	void HpBarMove();
 
-	void Easing(XMFLOAT2 Position, XMFLOAT2 pointPos, XMFLOAT2 Vec);
+	void EnemyDown(XMFLOAT3 EnemyPos);
 
 private:
 	//定数
@@ -238,6 +238,8 @@ private:
 	//Particle* EnemyPart = nullptr;
 	//Particle* ShotPart = nullptr;
 	Particle* particle_Red = nullptr;
+
+	Particle* Testpart = nullptr;
 
 
 	//Player
@@ -495,6 +497,8 @@ private:
 	XMFLOAT3 SatellitePos_R = { 0, 0, 0 };
 	XMFLOAT3 SatellitePos_L = { 0, 0, 0 };
 
+	XMFLOAT3 TestPos = { 0, 0, 0 };
+
 	//敵
 	XMFLOAT3 EnemyPos = { 0, 0, 0 };
 
@@ -518,5 +522,9 @@ private:
 	float Move_F = 0.0f;
 
 	XMFLOAT3 CameraPos = { 0, 0, -50.0f };
+
+
+	//レベルタイマー
+	int LevelCount = 0;
 };
 

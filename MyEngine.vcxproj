@@ -115,7 +115,6 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Math.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Mouse.cpp" />
@@ -130,6 +129,7 @@
     <ClCompile Include="SpriteCommon.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -246,7 +246,6 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="Material.h" />
-    <ClInclude Include="Math.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="Mouse.h" />
@@ -263,6 +262,7 @@
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="SpriteCommon.h" />
     <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="Vector3.h" />
     <ClInclude Include="WinApp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

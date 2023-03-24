@@ -480,7 +480,7 @@ bool Particle::Initialize(UINT texnumber)
 	return true;
 }
 
-void Particle::Update()
+void Particle::Update(/*XMFLOAT4 color*/)
 {
 	HRESULT result;
 	XMMATRIX matScale, matRot, matTrans;
@@ -523,7 +523,7 @@ void Particle::Update()
 		it->scale = (it->scale_end - it->scale_start) / f;
 		it->scale += it->scale_start;
 		//色の値を渡す
-		it->color = color_;
+		it->color = it->color;
 		//回転の値を渡す
 		it->rotation = rotation_;
 	}
@@ -587,7 +587,7 @@ void Particle::Draw()
 	cmdList->DrawInstanced((UINT)std::distance(particles.begin(), particles.end()), 1, 0, 0);
 }
 
-void Particle::AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale)
+void Particle::AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale, XMFLOAT4 color)
 {
 	//リストに要素を追加
 	particles.emplace_front();
@@ -601,9 +601,10 @@ void Particle::AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLO
 	//p.scale = start_scale;
 	p.scale_start = start_scale;
 	p.scale_end = end_scale;
+	p.color = color;
 }
 
-void Particle::CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale)
+void Particle::CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT4 color)
 {
 	for (int i = 0; i < PartNum; i++)
 	{
@@ -627,12 +628,12 @@ void Particle::CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int
 		XMFLOAT3 rot{};
 
 		//追加
-		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
+		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale, color);
 
 	}
 }
 
-void Particle::DeathParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale)
+void Particle::DeathParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT4 color)
 {
 	for (int i = 0; i < PartNum; i++)
 	{
@@ -654,12 +655,12 @@ void Particle::DeathParticle(int PartNum, XMFLOAT3 Position, float Vel, int Part
 		XMFLOAT3 rot{};
 
 		//追加
-		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
+		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale, color);
 
 	}
 }
 
-void Particle::FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed)
+void Particle::FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed, XMFLOAT4 color)
 {
 	for (int i = 0; i < PartNum; i++)
 	{
@@ -683,12 +684,12 @@ void Particle::FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int Parti
 		XMFLOAT3 rot{};
 
 		//追加
-		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
+		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale, color);
 
 	}
 }
 
-void Particle::EnemyFireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed)
+void Particle::EnemyFireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed, XMFLOAT4 color)
 {
 	for (int i = 0; i < PartNum; i++)
 	{
@@ -712,12 +713,12 @@ void Particle::EnemyFireParticle(int PartNum, XMFLOAT3 Position, float Vel, int 
 		XMFLOAT3 rot{};
 
 		//追加
-		AddParticle(ParticleLife, pos, vel, rot, StartScale, EndScale);
+		AddParticle(ParticleLife, pos, vel, rot, StartScale, EndScale, color);
 
 	}
 }
 
-void Particle::LevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale)
+void Particle::PlayerLevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT4 color)
 {
 	for (int i = 0; i < PartNum; i++)
 	{
@@ -748,7 +749,44 @@ void Particle::LevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int Pa
 		acc.y = -(float)rand() / RAND_MAX * md_acc;
 
 		//追加
-		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale);
+		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale, color);
 
 	}
 }
+
+void Particle::LevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT4 color)
+{
+	for (int i = 0; i < PartNum; i++)
+	{
+		//中心座標
+		XMFLOAT3 Center{};
+		//半径
+		float Radius;
+		//角度
+		float angle;
+		//半径の長さ
+		float Length;
+
+		//引数の値を貰う
+		const float md_width = 10.0f;
+		XMFLOAT3 pos{};
+		pos.x = Position.x;
+		pos.y = Position.y;
+		pos.z = Position.z;
+		//パーティクルの速度
+		const float md_vel = Vel;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.y = 0.5f;
+		vel.z = 0;
+		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
+		XMFLOAT3 acc{};
+		const float md_acc = 0.001f;
+		acc.y = -(float)rand() / RAND_MAX * md_acc;
+
+		//追加
+		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale, color);
+
+	}
+}
+

@@ -71,7 +71,7 @@ public:	//サブクラス
 	static Particle* GetInstance();
 
 	//テクスチャの最大枚数
-	static const int MaxTexture = 512;
+	static const int MaxTexture = 1024;
 
 private: // 定数
 	static const int division = 50;					// 分割数
@@ -186,7 +186,7 @@ public: //メンバ関数
 	/// <summary>
 /// 毎フレーム処理
 /// </summary>
-	virtual void Update();
+	virtual void Update(/*XMFLOAT4 color*/);
 
 	/// <summary>
 	/// 描画
@@ -211,6 +211,10 @@ public: //メンバ関数
 	/// <returns>座標</returns>
 	const XMFLOAT3& GetRotation() { return rotation_; }
 
+	const XMFLOAT3& GetLevelUpPartPos() { return LevelUpPartPos; }
+
+	const XMFLOAT3& GetLevelUpPartPos_2() { return LevelUpPartPos_2; }
+
 	/// <summary>
 	/// 座標の設定
 	/// </summary>
@@ -223,22 +227,25 @@ public: //メンバ関数
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
 	//パーティクル追加
-	void AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale);
+	void AddParticle(int life, XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel, float start_scale, float end_scale, XMFLOAT4 color);
 
 	//パーティクル発生関数
-	void CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
+	void CreateParticleInfo(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT4 color);
 
 	//死亡パーティクル
-	void DeathParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
+	void DeathParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT4 color);
 
 	//弾発射パーティクル
-	void FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed);
+	void FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed, XMFLOAT4 color);
 
 	//敵弾発射パーティクル
-	void EnemyFireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed);
+	void EnemyFireParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed, XMFLOAT4 color);
 
 	//レベルアップ演出パーティクル
-	void LevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale);
+	void PlayerLevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT4 color);
+
+	//レベルアップ演出パーティクル(経験値バー用)
+	void LevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT4 color);
 
 private:	//メンバ変数
 	//行列用定数バッファ
@@ -246,7 +253,7 @@ private:	//メンバ変数
 	//カメラ
 	Camera* camera_ = nullptr;
 	//色
-	XMFLOAT4 color_ = { 1, 0.1, 1, 1 };
+	XMFLOAT4 color_ = { 1, 1, 1, 1 };
 	// ローカルスケール
 	XMFLOAT3 scale_ = { 1,1,1 };
 	// X,Y,Z軸回りのローカル回転角
@@ -257,6 +264,9 @@ private:	//メンバ変数
 	XMMATRIX matWorld_;
 	//テクスチャ番号
 	UINT texNumber = 0;
+
+	XMFLOAT3 LevelUpPartPos = { 40, -20, 0 };
+	XMFLOAT3 LevelUpPartPos_2 = { 50, -20, 0 };
 
 };
 

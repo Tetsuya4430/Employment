@@ -46,6 +46,7 @@ public:
 	const int& GetIntervalTime() { return IntervalTime; }
 	const int& GetFireTime() { return FireTime; }
 	const float& GetMAXHP() { return MAXHP; }
+	const XMFLOAT4& GetBossParticleColor() { return BossParticleColor; }
 
 private:
 	//速度
@@ -71,6 +72,9 @@ private:
 
 	//ボスの体力上限値
 	float MAXHP = 15;
+
+	//死亡時のパーティクルの色
+	XMFLOAT4 BossParticleColor = { 0.988f, 0.443f, 0.180f, 1.0f };
 };
 
 
