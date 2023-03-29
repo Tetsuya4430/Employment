@@ -131,6 +131,8 @@ public:
 
 	void EnemyDown(XMFLOAT3 EnemyPos);
 
+	void CameraMove();
+
 private:
 	//定数
 	const int MAX_Object = 10;
@@ -523,6 +525,10 @@ private:
 
 	XMFLOAT3 CameraPos = { 0, 0, -50.0f };
 
+	//カメラの視点移動制限
+	float CameraLimit = 1.0f;
+
+	float CameraMoveValue = 0.1f;
 
 	//レベルタイマー
 	int LevelCount = 0;

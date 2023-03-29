@@ -343,6 +343,8 @@ void GameScene::Update()
 		{
 			HpBarMove();
 
+			CameraMove();
+
 			//Vector3::lerp(TestPos, { 0, 0, 0 }, { 10, 10, 0 }, 5.0f);
 
 
@@ -771,28 +773,40 @@ void GameScene::Update()
 
 		UpdateSprite();
 
-		if (Input::GetInstance()->PushKey(DIK_J) || Input::GetInstance()->PushKey(DIK_L) || Input::GetInstance()->PushKey(DIK_I) || Input::GetInstance()->PushKey(DIK_K))
+		/*if (Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 		{
-			if (Input::GetInstance()->PushKey(DIK_J))
+			if (Input::GetInstance()->PushKey(DIK_A))
 			{
-				camera->CameraMoveEyeVector({ -1.0f, 0, 0 });
+				if (camera->GetEye().x > -CameraLimit)
+				{
+					camera->CameraMoveEyeVector({ -CameraMoveValue, 0, 0 });
+				}
 			}
 
-			if (Input::GetInstance()->PushKey(DIK_L))
+			if (Input::GetInstance()->PushKey(DIK_D))
 			{
-				camera->CameraMoveEyeVector({ 1.0f, 0, 0 });
+				if (camera->GetEye().x < CameraLimit)
+				{
+					camera->CameraMoveEyeVector({ CameraMoveValue, 0, 0 });
+				}
 			}
 
-			if (Input::GetInstance()->PushKey(DIK_I))
+			if (Input::GetInstance()->PushKey(DIK_W))
 			{
-				camera->CameraMoveEyeVector({ 0, 1.0f, 0 });
+				if (camera->GetEye().y < CameraLimit)
+				{
+					camera->CameraMoveEyeVector({ 0, CameraMoveValue, 0 });
+				}
 			}
 
-			if (Input::GetInstance()->PushKey(DIK_K))
+			if (Input::GetInstance()->PushKey(DIK_S))
 			{
-				camera->CameraMoveEyeVector({ 0, -1.0f, 0 });
+				if (camera->GetEye().y > -CameraLimit)
+				{
+					camera->CameraMoveEyeVector({ 0, -CameraMoveValue, 0 });
+				}
 			}
-		}
+		}*/
 
 		//カメラの更新
 		camera->Update();
@@ -1339,23 +1353,28 @@ void GameScene::UpdateSprite()
 	HPdiv = player->GetHP() / player->GetMAXHP();
 	PlayerNowHP.x = HPdiv * PlayerHPSize.x;
 
-	
-	HPBar->SetSize(PlayerNowHP);
+	if (player->GetHP() >= 0)
+	{
+		HPBar->SetSize(PlayerNowHP);
+	}
 	HPBar->TransferVertexBuffer();
 	HPBar->Update();
 	EmpBar->Update();
 	PlayerFrame->Update();
 	BossFrame->Update();
-	EmpBar->Update();
 
 	//ボスHP
 	if (Boss)
 	{
 		BossHPdiv = Boss->GetHP() / Boss->GetMAXHP();
 		BossNowHP.x = BossHPdiv * BossHPSize.x;
-		BossHPBar->SetSize(BossNowHP);
+		if (Boss->GetHP() >= 0)
+		{
+			BossHPBar->SetSize(BossNowHP);
+		}
 		BossHPBar->TransferVertexBuffer();
 		BossHPBar->Update();
+		EmpBossBar->Update();
 	}
 
 
@@ -1706,10 +1725,10 @@ void GameScene::DrawSprite()
 	PlayerFrame->Draw();
 	BossFrame->Draw();
 	EmpBar->Draw();
-	//EmpBossBar->Draw();
 	HPBar->Draw();
 	if (Boss)
 	{
+		EmpBossBar->Draw();
 		BossHPBar->Draw();
 	}
 }
@@ -1933,6 +1952,44 @@ void GameScene::EnemyDown(XMFLOAT3 EnemyPos)
 		if (EnemyPos.y <= -10)
 		{
 			//enemy->SetDeathFlag(true);
+		}
+	}
+}
+
+void GameScene::CameraMove()
+{
+	if (Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
+	{
+		if (Input::GetInstance()->PushKey(DIK_A))
+		{
+			if (camera->GetEye().x > -CameraLimit)
+			{
+				camera->CameraMoveEyeVector({ -CameraMoveValue, 0, 0 });
+			}
+		}
+
+		if (Input::GetInstance()->PushKey(DIK_D))
+		{
+			if (camera->GetEye().x < CameraLimit)
+			{
+				camera->CameraMoveEyeVector({ CameraMoveValue, 0, 0 });
+			}
+		}
+
+		if (Input::GetInstance()->PushKey(DIK_W))
+		{
+			if (camera->GetEye().y < CameraLimit)
+			{
+				camera->CameraMoveEyeVector({ 0, CameraMoveValue, 0 });
+			}
+		}
+
+		if (Input::GetInstance()->PushKey(DIK_S))
+		{
+			if (camera->GetEye().y > -CameraLimit)
+			{
+				camera->CameraMoveEyeVector({ 0, -CameraMoveValue, 0 });
+			}
 		}
 	}
 }
