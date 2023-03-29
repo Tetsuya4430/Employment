@@ -152,7 +152,7 @@ void Player::Update()
 
 					if (Object3d::rotation_.z > -RotLimit)
 					{
-						//Object3d::rotation_.z -= RotValue;
+						Object3d::rotation_.z -= RotValue;
 					}
 				}
 
@@ -168,7 +168,7 @@ void Player::Update()
 
 					if (Object3d::rotation_.z < RotLimit)
 					{
-						//Object3d::rotation_.z += RotValue;
+						Object3d::rotation_.z += RotValue;
 					}
 				}
 
@@ -181,6 +181,11 @@ void Player::Update()
 						Object3d::position_.y += Speed * Mag;
 						Old.y = Speed * Mag;
 					}
+
+					if (Object3d::rotation_.x > -RotLimit)
+					{
+						Object3d::rotation_.x -= RotValue;
+					}
 				}
 
 				if (Input::GetInstance()->PushKey(DIK_S))
@@ -190,6 +195,11 @@ void Player::Update()
 					{
 						Object3d::position_.y -= Speed * Mag;
 						Old.y = -Speed * Mag;
+					}
+
+					if (Object3d::rotation_.x < RotLimit)
+					{
+						Object3d::rotation_.x += RotValue;
 					}
 				}
 
@@ -251,6 +261,30 @@ void Player::Update()
 		else
 		{
 			MoveFlag = 0;
+		}
+
+
+		if (MoveFlag == false)
+		{
+			if (Object3d::rotation_.z < 0)
+			{
+				Object3d::rotation_.z += RotValue;
+			}
+
+			else if (Object3d::rotation_.z > 0)
+			{
+				Object3d::rotation_.z -= RotValue;
+			}
+
+			if (Object3d::rotation_.x < 0)
+			{
+				Object3d::rotation_.x += RotValue;
+			}
+
+			else if (Object3d::rotation_.x > 0)
+			{
+				Object3d::rotation_.x -= RotValue;
+			}
 		}
 
 

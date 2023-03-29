@@ -345,8 +345,6 @@ void GameScene::Update()
 
 			CameraMove();
 
-			//Vector3::lerp(TestPos, { 0, 0, 0 }, { 10, 10, 0 }, 5.0f);
-
 
 			MoonRot = Moon->GetRotation();
 			MoonPos = Moon->GetPosition();
@@ -754,13 +752,6 @@ void GameScene::Update()
 
 		CameraObject->Update();
 
-
-		//テスト用
-		/*nowCount++;
-
-		elapsedCount = nowCount - startount;*/
-
-		//Vector3::lerp(TestPos, { 0, 0, 0 }, { 10, 10, 0 }, 5.0f);
 		//TestPos = { 10, 10, 0 };
 		
 		test->Update();
@@ -772,41 +763,6 @@ void GameScene::Update()
 		//スプライトの更新
 
 		UpdateSprite();
-
-		/*if (Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
-		{
-			if (Input::GetInstance()->PushKey(DIK_A))
-			{
-				if (camera->GetEye().x > -CameraLimit)
-				{
-					camera->CameraMoveEyeVector({ -CameraMoveValue, 0, 0 });
-				}
-			}
-
-			if (Input::GetInstance()->PushKey(DIK_D))
-			{
-				if (camera->GetEye().x < CameraLimit)
-				{
-					camera->CameraMoveEyeVector({ CameraMoveValue, 0, 0 });
-				}
-			}
-
-			if (Input::GetInstance()->PushKey(DIK_W))
-			{
-				if (camera->GetEye().y < CameraLimit)
-				{
-					camera->CameraMoveEyeVector({ 0, CameraMoveValue, 0 });
-				}
-			}
-
-			if (Input::GetInstance()->PushKey(DIK_S))
-			{
-				if (camera->GetEye().y > -CameraLimit)
-				{
-					camera->CameraMoveEyeVector({ 0, -CameraMoveValue, 0 });
-				}
-			}
-		}*/
 
 		//カメラの更新
 		camera->Update();
