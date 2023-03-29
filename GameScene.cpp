@@ -390,7 +390,7 @@ void GameScene::Update()
 
 				particle_Red->LevelUpParticle(5, particle->GetLevelUpPartPos(), 0.2f, 80, 3.0f, 0.0f, { 0.1f, 1.0f, 0.1f, 1.0f });
 				particle_Red->LevelUpParticle(5, particle->GetLevelUpPartPos_2(), 0.2f, 80, 3.0f, 0.0f, { 0.1f, 1.0f, 0.1f, 1.0f });
-				particle->PlayerLevelUpParticle(20, PlayerPos, 2.0f, 30, 5.0f, 0.0f, {0.078, 1.0, 0.654, 1.0});
+				particle->PlayerLevelUpParticle(5, PlayerPos, 2.0f, 30, 5.0f, 0.0f, {0.078, 1.0, 0.654, 1.0});
 			}
 
 			if (player->Level >= 2)
@@ -438,6 +438,16 @@ void GameScene::Update()
 
 					//発射タイマーを初期化
 					enemy->SetFireTime(enemy->GetIntervalTime());
+				}
+
+				if (enemy->GetDownFlag() == true)
+				{
+					particle->LevelUpParticle(5, EnemyPos, 2.0f, 30, 3.0f, 0.0f, enemy->GetEnemyDeathPartColor());
+				}
+
+				if (enemy->GetPosition().y < -50)
+				{
+					enemy->SetDeathFlag(true);
 				}
 			}
 
@@ -560,11 +570,13 @@ void GameScene::Update()
 					if (CheckCollision(bullet->GetPosition(), enemy->GetPosition(), 2.0f, 2.0f) == true)
 					{
 						//パーティクルを生成
-						particle->CreateParticleInfo(50, EnemyPos, 2.0f, 30, 2.0f, 0.0f,{1.0, 0.654, 0.1, 1.0});
+						particle->CreateParticleInfo(50, EnemyPos, 2.0f, 30, 10.0f, 0.0f, { 1.0, 0.654, 0.1, 1.0 });
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						bullet->SetDeathFlag(true);
 						EnemyDown(EnemyPos);
-						enemy->SetDeathFlag(true);
+						/*enemy->SetDeathFlag(true);*/
+
+						enemy->SetDownFlag(true);
 						player->EXP += 1;
 					}
 				}

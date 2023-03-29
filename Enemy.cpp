@@ -44,100 +44,111 @@ void Enemy::Update()
 {
 	Object3d::Update();
 
-	switch (phase_)
+	if (DownFlag == false)
 	{
-	case Phase::Approach:
-	default:
-
-		//ˆÚ“®
-		Object3d::position_.z -= Speed;
-
-		//‹K’è‚ÌˆÊ’u‚Å—£’E
-		if (Object3d::position_.z <= 30)
+		switch (phase_)
 		{
-			if (Object3d::position_.x == 0)
+		case Phase::Approach:
+		default:
+
+			//ˆÚ“®
+			Object3d::position_.z -= Speed;
+
+			//‹K’è‚ÌˆÊ’u‚Å—£’E
+			if (Object3d::position_.z <= 30)
 			{
-				if (Object3d::position_.y >= 0)
+				if (Object3d::position_.x == 0)
 				{
-					phase_ = Phase::LeaveU;
+					if (Object3d::position_.y >= 0)
+					{
+						phase_ = Phase::LeaveU;
+					}
+
+					else if (Object3d::position_.y < 0)
+					{
+						phase_ = Phase::LeaveD;
+					}
 				}
 
-				else if (Object3d::position_.y < 0)
+				else if (Object3d::position_.x > 0)
 				{
-					phase_ = Phase::LeaveD;
+					phase_ = Phase::LeaveR;
+				}
+
+				else
+				{
+					phase_ = Phase::LeaveL;
 				}
 			}
+			break;
 
-			else if (Object3d::position_.x > 0)
+		case Phase::LeaveR:
+			//ˆÚ“®
+			Object3d::position_.x -= Speed;
+
+			if (Object3d::position_.x < -100)
 			{
-				phase_ = Phase::LeaveR;
+
+				DeathFlag = true;
 			}
 
-			else
+			break;
+
+		case Phase::LeaveL:
+			//ˆÚ“®
+			Object3d::position_.x += Speed;
+
+			if (Object3d::position_.x > 100)
 			{
-				phase_ = Phase::LeaveL;
+				DeathFlag = true;
 			}
+
+			break;
+
+		case Phase::LeaveS:
+			//ˆÚ“®
+
+			Object3d::position_.z -= Speed;
+
+			if (Object3d::position_.z <= 0)
+			{
+				DeathFlag = true;
+			}
+
+			break;
+
+		case Phase::LeaveU:
+			//ˆÚ“®
+
+			Object3d::position_.y += Speed;
+
+			if (Object3d::position_.y >= 50)
+			{
+				DeathFlag = true;
+			}
+
+			break;
+
+		case Phase::LeaveD:
+			//ˆÚ“®
+
+			Object3d::position_.y -= Speed;
+
+			if (Object3d::position_.y <= -50)
+			{
+				DeathFlag = true;
+			}
+
+			break;
 		}
-		break;
-
-	case Phase::LeaveR:
-		//ˆÚ“®
-		Object3d::position_.x -= Speed;
-
-		if (Object3d::position_.x < -100)
-		{
-
-			DeathFlag = true;
-		}
-
-		break;
-
-	case Phase::LeaveL:
-		//ˆÚ“®
-		Object3d::position_.x += Speed;
-
-		if (Object3d::position_.x > 100)
-		{
-			DeathFlag = true;
-		}
-
-		break;
-
-	case Phase::LeaveS:
-		//ˆÚ“®
-
-		Object3d::position_.z -= Speed;
-
-		if (Object3d::position_.z <= 0)
-		{
-			DeathFlag = true;
-		}
-
-		break;
-
-	case Phase::LeaveU:
-		//ˆÚ“®
-
-		Object3d::position_.y += Speed;
-
-		if (Object3d::position_.y >= 50)
-		{
-			DeathFlag = true;
-		}
-
-		break;
-
-	case Phase::LeaveD:
-		//ˆÚ“®
-
-		Object3d::position_.y -= Speed;
-
-		if (Object3d::position_.y <= -50)
-		{
-			DeathFlag = true;
-		}
-
-		break;
 	}
+
+	if (DownFlag == true)
+	{
+		Object3d::VY += Object3d::gravity;
+
+		Object3d::position_.y += Object3d::VY * 0.2f;
+	}
+
 }
 

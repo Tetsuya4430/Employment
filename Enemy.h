@@ -39,6 +39,8 @@ public:
 	//setter
 	void SetDeathFlag(bool deathFlag) { this->DeathFlag = deathFlag; }
 
+	void SetDownFlag(bool downFlag) { this->DownFlag = downFlag; }
+
 	void SetIntervalTime(int intervalTime) { this->IntervalTime = intervalTime; }
 
 	void SetFireTime(int fireTime) { this->FireTime = fireTime; }
@@ -46,9 +48,13 @@ public:
 	//getter
 	const bool& GetDeathFlag() { return DeathFlag; }
 
+	const bool& GetDownFlag() { return DownFlag; }
+
 	const int& GetIntervalTime() { return IntervalTime; }
 
 	const int& GetFireTime() { return FireTime; }
+
+	const XMFLOAT4& GetEnemyDeathPartColor() { return EnemyDeathPartColor; }
 
 private: // メンバ変数
 	//速度
@@ -60,10 +66,16 @@ private: // メンバ変数
 	//デスフラグ
 	bool DeathFlag = false;
 
+	//落下フラグ
+	bool DownFlag = false;
+
 	//弾の発射インターバル
 	int IntervalTime = 240;
 
 	//発射タイマー
 	int FireTime = 0;
+
+	//パーティクルカラー
+	XMFLOAT4 EnemyDeathPartColor = { 0.972f, 0.654f, 0.286f, 1.0f };
 };
 
