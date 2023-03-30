@@ -574,8 +574,6 @@ void GameScene::Update()
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						bullet->SetDeathFlag(true);
 						EnemyDown(EnemyPos);
-						/*enemy->SetDeathFlag(true);*/
-
 						enemy->SetDownFlag(true);
 						player->EXP += 1;
 					}

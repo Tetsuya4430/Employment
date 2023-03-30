@@ -85,6 +85,7 @@ void Enemy::Update()
 		case Phase::LeaveR:
 			//ˆÚ“®
 			Object3d::position_.x -= Speed;
+			Object3d::rotation_.z += RotSpeed;
 
 			if (Object3d::position_.x < -100)
 			{
@@ -97,6 +98,7 @@ void Enemy::Update()
 		case Phase::LeaveL:
 			//ˆÚ“®
 			Object3d::position_.x += Speed;
+			Object3d::rotation_.z -= RotSpeed;
 
 			if (Object3d::position_.x > 100)
 			{

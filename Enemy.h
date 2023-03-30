@@ -60,6 +60,9 @@ private: // メンバ変数
 	//速度
 	float Speed = 0.4f;
 
+	//回転速度
+	float RotSpeed = 5.0f;
+
 	//フェーズ
 	Phase phase_ = Phase::Approach;
 
