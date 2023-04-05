@@ -671,7 +671,7 @@ void Particle::FireParticle(int PartNum, XMFLOAT3 Position, float Vel, int Parti
 		pos.y = Position.y/* + (float)rand() / RAND_MAX * md_width - md_width / 2.0f*/;
 		pos.z = Position.z + 10;
 		//パーティクルの速度
-		const float md_vel = Vel;
+		const float md_vel = 0.5;
 		XMFLOAT3 vel{};
 		vel.x = Speed.x;
 		vel.y = Speed.y;
@@ -754,7 +754,7 @@ void Particle::PlayerLevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, 
 	}
 }
 
-void Particle::LevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT4 color)
+void Particle::LevelUpParticle(int PartNum, XMFLOAT3 Position, XMFLOAT3 EndPosition, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT4 color)
 {
 	for (int i = 0; i < PartNum; i++)
 	{
@@ -783,6 +783,70 @@ void Particle::LevelUpParticle(int PartNum, XMFLOAT3 Position, float Vel, int Pa
 		XMFLOAT3 acc{};
 		const float md_acc = 0.001f;
 		acc.y = -(float)rand() / RAND_MAX * md_acc;
+
+		//追加
+		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale, color);
+
+	}
+}
+
+void Particle::JettParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed, XMFLOAT4 color)
+{
+	for (int i = 0; i < PartNum; i++)
+	{
+		//引数の値を貰う
+		const float md_width = 10.0f;
+		XMFLOAT3 pos{};
+		pos.x = Position.x/* +(float)rand() / RAND_MAX * md_width - md_width/ 2.0f*/;
+		pos.y = Position.y/* + (float)rand() / RAND_MAX * md_width - md_width / 2.0f*/;
+		pos.z = Position.z + 10;
+		//パーティクルの速度
+		const float md_vel = 0.2;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.y = Speed.y;
+		vel.z -= Speed.z / 10;
+		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
+		XMFLOAT3 acc{};
+		//const float md_acc = 0.001f;
+		//acc.y = -(float)rand() / RAND_MAX * md_acc;
+
+		XMFLOAT3 rot{};
+
+		//追加
+		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale, color);
+
+	}
+}
+
+void Particle::WarningParticle(int PartNum, XMFLOAT3 Position, float Vel, int ParticleLife, float StartScale, float EndScale, XMFLOAT3 Speed, XMFLOAT4 color)
+{
+	D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
+	for (int i = 0; i < PartNum; i++)
+	{
+		//引数の値を貰う
+		const float md_width = 10.0f;
+		XMFLOAT3 pos{};
+		pos.x = Position.x;
+		pos.y = Position.y;
+		pos.z = Position.z + 10;
+		//パーティクルの速度
+		const float md_vel = 0.5;
+		XMFLOAT3 vel{};
+		vel.x = (float)rand() / RAND_MAX * md_vel - md_vel / 2.0f;
+		vel.x += Speed.x / 10;;
+		vel.y += Speed.y / 10;
+		vel.z -= Speed.z / 10;
+		//重力に見立ててYのみ[-0.001f, 0]でランダムに分布
+		XMFLOAT3 acc{};
+		//const float md_acc = 0.001f;
+		//acc.y = -(float)rand() / RAND_MAX * md_acc;
+
+		XMFLOAT3 rot{};
+
+		blenddesc.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
+		blenddesc.SrcBlend = D3D12_BLEND_ONE;
+		blenddesc.DestBlend = D3D12_BLEND_ONE;
 
 		//追加
 		AddParticle(ParticleLife, pos, vel, acc, StartScale, EndScale, color);

@@ -12,9 +12,8 @@ protected: // エイリアス
 
 public:
 	//補間関数
-	static XMFLOAT3 lerp(XMFLOAT3 position, const XMFLOAT3& start, const XMFLOAT3& end, const float t);
-	const XMFLOAT3 easeIn(const XMFLOAT3& start, const XMFLOAT3& end, const float t);
-	const XMFLOAT3 easeOut(const XMFLOAT3& start, const XMFLOAT3& end, const float t);
-	const XMFLOAT3 easeInOut(const XMFLOAT3& start, const XMFLOAT3& end, const float t);
+	static const double easeIn(const float time, const float start, const float startToend , float end);
+
+	static const double ease_in_cubic(double x);
 };
 

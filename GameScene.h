@@ -9,7 +9,6 @@
 #include "Audio.h"
 #include "Input.h"
 #include "Bullet.h"
-//#include "Reticle.h"
 #include "EnemyBullet.h"
 #include "Enemy.h"
 #include "Boss.h"
@@ -19,16 +18,12 @@
 #include "Controller.h"
 #include "Particle.h"
 #include "DefenceObject.h"
-//#include "Test.h"
 #include "ImGuiManager.h"
 
 #include <list>
 #include <sstream>
 #include <fstream>
 
-//class Player;
-//class Bullet;
-//class EnemyBullet;
 
 /// <summary>
 /// ゲームプレイシーン
@@ -132,6 +127,10 @@ public:
 	void EnemyDown(XMFLOAT3 EnemyPos);
 
 	void CameraMove();
+
+	//UIアルファ値操作関数
+	void UI_AlphaIncriment(float color_w);
+	void UI_AlphaDecriment(float color_w);
 
 private:
 	//定数
@@ -255,12 +254,6 @@ private:
 	//UI
 	Sprite* sprite = nullptr;
 	Sprite* UI = nullptr;
-	Sprite* HP_0 = nullptr;
-	Sprite* HP_1 = nullptr;
-	Sprite* HP_2 = nullptr;
-	Sprite* HP_3 = nullptr;
-	Sprite* HP_4 = nullptr;
-	Sprite* HP_5 = nullptr;
 	Sprite* Stage_1 = nullptr;
 	Sprite* Go = nullptr;
 	Sprite* Rule = nullptr;
@@ -273,24 +266,6 @@ private:
 	Sprite* PlayerFrame = nullptr;
 	Sprite* BossFrame = nullptr;
 	Sprite* EmpBossBar = nullptr;
-
-	//ボスHPスプライト
-	Sprite* BossHP_0 = nullptr;
-	Sprite* BossHP_1 = nullptr;
-	Sprite* BossHP_2 = nullptr;
-	Sprite* BossHP_3 = nullptr;
-	Sprite* BossHP_4 = nullptr;
-	Sprite* BossHP_5 = nullptr;
-	Sprite* BossHP_6 = nullptr;
-	Sprite* BossHP_7 = nullptr;
-	Sprite* BossHP_8 = nullptr;
-	Sprite* BossHP_9 = nullptr;
-	Sprite* BossHP_10 = nullptr;
-	Sprite* BossHP_11 = nullptr;
-	Sprite* BossHP_12 = nullptr;
-	Sprite* BossHP_13 = nullptr;
-	Sprite* BossHP_14 = nullptr;
-	Sprite* BossHP_15 = nullptr;
 
 	//プレイヤー経験値スプライト
 	Sprite* ExpBar_0 = nullptr;
@@ -501,6 +476,13 @@ private:
 
 	XMFLOAT3 TestPos = { 0, 0, 0 };
 
+	XMFLOAT3 testStart = { 0, 0, 0 };
+	XMFLOAT3 testEnd = { 20, 20, 40 };
+
+	XMFLOAT3 PartSpeed = { 0, 0, 10 };
+	XMFLOAT3 WarningPartSpeed = { 5, 5, 3 };
+	float PartVel = 10.0f;
+
 	//敵
 	XMFLOAT3 EnemyPos = { 0, 0, 0 };
 
@@ -511,6 +493,7 @@ private:
 
 	//オーディオ音量
 	float Attack_Volume = 0.5f;
+	float GameBGM_Volume = 0.1f;
 
 	//ゲームスタートフラグ
 	bool GameStart = false;
@@ -532,5 +515,26 @@ private:
 
 	//レベルタイマー
 	int LevelCount = 0;
+
+	//UI演出待機カウント
+	int RangeCount = 100;
+
+	//ボス撃破時の待機カウント
+	int WaitCount = 120;
+
+	//ゲームオーバー時の待機カウント
+	int WaitCount_GameOver = 100;
+
+	//タイマーインクリメント変数
+	int TimerIncrimentValue = 1;
+
+	//ゼロ変数
+	int Value_Zero = 0;
+
+	//---UIのアルファ値設定用---//
+	//アルファ値最大値
+	const float MAX_ALPHA = 1.0f;
+	//アルファ値の最小値
+	const float MIN_ALPHA = 0.5f;
 };
 

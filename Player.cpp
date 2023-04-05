@@ -400,15 +400,7 @@ void Player::Update()
 			{
 				if (Avoidanceflag_X == false && Avoidanceflag_Y == false)
 				{
-					/*if (rotation_.z > 0)
-					{
-						rotation_.z -= 0.5f;
-					}
-
-					if (rotation_.z < 0)
-					{
-						rotation_.z += 0.5f;
-					}*/
+					
 				}
 			}
 
@@ -596,7 +588,7 @@ void Player::Update()
 				{
 					Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
 					PointPos = Object3d::position_.x + AvoidDistance_X;
-					RolePos = Object3d::rotation_.z - RoleDistance;
+					RolePos = -360/*Object3d::rotation_.z - RoleDistance*/;
 					RotFlag_R = true;
 
 					Avoidanceflag_X = true;
@@ -607,7 +599,7 @@ void Player::Update()
 				{
 					Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
 					PointPos = Object3d::position_.x - AvoidDistance_X;
-					RolePos = Object3d::rotation_.z + RoleDistance;
+					RolePos = 360;/*Object3d::rotation_.z + RoleDistance;*/
 					RotFlag_L = true;
 
 					Avoidanceflag_X = true;
@@ -740,20 +732,20 @@ void Player::Update()
 		//é¿ç€ÇÃâÒîèàóù
 		if (Avoidanceflag_X == true)
 		{
-			AvoidanceTimer_X += 1;
-
 
 			dx = (PointPos - Object3d::position_.x) / AvoidCount;
 			Object3d::position_.x += dx;
 
 			if (RotFlag_R == true)
 			{
+				AvoidanceTimer_X += 1;
 				rx = (RolePos - Object3d::rotation_.z) / AvoidCount;
 				Object3d::rotation_.z += rx;
 			}
 
-			else if (RotFlag_L == true)
+			if (RotFlag_L == true)
 			{
+				AvoidanceTimer_X += 1;
 				rx = (RolePos - Object3d::rotation_.z) / AvoidCount;
 				Object3d::rotation_.z += rx;
 			}

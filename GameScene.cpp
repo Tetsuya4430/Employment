@@ -170,13 +170,14 @@ void GameScene::Initialize()
 	BossUI_D_2->PointPos.x = BossUIPointPos_2.x;
 	BossUI_D_2->PointPos.y = BossUIPointPos_2.y;
 
-	LoadBG->color_.w = DefaultAlpha_Max;
 
 	//スケールのセット
 	player->Object3d::SetScale(PlayerScale);
 	Satellite_R->Object3d::SetScale(PlayerScale);
 	Satellite_L->Object3d::SetScale(PlayerScale);
 
+	//フェードイン用の画像のアルファ値をデフォルトに設定
+	LoadBG->color_.w = DefaultAlpha_Max;
 
 	//コントローラー初期化
 	InitInput();
@@ -184,7 +185,8 @@ void GameScene::Initialize()
 	//親子関係を結ぶ
 	//player->SetParent(CameraObject);
 
-	Audio::GetInstance()->PlayWave("GameScene.wav", 0.1f, true);
+	//ゲームBGMの再生
+	Audio::GetInstance()->PlayWave("GameScene.wav", GameBGM_Volume, true);
 }
 
 void GameScene::Finalize()
@@ -192,12 +194,7 @@ void GameScene::Finalize()
 	//スプライト解放
 	delete sprite;
 	delete UI;
-	delete HP_0;
-	delete HP_1;
-	delete HP_2;
-	delete HP_3;
-	delete HP_4;
-	delete HP_5;
+	
 
 	//モデルの解放
 	delete model_1;
@@ -212,12 +209,19 @@ void GameScene::Update()
 
 	PlayerRot = player->GetRotation();
 
+	
 	if (!LoadBG->color_.w <= 0.0f)
 	{
 		LoadBG->color_.w -= 0.02f;
 
 		LoadBG->Update();
 	}
+
+	if (LoadBG->color_.w <= 0.0f)
+	{
+		LoadBG->color_.w = 0.0f;
+	}
+
 
 	//テキストの座標を取得
 	ShootingPos = Shooting->GetPosition();
@@ -226,10 +230,6 @@ void GameScene::Update()
 
 	Force->SetPosition(ForcePos);
 
-	if (LoadBG->color_.w <= 0.0f)
-	{
-		LoadBG->color_.w = 0.0f;
-	}
 
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && GameStart == false)
 	{
@@ -240,9 +240,11 @@ void GameScene::Update()
 	{
 		MoveTitle();
 
+		//レンジタイムのインクリメント
 		RangeTime++;
 
-		if (RangeTime > 100)
+		//待機カウントより上回ったらゲームスタート
+		if (RangeTime > RangeCount)
 		{
 			Start();
 		}
@@ -259,15 +261,6 @@ void GameScene::Update()
 	SatellitePos_L.y = PlayerPos.y - SatelliteRange.y;
 	SatellitePos_L.z = PlayerPos.z;
 
-	
-
-		if (Input::GetInstance()->PushKey(DIK_P))
-		{
-			UI->BarSize.x += 1;
-			UI->BarSize.y += 1;
-
-			UI->SetSize(BarSize);
-		}
 
 		//攻撃時SE再生
 		if (player->MoveCanFlag == true && Input::GetInstance()->TriggerKey(DIK_SPACE))
@@ -291,35 +284,35 @@ void GameScene::Update()
 		{
 			if (Boss->GetDeathFlag() == true && BossTimer <= 0)
 			{
-				if (WaitTimer < 120)
+				if (WaitTimer < WaitCount)
 				{
-					WaitTimer += 1;
+					WaitTimer++;
 				}
 
-				if (WaitTimer >= 120)
+				if (WaitTimer >= WaitCount)
 				{
-					WaitTimer = 0;
+					WaitTimer = Value_Zero;
 					Audio::GetInstance()->StopWave("GameScene.wav");
 					SceneManager::GetInstance()->ChangeScene("GAMECLEAR");
 				}
 			}
 		}
 		//プレイヤーのHPが0になったらゲームオーバー
-		if (player->HP <= 0)
+		if (player->HP <= Value_Zero)
 		{
 			particle->CreateParticleInfo(10, PlayerPos, 2.0f, 30, 2.0f, 0.0f, { 1.000,0.470, 0.227, 1.0});
 			particle->DeathParticle(10, PlayerPos, 2.0f, 30, 5.0f, 0.0f, { 1.000,0.470, 0.227, 1.0 });
 
 			GameOver();
 
-			if (WaitTimer < 100)
+			if (WaitTimer < WaitCount_GameOver)
 			{
-				WaitTimer += 1;
+				WaitTimer++;
 			}
 
-			if (WaitTimer >= 100)
+			if (WaitTimer >= WaitCount_GameOver)
 			{
-				WaitTimer = 0;
+				WaitTimer = Value_Zero;
 				Audio::GetInstance()->StopWave("GameScene.wav");
 				SceneManager::GetInstance()->ChangeScene("GAMEOVER");
 			}
@@ -345,6 +338,7 @@ void GameScene::Update()
 
 			CameraMove();
 
+			particle->JettParticle(2, {PlayerPos.x, PlayerPos.y , PlayerPos.z - 12}, PartVel, 20, 1.0f, 0.0f, PartSpeed, {1.0, 0.654, 0.1, 1.0});
 
 			MoonRot = Moon->GetRotation();
 			MoonPos = Moon->GetPosition();
@@ -380,17 +374,17 @@ void GameScene::Update()
 
 			if (player->LevelFlag == true)
 			{
-				LevelCount += 1;
+				LevelCount++;
 
 				if (LevelCount == 30)
 				{
-					LevelCount = 0;
+					LevelCount = Value_Zero;
 					player->SetLelelflag(false);
 				}
 
-				particle_Red->LevelUpParticle(5, particle->GetLevelUpPartPos(), 0.2f, 80, 3.0f, 0.0f, { 0.1f, 1.0f, 0.1f, 1.0f });
-				particle_Red->LevelUpParticle(5, particle->GetLevelUpPartPos_2(), 0.2f, 80, 3.0f, 0.0f, { 0.1f, 1.0f, 0.1f, 1.0f });
-				particle->PlayerLevelUpParticle(5, PlayerPos, 2.0f, 30, 5.0f, 0.0f, {0.078, 1.0, 0.654, 1.0});
+				//particle_Red->LevelUpParticle(3, particle->GetLevelUpPartPos(), player->GetPosition(), 0.2f, 80, 3.0f, 0.0f, { 0.1f, 1.0f, 0.1f, 1.0f });
+				//particle_Red->LevelUpParticle(3, particle->GetLevelUpPartPos_2(), player->GetPosition(), 0.2f, 80, 3.0f, 0.0f, { 0.1f, 1.0f, 0.1f, 1.0f });
+				//particle->PlayerLevelUpParticle(5, PlayerPos, 2.0f, 30, 5.0f, 0.0f, {0.078, 1.0, 0.654, 1.0});
 			}
 
 			if (player->Level >= 2)
@@ -405,12 +399,12 @@ void GameScene::Update()
 		}
 
 
-		MeteorTimer += 1;
+		MeteorTimer++;
 
 		if (MeteorTimer >= 20)
 		{
 			MeteorMove();
-			MeteorTimer = 0;
+			MeteorTimer = Value_Zero;
 		}
 
 		if (GameStart == true)
@@ -432,7 +426,7 @@ void GameScene::Update()
 
 				enemy->SetFireTime(EnemyFire);
 
-				if (enemy->GetFireTime() <= 0)
+				if (enemy->GetFireTime() <= Value_Zero)
 				{
 					EnemyAttack(EnemyPos);
 
@@ -442,7 +436,7 @@ void GameScene::Update()
 
 				if (enemy->GetDownFlag() == true)
 				{
-					particle->LevelUpParticle(5, EnemyPos, 2.0f, 30, 3.0f, 0.0f, enemy->GetEnemyDeathPartColor());
+					particle->LevelUpParticle(5, EnemyPos, player->GetPosition(),2.0f, 30, 3.0f, 0.0f, enemy->GetEnemyDeathPartColor());
 				}
 
 				if (enemy->GetPosition().y < -50)
@@ -465,7 +459,7 @@ void GameScene::Update()
 					BossFire--;
 				}
 
-				if (BossFire <= 0)
+				if (BossFire <= Value_Zero)
 				{
 					EnemyAttack(Boss->GetPosition());
 
@@ -575,7 +569,7 @@ void GameScene::Update()
 						bullet->SetDeathFlag(true);
 						EnemyDown(EnemyPos);
 						enemy->SetDownFlag(true);
-						player->EXP += 1;
+						player->EXP++;
 					}
 				}
 			}
@@ -598,7 +592,7 @@ void GameScene::Update()
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						CoreR_bullet->SetDeathFlag(true);
 						enemy->SetDeathFlag(true);
-						player->EXP += 1;
+						player->EXP++;
 					}
 				}
 			}
@@ -620,7 +614,7 @@ void GameScene::Update()
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						CoreL_bullet->SetDeathFlag(true);
 						enemy->SetDeathFlag(true);
-						player->EXP += 1;
+						player->EXP++;
 					}
 				}
 			}
@@ -639,7 +633,7 @@ void GameScene::Update()
 				//ダメージSEを再生
 				Audio::GetInstance()->PlayWave("Damage.wav", 0.1f, false);
 				//プレイヤーのHPをデクリメントして敵の弾のデスフラグを上げる
-				player->HP -= 1;
+				player->HP-- ;
 				bullet->SetDeathFlag(true);
 			}
 		}
@@ -658,7 +652,7 @@ void GameScene::Update()
 						particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 30, 1.0f, 0.0f, { 1.0, 0.654, 0.1, 1.0 });
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						Boss->SetHP(Boss->GetHP()-1);
-						if (Boss->GetHP() <= 0)
+						if (Boss->GetHP() <= Value_Zero)
 						{
 							Audio::GetInstance()->PlayWave("BossDown.wav", 0.1f, false);
 						}
@@ -667,21 +661,21 @@ void GameScene::Update()
 				}
 			}
 
-			if (Boss->GetHP() <= 0)
+			if (Boss->GetHP() <= Value_Zero)
 			{
-				BossPartTimer += 1;
+				BossPartTimer++;
 
 				if (BossPartTimer >= 20 && Boss->GetDeathFlag() == false)
 				{
-					BossPartTimer = 0;
-					PartCount += 1;
+					BossPartTimer = Value_Zero;
+					PartCount++;
 					particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 50, 8.0f, 0.0f, { 1.0, 0.654, 0.1, 1.0 });
 				}
 
 				if (PartCount >= 5)
 				{
 					particle->CreateParticleInfo(60, Boss->GetPosition(), 4.0f, 50, 15.0f, 0.0f, { 1.0, 0.654, 0.1, 1.0 });
-					PartCount = 0;
+					PartCount = Value_Zero;
 					Boss->SetDeathFlag(true);
 				}
 
@@ -702,7 +696,7 @@ void GameScene::Update()
 						particle->CreateParticleInfo(50, PlayerPos, 2.0f, 50, 5.0f, 0.0f, { 1.0, 0.654, 0.1, 1.0 });
 						Audio::GetInstance()->PlayWave("BossDown.wav", 0.1f, false);
 					}
-					player->HP -= 1;
+					player->HP--;
 					bullet->DeathFlag = true;
 				}
 			}
@@ -721,7 +715,7 @@ void GameScene::Update()
 			if (ShakeTimer >= 5)
 			{
 				HitFlag = false;
-				ShakeTimer = 0;
+				ShakeTimer = Value_Zero;
 				camera->SetEye(CameraDefault);
 			}
 		}
@@ -764,6 +758,13 @@ void GameScene::Update()
 
 		//TestPos = { 10, 10, 0 };
 		
+		/*TestPos.x = Vector3::easeIn(100.0f, testStart.x, (testEnd.x - testStart.x), 100.0f);
+		TestPos.y = Vector3::easeIn(0.0f, testStart.y, (testEnd.y - testStart.y), 10.0f);
+		TestPos.z = Vector3::easeIn(0.0f, testStart.z, (testEnd.y - testStart.z), 10.0f);*/
+
+
+		test->SetPosition(TestPos);
+
 		test->Update();
 
 		//FBXオブジェクトの更新
@@ -827,7 +828,7 @@ void GameScene::Draw()
 		}
 
 		//ボス登場タイマーのデクリメント
-		if (BossTimer > 0)
+		if (BossTimer > Value_Zero)
 		{
 			BossTimer--;
 		}
@@ -911,7 +912,6 @@ void GameScene::Draw()
 	Stage_1->Draw();
 	Go->Draw();
 	LoadBG->Draw();
-			
 
 	DrawSprite();
 
@@ -993,7 +993,7 @@ void GameScene::UpdateEnemyPopCommands()
 	{
 		EnemyTimer--;
 
-		if (EnemyTimer <= 0)
+		if (EnemyTimer <= Value_Zero)
 		{
 			//待機完了
 			EnemyFlag = false;
@@ -1016,14 +1016,14 @@ void GameScene::UpdateEnemyPopCommands()
 		getline(line_stream, word, ',');
 
 		//"//"から始まる行はコメントアウト
-		if (word.find("//") == 0)
+		if (word.find("//") == Value_Zero)
 		{
 			//コメントを飛ばす
 			continue;
 		}
 
 		//POPコマンド
-		if (word.find("POP") == 0)
+		if (word.find("POP") == Value_Zero)
 		{
 			//x座標
 			getline(line_stream, word, ',');
@@ -1050,7 +1050,7 @@ void GameScene::UpdateEnemyPopCommands()
 		}
 
 		//POPコマンド
-		else if (word.find("BOSS_POP") == 0)
+		else if (word.find("BOSS_POP") == Value_Zero)
 		{
 			//x座標
 			getline(line_stream, word, ',');
@@ -1073,7 +1073,7 @@ void GameScene::UpdateEnemyPopCommands()
 		}
 
 		//POPコマンド
-		else if (word.find("OBJECT_POP") == 0)
+		else if (word.find("OBJECT_POP") == Value_Zero)
 		{
 			//x座標
 			getline(line_stream, word, ',');
@@ -1099,7 +1099,7 @@ void GameScene::UpdateEnemyPopCommands()
 		}
 
 		//WAITコマンド
-		else if (word.find("WAIT") == 0)
+		else if (word.find("WAIT") == Value_Zero)
 		{
 			getline(line_stream, word, ',');
 
@@ -1114,14 +1114,14 @@ void GameScene::UpdateEnemyPopCommands()
 			break;
 		}
 
-		else if (word.find("EVENT_S") == 0)
+		else if (word.find("EVENT_S") == Value_Zero)
 		{
 			getline(line_stream, word, ',');
 
 			BossFlag_S = true;
 		}
 
-		else if (word.find("EVENT_E") == 0)
+		else if (word.find("EVENT_E") == Value_Zero)
 		{
 			getline(line_stream, word, ',');
 
@@ -1129,7 +1129,7 @@ void GameScene::UpdateEnemyPopCommands()
 			BossFlag_S = false;
 		}
 
-		else if (word.find("UI_FLAGDOWN") == 0)
+		else if (word.find("UI_FLAGDOWN") == Value_Zero)
 		{
 			getline(line_stream, word, ',');
 
@@ -1159,28 +1159,7 @@ void GameScene::LoadSprite()
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(1, L"Resources/Image/BackGround.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(2, L"Resources/Image/Reticle.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(2, L"Resources/Image/Reticle.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(3, L"Resources/Image/HP_5.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(4, L"Resources/Image/HP_4.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(5, L"Resources/Image/HP_3.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(6, L"Resources/Image/HP_2.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(7, L"Resources/Image/HP_1.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(8, L"Resources/Image/HP_0.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(9, L"Resources/Image/BossHP/BossHP_0.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(10, L"Resources/Image/BossHP/BossHP_1.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(11, L"Resources/Image/BossHP/BossHP_2.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(12, L"Resources/Image/BossHP/BossHP_3.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(13, L"Resources/Image/BossHP/BossHP_4.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(14, L"Resources/Image/BossHP/BossHP_5.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(15, L"Resources/Image/BossHP/BossHP_6.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(16, L"Resources/Image/BossHP/BossHP_7.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(17, L"Resources/Image/BossHP/BossHP_8.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(18, L"Resources/Image/BossHP/BossHP_9.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(19, L"Resources/Image/BossHP/BossHP_10.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(20, L"Resources/Image/BossHP/BossHP_11.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(21, L"Resources/Image/BossHP/BossHP_12.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(22, L"Resources/Image/BossHP/BossHP_13.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(23, L"Resources/Image/BossHP/BossHP_14.png");
-	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(24, L"Resources/Image/BossHP/BossHP_15.png");
+
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(25, L"Resources/Image/ExpBar/ExpUI_0.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(26, L"Resources/Image/ExpBar/ExpUI_1.png");
 	SpriteCommon::GetInstance()->SpriteCommonLoadTexture(27, L"Resources/Image/ExpBar/ExpUI_2.png");
@@ -1203,28 +1182,8 @@ void GameScene::LoadSprite()
 
 	sprite = Sprite::Create(1, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
 	UI = Sprite::Create(2, { 1, 1, 1, 1 }, { 0.5, 0.5 }, false, false);
-	HP_0 = Sprite::Create(8, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	HP_1 = Sprite::Create(7, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	HP_2 = Sprite::Create(6, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	HP_3 = Sprite::Create(5, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	HP_4 = Sprite::Create(4, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	HP_5 = Sprite::Create(3, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_0 = Sprite::Create(9, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_1 = Sprite::Create(10, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_2 = Sprite::Create(11, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_3 = Sprite::Create(12, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_4 = Sprite::Create(13, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_5 = Sprite::Create(14, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_6 = Sprite::Create(15, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_7 = Sprite::Create(16, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_8 = Sprite::Create(17, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_9 = Sprite::Create(18, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_10 = Sprite::Create(19, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_11 = Sprite::Create(20, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_12 = Sprite::Create(21, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_13 = Sprite::Create(22, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_14 = Sprite::Create(23, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
-	BossHP_15 = Sprite::Create(24, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
+	
+	
 	ExpBar_0 = Sprite::Create(25, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
 	ExpBar_1 = Sprite::Create(26, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
 	ExpBar_2 = Sprite::Create(27, { 1, 1, 1, 1 }, { 0, 0 }, false, false);
@@ -1294,18 +1253,79 @@ void GameScene::LoadSprite()
 void GameScene::UpdateSprite()
 {
 	sprite->Update();
-	HP_0->Update();
-	HP_1->Update();
-	HP_2->Update();
-	HP_3->Update();
-	HP_4->Update();
-	HP_5->Update();
+	
+
+	//経験値UI
+	if (PlayerPos.x > 35)
+	{
+		if (ExpBar_0->color_.w > MIN_ALPHA)
+		{
+			ExpBar_0->color_.w -= 0.1f;
+		}
+
+		if (ExpBar_1->color_.w > MIN_ALPHA)
+		{
+			ExpBar_1->color_.w -= 0.1f;
+		}
+
+		if (ExpBar_2->color_.w > MIN_ALPHA)
+		{
+			ExpBar_2->color_.w -= 0.1f;
+		}
+
+		if (ExpBar_3->color_.w > MIN_ALPHA)
+		{
+			ExpBar_3->color_.w -= 0.1f;
+		}
+
+		if (ExpBar_4->color_.w > MIN_ALPHA)
+		{
+			ExpBar_4->color_.w -= 0.1f;
+		}
+
+		if (ExpBar_5->color_.w > MIN_ALPHA)
+		{
+			ExpBar_5->color_.w -= 0.1f;
+		}
+
+		if (Level_1->color_.w > MIN_ALPHA)
+		{
+			Level_1->color_.w -= 0.1f;
+		}
+
+		if (Level_2->color_.w > MIN_ALPHA)
+		{
+			Level_2->color_.w -= 0.1f;
+		}
+
+		if (Level_3->color_.w > MIN_ALPHA)
+		{
+			Level_3->color_.w -= 0.1f;
+		}
+		
+	}
+
+	else
+	{
+		ExpBar_0->color_.w = MAX_ALPHA;
+		ExpBar_1->color_.w = MAX_ALPHA;
+		ExpBar_2->color_.w = MAX_ALPHA;
+		ExpBar_3->color_.w = MAX_ALPHA;
+		ExpBar_4->color_.w = MAX_ALPHA;
+		ExpBar_5->color_.w = MAX_ALPHA;
+		Level_1->color_.w = MAX_ALPHA;
+		Level_2->color_.w = MAX_ALPHA;
+		Level_3->color_.w = MAX_ALPHA;
+	}
 	ExpBar_0->Update();
 	ExpBar_1->Update();
 	ExpBar_2->Update();
 	ExpBar_3->Update();
 	ExpBar_4->Update();
 	ExpBar_5->Update();
+	Level_1->Update();
+	Level_2->Update();
+	Level_3->Update();
 
 	Stage_1->Update();
 	Go->Update();
@@ -1319,11 +1339,27 @@ void GameScene::UpdateSprite()
 	HPdiv = player->GetHP() / player->GetMAXHP();
 	PlayerNowHP.x = HPdiv * PlayerHPSize.x;
 
-	if (player->GetHP() >= 0)
+	if (player->GetHP() >= Value_Zero)
 	{
 		HPBar->SetSize(PlayerNowHP);
 	}
+
+	if (player->GetHP() > 3 && player->GetHP() <= 5)
+	{
+		particle->WarningParticle(1, { PlayerPos.x, PlayerPos.y , PlayerPos.z - 12 }, PartVel, 10, 3.0f, 0.0f, WarningPartSpeed, { 0.901, 0.0, 0.200, 1.0 });
+		particle->WarningParticle(1, { PlayerPos.x, PlayerPos.y , PlayerPos.z - 12 }, PartVel, 10, 3.0f, 0.0f, WarningPartSpeed, { 1.0, 0.615, 0.200, 1.0 });
+		HPBar->SetColor({ 0.964f, 0.921f, 0.415f , 1 });
+	}
+
+	if (player->GetHP() > 0 && player->GetHP() <= 3)
+	{
+		particle->WarningParticle(2, { PlayerPos.x, PlayerPos.y , PlayerPos.z - 12 }, PartVel, 15, 3.0f, 0.0f, WarningPartSpeed, { 0.901, 0.0, 0.200, 1.0 });
+		particle->WarningParticle(2, { PlayerPos.x, PlayerPos.y , PlayerPos.z - 12 }, PartVel, 15, 3.0f, 0.0f, WarningPartSpeed, { 1.0, 0.615, 0.200, 1.0 });
+		HPBar->SetColor({ 0.854f, 0.101f, 0.062f , 1 });
+	}
+
 	HPBar->TransferVertexBuffer();
+
 	HPBar->Update();
 	EmpBar->Update();
 	PlayerFrame->Update();
@@ -1334,7 +1370,7 @@ void GameScene::UpdateSprite()
 	{
 		BossHPdiv = Boss->GetHP() / Boss->GetMAXHP();
 		BossNowHP.x = BossHPdiv * BossHPSize.x;
-		if (Boss->GetHP() >= 0)
+		if (Boss->GetHP() >= Value_Zero)
 		{
 			BossHPBar->SetSize(BossNowHP);
 		}
@@ -1344,25 +1380,7 @@ void GameScene::UpdateSprite()
 	}
 
 
-	if (Boss)
-	{
-		BossHP_0->Update();
-		BossHP_1->Update();
-		BossHP_2->Update();
-		BossHP_3->Update();
-		BossHP_4->Update();
-		BossHP_5->Update();
-		BossHP_6->Update();
-		BossHP_7->Update();
-		BossHP_8->Update();
-		BossHP_9->Update();
-		BossHP_10->Update();
-		BossHP_11->Update();
-		BossHP_12->Update();
-		BossHP_13->Update();
-		BossHP_14->Update();
-		BossHP_15->Update();
-	}
+	
 
 	if (BossFlag_S == true)
 	{
@@ -1391,6 +1409,22 @@ void GameScene::UpdateSprite()
 	{
 		StartUI->Update();
 	}
+
+	//ルールUI
+	if (PlayerPos.x < -30 && PlayerPos.y > 15)
+	{
+		if (Rule->color_.w > MIN_ALPHA)
+		{
+			Rule->color_.w -= 0.1f;
+		}
+	}
+
+	else
+	{
+		Rule->color_.w = MAX_ALPHA;
+	}
+
+	Rule->Update();
 }
 
 void GameScene::DrawSprite()
@@ -1400,177 +1434,12 @@ void GameScene::DrawSprite()
 		DamageEffect->Draw();
 	}
 
-	////体力演出中の描画
-
-	//if (BossTimer < 128 && BossTimer > 120)
-	//{
-	//	BossHP_0->Draw();
-	//}
-
-	//if (BossTimer <= 120 && BossTimer > 112)
-	//{
-	//	BossHP_1->Draw();
-	//}
-
-	//if (BossTimer <= 112 && BossTimer > 104)
-	//{
-	//	BossHP_2->Draw();
-	//}
-
-	//if (BossTimer <= 104 && BossTimer > 96)
-	//{
-	//	BossHP_3->Draw();
-	//}
-
-	//if (BossTimer <= 96 && BossTimer > 88)
-	//{
-	//	BossHP_4->Draw();
-	//}
-
-	//if (BossTimer <= 88 && BossTimer > 80)
-	//{
-	//	BossHP_5->Draw();
-	//}
-
-	//if (BossTimer <= 80 && BossTimer > 72)
-	//{
-	//	BossHP_6->Draw();
-	//}
-
-	//if (BossTimer <= 72 && BossTimer > 64)
-	//{
-	//	BossHP_7->Draw();
-	//}
-
-	//if (BossTimer <= 64 && BossTimer > 56)
-	//{
-	//	BossHP_8->Draw();
-	//}
-
-	//if (BossTimer <= 56 && BossTimer > 48)
-	//{
-	//	BossHP_9->Draw();
-	//}
-
-	//if (BossTimer <= 48 && BossTimer > 40)
-	//{
-	//	BossHP_10->Draw();
-	//}
-
-	//if (BossTimer <= 40 && BossTimer > 32)
-	//{
-	//	BossHP_11->Draw();
-	//}
-
-	//if (BossTimer <= 32 && BossTimer > 26)
-	//{
-	//	BossHP_12->Draw();
-	//}
-
-	//if (BossTimer <= 26 && BossTimer > 18)
-	//{
-	//	BossHP_13->Draw();
-	//}
-
-	//if (BossTimer <= 18 && BossTimer > 10)
-	//{
-	//	BossHP_14->Draw();
-	//}
-
-	//if (BossTimer <= 10 && BossTimer > 0)
-	//{
-	//	BossHP_15->Draw();
-	//}
-
-	////ボス体力演出後の描画
-	//if (Boss && BossTimer <= 0)
-	//{
-	//	if (Boss->GetHP() == 15)
-	//	{
-	//		BossHP_15->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 14)
-	//	{
-	//		BossHP_14->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 13)
-	//	{
-	//		BossHP_13->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 12)
-	//	{
-	//		BossHP_12->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 11)
-	//	{
-	//		BossHP_11->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 10)
-	//	{
-	//		BossHP_10->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 9)
-	//	{
-	//		BossHP_9->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 8)
-	//	{
-	//		BossHP_8->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 7)
-	//	{
-	//		BossHP_7->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 6)
-	//	{
-	//		BossHP_6->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 5)
-	//	{
-	//		BossHP_5->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 4)
-	//	{
-	//		BossHP_4->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 3)
-	//	{
-	//		BossHP_3->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 2)
-	//	{
-	//		BossHP_2->Draw();
-	//	}
-
-	//	if (Boss->GetHP() == 1)
-	//	{
-	//		BossHP_1->Draw();
-	//	}
-
-	//	if (Boss->GetHP() <= 0)
-	//	{
-	//		BossHP_0->Draw();
-	//	}
-	//}
 	
 	//経験値UIの描画
 
 	if (Go->ComFlag_2 == true)
 	{
-		if (player->EXP == 0)
+		if (player->EXP == Value_Zero)
 		{
 			ExpBar_0->Draw();
 		}
@@ -1701,7 +1570,6 @@ void GameScene::DrawSprite()
 
 void GameScene::Start()
 {
-	//StartTimer += 1;
 	player->MoveCanFlag = false;
 	Stage_1->Vec.x = (Stage_1->PointPos.x - Stage_1->position_.x) / 20;
 	Stage_1->position_.x += Stage_1->Vec.x;
@@ -1730,9 +1598,8 @@ void GameScene::Start()
 
 	if (Go->position_.y >= Go->PointPos.y - 20 && Go->ComFlag_2 == true)
 	{
-		if (PlayerPos.z < 0)
+		if (PlayerPos.z < Value_Zero)
 		{
-			//P->position_.z += 3;
 			PlayerPos.z += 3;
 			player->SetPosition(PlayerPos);
 
@@ -1786,7 +1653,7 @@ void GameScene::BossDeath()
 
 	if (BossPartTimer >= 20 && Boss->GetDeathFlag() == false)
 	{
-		BossPartTimer = 0;
+		BossPartTimer = Value_Zero;
 		PartCount += 1;
 		particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 50, 8.0f, 0.0f, { 1.0, 0.654, 0.1, 1.0 });
 	}
@@ -1794,7 +1661,7 @@ void GameScene::BossDeath()
 	if (PartCount >= 5)
 	{
 		particle->CreateParticleInfo(60, Boss->GetPosition(), 4.0f, 50, 15.0f, 0.0f, { 1.0, 0.654, 0.1, 1.0 });
-		PartCount = 0;
+		PartCount = Value_Zero;
 		Boss->SetDeathFlag(true);
 	}
 }
@@ -1909,10 +1776,8 @@ void GameScene::EnemyDown(XMFLOAT3 EnemyPos)
 {
 	VY += gravity;
 
-	//EnemyPos.x += 0.5f;
 	EnemyPos.y += VY * 0.2f;
 
-	//PlayerRot.x += 0.5f;
 	for (std::unique_ptr<Enemy>& enemy : enemys)
 	{
 		if (EnemyPos.y <= -10)
@@ -1926,6 +1791,7 @@ void GameScene::CameraMove()
 {
 	if (Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 	{
+		PartVel = 5.0f;
 		if (Input::GetInstance()->PushKey(DIK_A))
 		{
 			if (camera->GetEye().x > -CameraLimit)
@@ -1958,6 +1824,25 @@ void GameScene::CameraMove()
 			}
 		}
 	}
+
+	else
+	{
+		PartVel = 10.0f;
+	}
+}
+
+void GameScene::UI_AlphaIncriment(float color_w)
+{
+	if (color_w < MAX_ALPHA)
+	{
+		color_w += 0.1f;
+	}
+}
+
+void GameScene::UI_AlphaDecriment(float color_w)
+{
+	
+		color_w -= 0.1f;
 }
 
 

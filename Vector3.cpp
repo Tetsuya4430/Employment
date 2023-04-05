@@ -2,39 +2,22 @@
 
 using namespace DirectX;
 
-XMFLOAT3 Vector3::lerp(XMFLOAT3 position, const XMFLOAT3& start, const XMFLOAT3& end, const float t)
+const double Vector3::easeIn(const float time, const float start, const float startToend, float end)
 {
-	/*XMFLOAT3 ReturnPos;
+	double x = time / end;
 
-	ReturnPos.x = start.x * (1.0f - t) + end.x * t;
-	ReturnPos.y = start.y * (1.0f - t) + end.y * t;
-	ReturnPos.z = start.z * (1.0f - t) + end.z * t;
+	double vec;
 
-	return ReturnPos;*/
-	XMFLOAT3 Vec = {};
-	Vec.x =  (end.x - position.x) / t;
-	Vec.y = (end.y - position.y) / t;
-	Vec.z = (end.z - position.z) / t;
+	vec = ease_in_cubic(x);
 
-	position.x += Vec.x;
-	position.z += Vec.y;
-	position.z += Vec.y;
+	double ret;
 
-	return position;
+	ret = startToend * vec + start;
 
+	return ret;
 }
 
-const XMFLOAT3 Vector3::easeIn(const XMFLOAT3& start, const XMFLOAT3& end, const float t)
+const double Vector3::ease_in_cubic(double x)
 {
-	return XMFLOAT3();
-}
-
-const XMFLOAT3 Vector3::easeOut(const XMFLOAT3& start, const XMFLOAT3& end, const float t)
-{
-	return XMFLOAT3();
-}
-
-const XMFLOAT3 Vector3::easeInOut(const XMFLOAT3& start, const XMFLOAT3& end, const float t)
-{
-	return XMFLOAT3();
+	return x * x * x;
 }

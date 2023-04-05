@@ -4,6 +4,14 @@ class Player :
     public Object3d
 {
 public:
+	//プレイヤーのHP状況
+	enum class HpState
+	{
+		High,
+		Normal,
+		Low,
+	};
+
 	/// <summary>
 	/// 3Dオブジェクト生成
 	/// </summary>
@@ -22,6 +30,9 @@ public:
 	/// 毎フレーム処理
 	/// </summary>
 	void Update();
+
+	//現在のHPの判定用関数
+	//bool HP
 
 	//setter
 	void SetLelelflag(bool Lelelflag) { this->LevelFlag = Lelelflag; }
@@ -100,6 +111,9 @@ private:
 	bool moveL = false;
 	bool moveD = false;
 	bool moveU = false;
+
+	//HPステータス
+	HpState NowHPState = HpState::High;
 
 public:
 	// ローカル座標
