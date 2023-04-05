@@ -7,7 +7,6 @@
 #include "Enemy.h"
 #include "Bullet.h"
 #include "EnemyBullet.h"
-#include "Reticle.h"
 #include "Boss.h"
 #include "BossBullet.h"
 #include "FbxLoader.h"
