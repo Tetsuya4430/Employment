@@ -154,3 +154,14 @@ void Enemy::Update()
 
 }
 
+void Enemy::DefenceEnemyUpdate()
+{
+	Object3d::Update();
+
+	//ˆÚ“®
+	Object3d::position_.z -= Speed;
+
+	//‰ñ“]
+	Object3d::rotation_.x -= EnemyRotSpeed;
+}
+

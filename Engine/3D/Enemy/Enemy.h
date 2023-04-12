@@ -35,6 +35,8 @@ public:
 	/// </summary>
 	void Update();
 
+	void DefenceEnemyUpdate();
+
 
 	//setter
 	void SetDeathFlag(bool deathFlag) { this->DeathFlag = deathFlag; }
@@ -62,6 +64,9 @@ private: // メンバ変数
 
 	//回転速度
 	float RotSpeed = 5.0f;
+
+	//回転敵の回転速度
+	float EnemyRotSpeed = 10.0f;
 
 	//フェーズ
 	Phase phase_ = Phase::Approach;

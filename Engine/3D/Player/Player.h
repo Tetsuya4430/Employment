@@ -37,13 +37,31 @@ public:
 	//setter
 	void SetLelelflag(bool Lelelflag) { this->LevelFlag = Lelelflag; }
 
+	//ゲームスタート判定フラグのセッター
+	void SetGameStart(bool gameStart) { this->GameStart = gameStart; }
+
+	//ベクトルのセット
+	void SetVec(XMFLOAT3 vec) { this->Vec = vec; }
+
+	//スタート演出目標座標のセッター
+	void SetStartPointPos(XMFLOAT3 startPointPos) { this->StartPointPos = startPointPos; }
+
 	//レベルフラグのゲッター
 	const bool& GetLelelflag() { return  LevelFlag; }
 
 	//HPのゲッター
 	const float& GetHP() { return  HP; }
 
+	//体力最大値のゲッター
 	const float& GetMAXHP() { return  MAX_HP; }
+
+	//移動フラグのゲッター
+	const bool& GetMoveFlag() { return MoveFlag; }
+
+	//スタート演出目標座標のゲッター
+	const XMFLOAT3& GetStartPointPos() { return StartPointPos; }
+
+	const XMFLOAT3& GetVec() { return Vec; }
 
 private:
 	//プレイヤーの移動スピード
@@ -59,9 +77,6 @@ private:
 	//プレイヤー回転限度
 	float RotlimR = -15.0f;
 	float RotlimL = 15.0f;
-
-	//プレイヤーの移動フラグ
-	int MoveFlag = 0;
 
 	//プレイヤーイージング用変数
 	float dx = 0;
@@ -106,6 +121,9 @@ private:
 	//回転量
 	float RotValue = 1.0f;
 
+	//移動フラグ
+	bool MoveFlag = false;
+
 	//移動方向
 	bool moveR = false;
 	bool moveL = false;
@@ -115,16 +133,12 @@ private:
 	//HPステータス
 	HpState NowHPState = HpState::High;
 
+	//スタート演出時の目標座標
+	XMFLOAT3 StartPointPos = { 0, -10, -50 };
+
+	XMFLOAT3 Vec = {};
+
 public:
-	// ローカル座標
-	//XMFLOAT3 position_ = { 0,0,0 };
-
-	//レティクル座標
-	XMFLOAT3 ReticlePos = { 0, 0, 0 };
-
-	// X,Y,Z軸回りのローカル回転角
-	//XMFLOAT3 rotation_ = { 0,0,0 };
-
 	//プレイヤーの最大HP
 	float MAX_HP = 10;
 
@@ -145,5 +159,9 @@ public:
 
 	//レベルアップフラグ
 	bool LevelFlag = false;
+
+	//ゲームスタート判定フラグ
+	bool GameStart = false;
+
 };
 

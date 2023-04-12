@@ -5,11 +5,12 @@ using namespace DirectX;
 XMMATRIX Camera::matView{};
 XMMATRIX Camera::matProjection{};
 XMMATRIX Camera::matViewProjection{};
-XMFLOAT3 Camera::eye = {0, 0, -50.0f };
+XMFLOAT3 Camera::eye = {0, 0, -100.0f };
 XMFLOAT3 Camera::target = { 0, 0, 0 };
 XMFLOAT3 Camera::up = { 0, 1, 0 };
 XMMATRIX Camera::matBillboard = XMMatrixIdentity();
 XMMATRIX Camera::matBillboardY = XMMatrixIdentity();
+XMFLOAT3 Camera::DefaultEyePos = { 0, 0, -100.0f };
 
 Camera* Camera::GetInstance()
 {
@@ -281,6 +282,11 @@ void Camera::CameraShake(XMFLOAT3 move)
 	{
 		ShakeTimer = 0;
 	}
+}
+
+void Camera::EyeReset()
+{
+	Camera::eye = DefaultEyePos;
 }
 
 void Camera::Update()

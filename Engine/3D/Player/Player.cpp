@@ -41,7 +41,7 @@ bool Player::Initialize()
     InitInput();
 
     //プレイヤー各種ステータス初期化
-	Object3d::SetPosition({ 0, -10, -50 });
+	Object3d::SetPosition({ 0, -10, -100 });
     Level = 1;
     EXP = 0;
 
@@ -88,7 +88,7 @@ void Player::Update()
 		//キーボード
 		if (Input::GetInstance()->PushKey(DIK_D) || Input::GetInstance()->PushKey(DIK_A) || Input::GetInstance()->PushKey(DIK_W) || Input::GetInstance()->PushKey(DIK_S))
 		{
-			MoveFlag = 1;
+			MoveFlag = true;
 			K = 0.5f;
 
 			if (MoveCanFlag == true)
@@ -253,9 +253,6 @@ void Player::Update()
 					Object3d::position_.y -= Speed * Mag;
 				}
 			}
-
-
-			//}
 		}
 
 		else
@@ -263,27 +260,29 @@ void Player::Update()
 			MoveFlag = 0;
 		}
 
-
-		if (MoveFlag == false)
+		if (GameStart == true)
 		{
-			if (Object3d::rotation_.z < 0)
+			if (MoveFlag == false)
 			{
-				Object3d::rotation_.z += RotValue;
-			}
+				if (Object3d::rotation_.z < 0)
+				{
+					Object3d::rotation_.z += RotValue;
+				}
 
-			else if (Object3d::rotation_.z > 0)
-			{
-				Object3d::rotation_.z -= RotValue;
-			}
+				else if (Object3d::rotation_.z > 0)
+				{
+					Object3d::rotation_.z -= RotValue;
+				}
 
-			if (Object3d::rotation_.x < 0)
-			{
-				Object3d::rotation_.x += RotValue;
-			}
+				if (Object3d::rotation_.x < 0)
+				{
+					Object3d::rotation_.x += RotValue;
+				}
 
-			else if (Object3d::rotation_.x > 0)
-			{
-				Object3d::rotation_.x -= RotValue;
+				else if (Object3d::rotation_.x > 0)
+				{
+					Object3d::rotation_.x -= RotValue;
+				}
 			}
 		}
 
@@ -394,15 +393,6 @@ void Player::Update()
 				}
 			}
 
-
-			//プレイヤーが移動していないときはプレイヤーの回転角度を徐々に戻す
-			if (MoveFlag == 0)
-			{
-				if (Avoidanceflag_X == false && Avoidanceflag_Y == false)
-				{
-					
-				}
-			}
 
 
 			if (IsButtonPush(ButtonKind::RightButton) || IsButtonPush(ButtonKind::LeftButton) || IsButtonPush(ButtonKind::UpButton) || IsButtonPush(ButtonKind::DownButton))

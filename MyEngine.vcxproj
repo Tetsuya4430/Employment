@@ -102,7 +102,6 @@
     <ClCompile Include="Engine\Input\Controller.cpp" />
     <ClCompile Include="Engine\2D\DebugText.cpp" />
     <ClCompile Include="Engine\3D\DefenceObject.cpp" />
-    <ClCompile Include="Engine\Math\Easing.cpp" />
     <ClCompile Include="Engine\3D\Enemy\Enemy.cpp" />
     <ClCompile Include="Engine\3D\Enemy\EnemyBullet.cpp" />
     <ClCompile Include="Engine\3D\Base\Fbx3d.cpp" />
@@ -130,7 +129,6 @@
     <ClCompile Include="Engine\2D\SpriteCommon.cpp" />
     <ClCompile Include="Engine\3D\Player\Player.cpp" />
     <ClCompile Include="Engine\Scene\TitleScene.cpp" />
-    <ClCompile Include="Engine\Math\Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="DirectXTex\DirectXTex_Desktop_2019.vcxproj">
@@ -233,7 +231,6 @@
     <ClInclude Include="Engine\Input\Controller.h" />
     <ClInclude Include="Engine\2D\DebugText.h" />
     <ClInclude Include="Engine\3D\DefenceObject.h" />
-    <ClInclude Include="Engine\Math\Easing.h" />
     <ClInclude Include="Engine\3D\Enemy\Enemy.h" />
     <ClInclude Include="Engine\3D\Enemy\EnemyBullet.h" />
     <ClInclude Include="Engine\3D\Base\Fbx3d.h" />
@@ -262,7 +259,6 @@
     <ClInclude Include="Engine\2D\Sprite.h" />
     <ClInclude Include="Engine\2D\SpriteCommon.h" />
     <ClInclude Include="Engine\Scene\TitleScene.h" />
-    <ClInclude Include="Engine\Math\Vector3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

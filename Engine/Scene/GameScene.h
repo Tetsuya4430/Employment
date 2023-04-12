@@ -77,6 +77,9 @@ public:
 	//敵の攻撃
 	void EnemyAttack(XMFLOAT3 EnemyPos);
 
+	//敵のカウンター攻撃
+	void CounterAttack(XMFLOAT3 EnemyPos);
+
 	//ボスの攻撃
 	void BossAttack(XMFLOAT3 BossPos);
 
@@ -128,6 +131,7 @@ public:
 
 	void CameraMove();
 
+
 	//UIアルファ値操作関数
 	void UI_AlphaIncriment(float color_w);
 	void UI_AlphaDecriment(float color_w);
@@ -150,6 +154,7 @@ private:
 	Model* model_Bullet = nullptr;
 	Model* model_EnemyBullet = nullptr;
 	Model* model_Enemy = nullptr;
+	Model* model_DefenceEnemy = nullptr;
 	Model* model_Boss = nullptr;
 	Model* model_sphere = nullptr;
 	Model* model_Moon = nullptr;
@@ -193,9 +198,14 @@ private:
 
 	//敵の弾
 	std::list<std::unique_ptr<EnemyBullet>> enemybullets;
+
+	//回転敵のカウンター弾
+	std::list<std::unique_ptr<EnemyBullet>> counterbullets;
 	
 	//敵
 	std::list<std::unique_ptr<Enemy>> enemys;
+
+	std::list<std::unique_ptr<Enemy>> Defenceenemys;
 
 	int EnemyFire = 0;
 
@@ -205,7 +215,6 @@ private:
 	std::stringstream enemyPopCommands;
 
 	//ボスの弾
-	//std::list<std::unique_ptr<BossBullet>> bossbullets;
 	std::list<std::unique_ptr<BossBullet>> bossbullets;
 
 	//3Dオブジェクト
@@ -226,18 +235,16 @@ private:
 	Player* P = nullptr;
 	Player* CoreR = nullptr;
 	Player* CoreL = nullptr;
-	//Reticle* Reticle = nullptr;
-	//Bullet* B = nullptr;
 
 	//ボス
-	//St1_Boss* Boss = nullptr;
+	Boss* BossCore = nullptr;
 	Boss* Boss = nullptr;
+
+
 	int BossFire = 0;
 	
 	//パーティクル
 	Particle* particle = nullptr;
-	//Particle* EnemyPart = nullptr;
-	//Particle* ShotPart = nullptr;
 	Particle* particle_Red = nullptr;
 
 	Particle* Testpart = nullptr;
@@ -302,7 +309,7 @@ private:
 
 	int BulletFlag = 0;
 
-	int MoveFlag = 0;
+	bool MoveFlag = false;
 
 	//敵の弾発射タイマー
 	int EnemyBulletTimer = 0;
@@ -318,6 +325,9 @@ private:
 
 	//ボスの待機フラグ
 	bool BossFlag = false;
+
+	//ボスの位置
+	XMFLOAT3 BossPos = {};
 
 	//ボス登場演出フラグ
 	bool BossFlag_S = false;
@@ -355,14 +365,22 @@ private:
 	XMFLOAT3 MoonPos = { 0, 0, 0 };
 	XMFLOAT3 MoonRot = { 0, 0, 0 };
 
+	XMFLOAT3 MoonVec = { 0.0f, 0.0f, -0.1f };
+
 	XMFLOAT3 MarsPos = { 0, 0, 0 };
 	XMFLOAT3 MarsRot = { 0, 0, 0 };
+
+	XMFLOAT3 MarsVec = { 0.0f, 0.0f, -0.5f };
 
 	XMFLOAT3 NeptunePos = { 0, 0, 0 };
 	XMFLOAT3 NeptuneRot = { 0, 0, 0 };
 
+	XMFLOAT3 NeptuneVec = { 0.0f,0.0f, -0.2f };
+
 	XMFLOAT3 StationPos = { 0, 0, 0 };
 	XMFLOAT3 StationRot = { 0, 0, 0 };
+
+	XMFLOAT3 StationVec = { 0.0f, 0.0f, -0.1f };
 
 	//天球スケール
 	XMFLOAT3 ShereScale = { 900, 900, 900 };
@@ -391,10 +409,10 @@ private:
 
 	//テキスト座標(Shooting)
 	XMFLOAT3 DefaultShootingScale = { 8, 8, 8 };
-	XMFLOAT3 DefaultShootingPos = { -20, 10, 0 };
+	XMFLOAT3 DefaultShootingPos = { -20, 10, -50 };
 	//テキスト座標(Force)
 	XMFLOAT3 DefaultForceScale = { 8, 8, 8 };
-	XMFLOAT3 DefaultForcePos = { 0, 0, 0 };
+	XMFLOAT3 DefaultForcePos = { 0, 0, -50 };
 
 	//スタート演出UI用変数(Stage1)
 	XMFLOAT2 DefaultStage1Pos = { 1280, 285 };
@@ -404,7 +422,7 @@ private:
 	//スタート演出UI用変数(Go)
 	XMFLOAT2 DefaultGoPos = { 0, -720 };
 	//目的座標変数
-	XMFLOAT3 GOPointPos = { 0, 0, 0};
+	XMFLOAT3 GOPointPos = { 0, 720, 0};
 
 	//ボス登場時UIのカラー変数
 	XMFLOAT4 BossUIColor = { 1, 1, 1, 0.7f };
@@ -485,6 +503,7 @@ private:
 
 	//敵
 	XMFLOAT3 EnemyPos = { 0, 0, 0 };
+	XMFLOAT3 DefenceEnemyPos = { 0, 0, 0 };
 
 	//隕石発生タイマー
 	int MeteorTimer = 0;
@@ -499,9 +518,9 @@ private:
 	bool GameStart = false;
 
 	//タイトルテキスト用座標
-	XMFLOAT3 ShootingPos = { 0, 0, 0 };
+	XMFLOAT3 ShootingPos = { 0, 0, -50 };
 
-	XMFLOAT3 ForcePos = { 0, 0, 0 };
+	XMFLOAT3 ForcePos = { 0, 0, -50 };
 
 	int Count = 0;
 	float Move_F = 0.0f;
@@ -509,9 +528,11 @@ private:
 	XMFLOAT3 CameraPos = { 0, 0, -50.0f };
 
 	//カメラの視点移動制限
-	float CameraLimit = 1.0f;
+	float CameraLimit = 3.0f;
 
 	float CameraMoveValue = 0.1f;
+
+	const float MaxValue = 0.1f;
 
 	//レベルタイマー
 	int LevelCount = 0;
@@ -529,12 +550,40 @@ private:
 	int TimerIncrimentValue = 1;
 
 	//ゼロ変数
-	int Value_Zero = 0;
+	float Value_Zero = 0;
 
 	//---UIのアルファ値設定用---//
 	//アルファ値最大値
 	const float MAX_ALPHA = 1.0f;
 	//アルファ値の最小値
 	const float MIN_ALPHA = 0.5f;
+
+	//カメラ制御カウント
+	int CameraDelayTime = 30;
+
+	float StartMoveVal = 3.0f;
+
+	bool StartCamMove = false;
+
+	XMFLOAT3 PointCameraPos = { 0.0f,0.0f,-50.0f };
+
+	XMFLOAT3 MoveCamVec = { 0.0f, 0.0f, 0.0f };
+
+	bool testFlag = false;
+
+	int DelayTime = 0;
+
+	//カメラ移動倍率
+	float MoveRate = 30.0f;
+
+	//バックグラウンドデクリメント変数
+	float BG_Decriment = 0.02f;
+
+	//プレイヤースタート演出用回転目的値
+	XMFLOAT3 PlayerPointRole = { 0.0f, 0.0f, 720.0f };
+	XMFLOAT3 PlayerRoleVec = { 0.0f, 0.0f, 0.0f };
+	XMFLOAT3 PlayerMoveVec = { 0.0f, 0.0f, 0.0f };
+
+	bool PlayerMoveFlag = false;
 };
 

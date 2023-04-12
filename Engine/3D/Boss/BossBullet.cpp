@@ -1,6 +1,6 @@
 #include "BossBullet.h"
 
-std::unique_ptr<BossBullet> BossBullet::Create(Model* model, Camera* camera, XMFLOAT3 pos, Player* player)
+std::unique_ptr<BossBullet> BossBullet::Create(Model* model, Camera* camera, XMFLOAT3 pos, XMFLOAT3 PlayerPos)
 {
 	//3Dオブジェクトのインスタンスを生成
 	BossBullet* instance = new BossBullet();
@@ -10,7 +10,7 @@ std::unique_ptr<BossBullet> BossBullet::Create(Model* model, Camera* camera, XMF
 	}
 
 	//初期化
-	if (!instance->Initialize(pos))
+	if (!instance->Initialize(pos, PlayerPos))
 	{
 		delete instance;
 		assert(0);
@@ -28,18 +28,17 @@ std::unique_ptr<BossBullet> BossBullet::Create(Model* model, Camera* camera, XMF
 		instance->SetCamera(camera);
 	}
 
-	//プレイヤーのアドレスを取得
-	if (player)
-	{
-		instance->SetPlayer(player);
-	}
 
 	return std::unique_ptr<BossBullet>(instance);
 }
 
-bool BossBullet::Initialize(XMFLOAT3 pos)
+bool BossBullet::Initialize(XMFLOAT3 pos, XMFLOAT3 PlayerPos)
 {
 	Object3d::position_ = pos;
+
+	Speed.x = (PlayerPos.x - Object3d::position_.x) / Count;
+	Speed.y = (PlayerPos.y - Object3d::position_.y) / Count;
+	Speed.z = (PlayerPos.z - Object3d::position_.z) / Count;
 
 	Object3d::Initialize();
 
@@ -58,5 +57,7 @@ void BossBullet::Update(XMFLOAT3 PlayerPos, XMFLOAT3 EnemyPos)
 		DeathFlag = true;
 	}
 
-	Object3d::position_.z -= Speed;
+	Object3d::position_.x += Speed.x;
+	Object3d::position_.y += Speed.y;
+	Object3d::position_.z += Speed.z;
 }

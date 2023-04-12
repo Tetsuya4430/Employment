@@ -65,6 +65,8 @@ public:	//メンバ関数
 
 	void CameraShake(XMFLOAT3 move);
 
+	void EyeReset();
+
 	/// <summary>
 	/// 射影行列の取得
 	/// </summary>
@@ -102,13 +104,14 @@ private:	//メンバ変数
 	// 上方向ベクトル
 	static XMFLOAT3 up;
 
+	//デフォルトのカメラ座標
+	static XMFLOAT3 DefaultEyePos;
+
 
 
 
 	//インプット
 	Input* input = nullptr;
-
-	XMFLOAT3 moveVec = { 0.0f, 0.0f, -2.0f };
 
 	int ShakeTimer = 0;
 
@@ -121,4 +124,6 @@ public:
 	static XMMATRIX matBillboard;
 	//Y軸回りビルボード行列
 	static XMMATRIX matBillboardY;
+
+	XMFLOAT3 moveVec = { 0.0f, 0.0f, 0.0f };
 };

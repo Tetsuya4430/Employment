@@ -28,12 +28,6 @@ std::unique_ptr<EnemyBullet> EnemyBullet::Create(Model* model, Camera* camera, X
         instance->SetCamera(camera);
     }
 
-    ////プレイヤーのアドレスを取得
-    //if (player)
-    //{
-    //	instance->SetPlayer(player);
-    //}
-
     return std::unique_ptr<EnemyBullet>(instance);
 }
 
@@ -60,7 +54,7 @@ void EnemyBullet::Update(XMFLOAT3 PlayerPos, XMFLOAT3 EnemyPos)
         DeathFlag = true;
     }
 
-    Object3d::position_.x += Speed.x;
-    Object3d::position_.y += Speed.y;
+    //Object3d::position_.x += Speed.x;
+    //Object3d::position_.y += Speed.y;
     Object3d::position_.z += Speed.z;
 }

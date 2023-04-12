@@ -28,12 +28,22 @@ class Bullet :
 	//setter
 	void SetDeathFlag(bool deathFlag) { this->DeathFlag = deathFlag; }
 
+	//弾速のセッター
+	void SetSpeed(XMFLOAT3 speed) { this->Speed = speed; }
+
+	//弾色のセッター
+	void SetBulletColor(XMFLOAT4 bulletColor) { this->BulletColor = bulletColor; }
+
 	//getter
 	//デスフラグのゲッター
 	const bool& GetDeathFlag() { return DeathFlag; }
 
 	//弾速のゲッター
 	const XMFLOAT3 GetSpeed() { return Speed; }
+
+	//カラーのゲッター
+	const XMFLOAT4 GetBulletColor() { return BulletColor; }
+	const XMFLOAT4 GetCounterColor() { return CounterColor; }
 
 private:
 	//弾の寿命
@@ -50,5 +60,9 @@ private:
 
 	//弾のデスフラグ
 	bool DeathFlag = false;
+
+	//弾の色
+	XMFLOAT4 BulletColor = { 1.0, 0.654, 0.1, 1.0 };
+	XMFLOAT4 CounterColor = { 1.0, 0.1, 0.1, 1.0 };
 };
 
