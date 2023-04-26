@@ -180,5 +180,7 @@ protected: // メンバ変数
 
 	float VY = 0.0f;	//Y方向の速度
 	const float gravity = -9.8f / 60.0f;	//重力
+
+	int BossPartsHP = 10;
 };
 

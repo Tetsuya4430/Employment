@@ -1,16 +1,5 @@
 #include "DebugText.h"
 
-DebugText::DebugText()
-{
-}
-
-DebugText::~DebugText()
-{
-	for (int i = 0; i < _countof(sprites_); i++) {
-		delete sprites_[i];
-	}
-}
-
 DebugText* DebugText::GetInstance()
 {
 	static DebugText instance;
@@ -25,6 +14,13 @@ void DebugText::Initialize(UINT texnumber)
 	{
 		//スプライトを生成
 		sprites_[i] = Sprite::Create(texnumber, { 1, 1, 1, 1 }, { 0, 0 });
+	}
+}
+
+void DebugText::Finalize()
+{
+	for (int i = 0; i < _countof(sprites_); i++) {
+		delete sprites_[i];
 	}
 }
 

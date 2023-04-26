@@ -1,5 +1,7 @@
 #include "Boss.h"
 
+#include "Input.h"
+
 Boss* Boss::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 {
 	//3Dオブジェクトのインスタンスを生成
@@ -35,9 +37,11 @@ bool Boss::Initialize(XMFLOAT3 pos)
 {
 	Object3d::position_ = pos;
 
+	Object3d::scale_ = { 2.5f, 2.5f, 2.5f };
+
 	
 
-	IntervalTime = 70;
+	IntervalTime = 45;
 	Speed = 1.0;
 
 	phase_ = Phase::Approach;
@@ -53,11 +57,21 @@ void Boss::Update()
 
 	rotation_.z += 2.0f;
 
+	if (Input::GetInstance()->PushKey(DIK_L))
+	{
+		Object3d::position_.x += Speed;
+	}
+
+	if (Input::GetInstance()->PushKey(DIK_J))
+	{
+		Object3d::position_.x -= Speed;
+	}
+
 	//更新処理
 
 	if (HP <= 8)
 	{
-		IntervalTime = 35;
+		IntervalTime = 20;
 		Speed = 1.5f;
 	}
 
@@ -100,6 +114,7 @@ void Boss::Update()
 			Object3d::position_.x -= Speed;
 		}
 
+
 		if (Object3d::position_.x <= -50 && HP > 0)
 		{
 			phase_ = Phase::MoveR;
@@ -113,7 +128,7 @@ void Boss::Update()
 
 		if (DownTimer <= 60)
 		{
-			//Object3d::position_.y -= 0.2f;
+			Object3d::position_.y -= 0.2f;
 		}
 
 		if (DownTimer % 2 == 0)

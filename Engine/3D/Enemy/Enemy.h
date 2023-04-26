@@ -61,6 +61,7 @@ public:
 private: // ƒƒ“ƒo•Ï”
 	//‘¬“x
 	float Speed = 0.4f;
+	float DefenceSpeed = 0.3f;
 
 	//‰ñ“]‘¬“x
 	float RotSpeed = 5.0f;

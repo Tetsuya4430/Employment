@@ -39,6 +39,7 @@ void GameScene::Initialize()
 	model_Enemy = Model::LoadFromObj("Enemy_1");
 	model_DefenceEnemy = Model::LoadFromObj("Enemy_2");
 	model_Boss = Model::LoadFromObj("Boss");
+	model_BossCore = Model::LoadFromObj("BossCore");
 	model_sphere = Model::LoadFromObj("CelestialSphere");
 	model_Moon = Model::LoadFromObj("Moon");
 	model_Mars = Model::LoadFromObj("Mars");
@@ -55,6 +56,7 @@ void GameScene::Initialize()
 	Audio::GetInstance()->LoadWave("Bullet.wav");
 	Audio::GetInstance()->LoadWave("BossDown.wav");
 	Audio::GetInstance()->LoadWave("Damage.wav");
+	Audio::GetInstance()->LoadWave("Reflect.wav");
 	Audio::GetInstance()->LoadWave("EnemyDown.wav");
 	Audio::GetInstance()->LoadWave("GameOver.wav");
 	Audio::GetInstance()->LoadWave("GameScene.wav");
@@ -218,12 +220,9 @@ void GameScene::Update()
 
 	particle->JettParticle(2, { PlayerPos.x, PlayerPos.y , PlayerPos.z - 12 }, PartVel, 20, 1.0f, Value_Zero, PartSpeed, { 1.0, 0.654, 0.1, 1.0 });
 
-	//ボスの位置取得
-	if (Boss)
-	{
-		BossPos = Boss->GetPosition();
-	}
-
+	//EnemyBulletColor.x = (float)rand() / RAND_MAX;
+	//EnemyBulletColor.y = (float)rand() / RAND_MAX;
+	//EnemyBulletColor.z = (float)rand() / RAND_MAX;
 	
 	if (!LoadBG->color_.w <= Value_Zero)
 	{
@@ -416,7 +415,7 @@ void GameScene::Update()
 
 		MeteorTimer++;
 
-		if (MeteorTimer >= 20)
+		if (MeteorTimer >= 100)
 		{
 			MeteorMove();
 			MeteorTimer = Value_Zero;
@@ -474,7 +473,17 @@ void GameScene::Update()
 				defenceenemy->DefenceEnemyUpdate();
 
 				//画面外に出たら消滅
-				if (defenceenemy->GetPosition().z < -60)
+				if (defenceenemy->GetPosition().x > 100)
+				{
+					defenceenemy->SetDeathFlag(true);
+				}
+
+				if (defenceenemy->GetPosition().x < -100)
+				{
+					defenceenemy->SetDeathFlag(true);
+				}
+
+				if(defenceenemy->GetPosition().z < -100)
 				{
 					defenceenemy->SetDeathFlag(true);
 				}
@@ -484,7 +493,59 @@ void GameScene::Update()
 		//ボスの更新
 		if (Boss)
 		{
+			//ボスの位置取得
+			BossPos = Boss->GetPosition();
+			BossCore->SetPosition(BossPos);
+			BossCore->Update();
+
+			//ボスコア上
+			PartsPos_U.x = BossPos.x;
+			PartsPos_U.y = BossPos.y;
+			PartsPos_U.z = BossPos.z;
+
+			//ボスコア右
+			PartsPos_R.x = BossPos.x;
+			PartsPos_R.y = BossPos.y;
+			PartsPos_R.z = BossPos.z;
+
+			//ボスコア下
+			PartsPos_D.x = BossPos.x;
+			PartsPos_D.y = BossPos.y;
+			PartsPos_D.z = BossPos.z;
+
+			//ボスコア左
+			PartsPos_L.x = BossPos.x;
+			PartsPos_L.y = BossPos.y;
+			PartsPos_L.z = BossPos.z;
+
+			//円運動上
+			PartsPos_U.y = cos(TestVal * 0.05f) * 20 + Boss->GetPosition().y;
+			PartsPos_U.x = sin(TestVal * 0.05f) * 20 + Boss->GetPosition().x;
+			BossParts_U->SetPosition(PartsPos_U);
+
+			//円運動右
+			PartsPos_R.y = sin(TestVal * 0.05f) * 20 + Boss->GetPosition().y;
+			PartsPos_R.x = -cos(TestVal * 0.05f) * 20 + Boss->GetPosition().x;
+			BossParts_R->SetPosition(PartsPos_R);
+
+			//円運動下
+			PartsPos_D.y = -cos(TestVal * 0.05f) * 20 + Boss->GetPosition().y;
+			PartsPos_D.x = -sin(TestVal * 0.05f) * 20 + Boss->GetPosition().x;
+			BossParts_D->SetPosition(PartsPos_D);
+
+			//円運動左
+			PartsPos_L.y = -sin(TestVal * 0.05f) * 20 + Boss->GetPosition().y;
+			PartsPos_L.x = cos(TestVal * 0.05f) * 20 + Boss->GetPosition().x;
+			BossParts_L->SetPosition(PartsPos_L);
+
+			TestVal += 1;
 			Boss->Update();
+			BossParts_U->Update();
+			BossParts_R->Update();
+			BossParts_D->Update();
+			BossParts_L->Update();
+
+
 
 			if (Boss->GetDeathFlag() == false)
 			{
@@ -495,13 +556,93 @@ void GameScene::Update()
 
 				if (BossFire <= Value_Zero)
 				{
-					BossAttack(Boss->GetPosition());
+					//BossAttack(Boss->GetPosition());
 
 					//発射タイマーを初期化
 					BossFire = Boss->GetIntervalTime();
 				}
 
 			}
+
+
+			if (BossParts_U->GetHP() > 0)
+			{
+				
+
+				BossPartsFire--;
+				
+				BossParts_U->SetFireTime(BossPartsFire);
+
+				if (BossPartsFire <= Value_Zero)
+				{
+					EnemyAttack(PartsPos_U);
+
+					//発射タイマーを初期化
+					BossParts_U->SetFireTime(BossParts_U->GetIntervalTime());
+					BossPartsFire = BossParts_U->GetIntervalTime();
+				}
+			}
+
+			//右
+			if (BossParts_R->GetHP() > 0)
+			{
+
+
+				BossPartsFire--;
+
+				BossParts_R->SetFireTime(BossPartsFire);
+
+				if (BossPartsFire <= Value_Zero)
+				{
+					EnemyAttack(PartsPos_R);
+
+					//発射タイマーを初期化
+					BossParts_R->SetFireTime(BossParts_R->GetIntervalTime());
+					BossPartsFire = BossParts_R->GetIntervalTime();
+				}
+
+			}
+
+			//下
+			if (BossParts_D->GetHP() > 0)
+			{
+
+
+				BossPartsFire--;
+
+				BossParts_D->SetFireTime(BossPartsFire);
+
+				if (BossPartsFire <= Value_Zero)
+				{
+					EnemyAttack(PartsPos_D);
+
+					//発射タイマーを初期化
+					BossParts_D->SetFireTime(BossParts_D->GetIntervalTime());
+					BossPartsFire = BossParts_D->GetIntervalTime();
+				}
+
+			}
+
+			//左
+			if (BossParts_L->GetHP() > 0)
+			{
+
+
+				BossPartsFire--;
+
+				BossParts_L->SetFireTime(BossPartsFire);
+
+				if (BossPartsFire <= Value_Zero)
+				{
+					EnemyAttack(PartsPos_L);
+
+					//発射タイマーを初期化
+					BossParts_L->SetFireTime(BossParts_L->GetIntervalTime());
+					BossPartsFire = BossParts_L->GetIntervalTime();
+				}
+
+			}
+
 		}
 
 
@@ -525,7 +666,7 @@ void GameScene::Update()
 		//敵の弾更新
 		for (std::unique_ptr<EnemyBullet>& bullet : enemybullets)
 		{
-			particle->EnemyFireParticle(2, bullet->GetPosition(), 2.0f, 30, 1.5f, Value_Zero, bullet->GetSpeed(),{ 1.0, 0.1, 1.0, 1.0 });
+			particle->EnemyFireParticle(2, bullet->GetPosition(), 2.0f, 30, 1.5f, Value_Zero, bullet->GetSpeed(), EnemyBulletColor);
 			//仮として引数をプレイヤーの座標にしている
 			bullet->Update(PlayerPos, PlayerPos);
 		}
@@ -581,6 +722,12 @@ void GameScene::Update()
 				return Bossbullet->DeathGetter();
 			});
 
+		//隕石
+		objects.remove_if([](std::unique_ptr<DefenceObject>& defenceObject)
+			{
+				return defenceObject->GetDeathFlag();
+			});
+
 		//オブジェクト
 		for (std::unique_ptr<DefenceObject>& object : objects)
 		{
@@ -589,7 +736,7 @@ void GameScene::Update()
 			//発射タイマーを初期化
 			for (std::unique_ptr<DefenceObject>& object : objects)
 			{
-				if (MeteorPos.z < -10)
+				if (object->GetPosition().z < -10)
 				{
 					object->SetDeathFlag(true);
 				}
@@ -679,6 +826,7 @@ void GameScene::Update()
 				{
 					if (CheckCollision(bullet->GetPosition(), defenceenemy->GetPosition(), 2.0f, 3.0f) == true)
 					{
+						Audio::GetInstance()->PlayWave("Reflect.wav", Reflect_Volume, false);
 						bullet->SetBulletColor(bullet->GetCounterColor());
 						bullet->SetSpeed({ 0.0f, 0.0f, -5.0f });
 					}
@@ -731,23 +879,132 @@ void GameScene::Update()
 		//プレイヤーの弾とボスの当たり判定
 		if (Boss)
 		{
+			if (Boss->GetHP() < 30)
+			{
+				BossParts_U->SetIntervalTime(10);
+				BossParts_R->SetIntervalTime(10);
+				BossParts_D->SetIntervalTime(10);
+				BossParts_L->SetIntervalTime(10);
+
+				EnemyBulletColor.x = (float)rand() / RAND_MAX;
+				EnemyBulletColor.y = (float)rand() / RAND_MAX;
+				EnemyBulletColor.z = (float)rand() / RAND_MAX;
+			}
+
 			if (Boss->GetDeathFlag() == false)
 			{
 				for (std::unique_ptr<Bullet>& bullet : bullets)
 				{
-					if (CheckCollision(bullet->GetPosition(), Boss->GetPosition(), 2.0f, 6.0f) == true)
+					if (CheckCollision(bullet->GetPosition(), Boss->GetPosition(), 7.0f, 7.0f) == true)
 					{
 						//パーティクルを生成
-						particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 30, 1.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+						particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 30, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
-						Boss->SetHP(Boss->GetHP()-1);
+						Boss->SetHP(Boss->GetHP() - 1);
 						if (Boss->GetHP() <= Value_Zero)
 						{
 							Audio::GetInstance()->PlayWave("BossDown.wav", 0.1f, false);
 						}
 						bullet->SetDeathFlag(true);
 					}
+
+
+					//プレイヤーの弾とボスコアの当たり判定(上)
+					if (BossParts_U->GetHP() > 0 && Boss->GetHP() > 0)
+					{
+						if (BossParts_U->GetFireTime() <= Value_Zero)
+						{
+							EnemyAttack(PartsPos_U);
+						}
+
+						if (CheckCollision(bullet->GetPosition(), PartsPos_U, 3.0f, 3.0f) == true)
+						{
+							//パーティクルを生成
+							particle->CreateParticleInfo(10, PartsPos_U, 2.0f, 30, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
+							BossParts_U->SetHP(BossParts_U->GetHP() - 1);
+							bullet->SetDeathFlag(true);
+							//HPが0になったらパーティクルを発生させて消滅
+							if (Boss->GetHP() <= Value_Zero)
+							{
+								particle->CreateParticleInfo(30, PartsPos_U, 2.0f, 30, 6.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							}
+						}
+					}
+					
+
+					//プレイヤーの弾とボスコアの当たり判定(右)
+					if (BossParts_R->GetHP() > 0 && Boss->GetHP() > 0)
+					{
+						if (BossParts_R->GetFireTime() <= Value_Zero)
+						{
+							EnemyAttack(PartsPos_U);
+						}
+
+						if (CheckCollision(bullet->GetPosition(), PartsPos_U, 3.0f, 3.0f) == true)
+						{
+							//パーティクルを生成
+							particle->CreateParticleInfo(10, PartsPos_U, 2.0f, 30, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
+							BossParts_R->SetHP(BossParts_R->GetHP() - 1);
+							bullet->SetDeathFlag(true);
+							//HPが0になったらパーティクルを発生させて消滅
+							if (Boss->GetHP() <= Value_Zero)
+							{
+								particle->CreateParticleInfo(30, PartsPos_U, 2.0f, 30, 6.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							}
+						}
+					}
+
+
+					//プレイヤーの弾とボスコアの当たり判定(下)
+					if (BossParts_D->GetHP() > 0 && Boss->GetHP() > 0)
+					{
+						if (BossParts_D->GetFireTime() <= Value_Zero)
+						{
+							EnemyAttack(PartsPos_D);
+						}
+
+						if (CheckCollision(bullet->GetPosition(), PartsPos_D, 3.0f, 3.0f) == true)
+						{
+							//パーティクルを生成
+							particle->CreateParticleInfo(10, PartsPos_D, 2.0f, 30, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
+							BossParts_D->SetHP(BossParts_D->GetHP() - 1);
+							bullet->SetDeathFlag(true);
+							//HPが0になったらパーティクルを発生させて消滅
+							if (Boss->GetHP() <= Value_Zero)
+							{
+								particle->CreateParticleInfo(30, PartsPos_D, 2.0f, 30, 6.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							}
+						}
+					}
+
+
+					//プレイヤーの弾とボスコアの当たり判定(下)
+					if (BossParts_L->GetHP() > 0 && Boss->GetHP() > 0)
+					{
+						if (BossParts_L->GetFireTime() <= Value_Zero)
+						{
+							EnemyAttack(PartsPos_L);
+						}
+
+						if (CheckCollision(bullet->GetPosition(), PartsPos_L, 3.0f, 3.0f) == true)
+						{
+							//パーティクルを生成
+							particle->CreateParticleInfo(10, PartsPos_L, 2.0f, 30, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
+							BossParts_L->SetHP(BossParts_L->GetHP() - 1);
+							bullet->SetDeathFlag(true);
+							//HPが0になったらパーティクルを発生させて消滅
+							if (Boss->GetHP() <= Value_Zero)
+							{
+								particle->CreateParticleInfo(30, PartsPos_D, 2.0f, 30, 6.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							}
+						}
+					}
 				}
+
 			}
 
 			if (Boss->GetHP() <= Value_Zero)
@@ -843,7 +1100,7 @@ void GameScene::Update()
 
 
 		Station->SetRotation(StationRot);
-
+		
 		Station->Update();
 		Shooting->Update();
 		Force->Update();
@@ -853,10 +1110,6 @@ void GameScene::Update()
 		test->SetPosition(TestPos);
 
 		test->Update();
-
-		//FBXオブジェクトの更新
-		//object1->Update();
-
 
 		//スプライトの更新
 
@@ -868,10 +1121,6 @@ void GameScene::Update()
 		//パーティクル更新
 		particle->Update();
 		particle_Red->Update();
-
-		
-		//EnemyPart->Update();
-
 
 		UpdateInput();
 
@@ -892,8 +1141,7 @@ void GameScene::Draw()
 	ID3D12GraphicsCommandList* cmdList = dxCommon->GetCmdList();
 
 	//////スプライトの共通コマンド
-	//SpriteCommon::GetInstance()->PreDraw();
-	postEffect->PreDraw();
+	//SpriteCommon::GetInstance()->PreDraw()
 
 	////スプライト描画
 
@@ -912,6 +1160,26 @@ void GameScene::Draw()
 		if (Boss->GetDeathFlag() == false)
 		{
 			Boss->Draw();
+			
+			if (BossParts_U->GetHP() > 0)
+			{
+				BossParts_U->Draw();
+			}
+
+			if (BossParts_R->GetHP() > 0)
+			{
+				BossParts_R->Draw();
+			}
+
+			if (BossParts_D->GetHP() > 0)
+			{
+				BossParts_D->Draw();
+			}
+
+			if (BossParts_L->GetHP() > 0)
+			{
+				BossParts_L->Draw();
+			}
 		}
 
 		//ボス登場タイマーのデクリメント
@@ -955,10 +1223,6 @@ void GameScene::Draw()
 	Station->Draw();
 	Shooting->Draw();
 	Force->Draw();
-	
-
-	//FBXオブジェクトの描画
-	//object1->Draw(cmdList);
 
 	if (player->Level >= 2)
 	{
@@ -972,8 +1236,6 @@ void GameScene::Draw()
 
 	player->Draw();
 
-	//test->Draw();
-
 	//3Dオブジェクトの描画後処理
 	Object3d::PostDraw();
 
@@ -984,9 +1246,6 @@ void GameScene::Draw()
 
 	particle_Red->Draw();
 
-
-	//EnemyPart->Draw();
-
 	
 
 	Particle::PostDraw();
@@ -994,10 +1253,8 @@ void GameScene::Draw()
 
 	////スプライトの共通コマンド
 	SpriteCommon::GetInstance()->PreDraw();
-	
-	//UI->Draw();
 
-	DebagText();
+	DrawDebugText();
 
 	Stage_1->Draw();
 	Go->Draw();
@@ -1020,6 +1277,11 @@ void GameScene::EnemyInit()
 void GameScene::BossInit()
 {
 	Boss->SetFireTime(Boss->GetIntervalTime());
+
+	BossParts_U->SetFireTime(BossParts_U->GetIntervalTime());
+	BossParts_R->SetFireTime(BossParts_R->GetIntervalTime());
+	BossParts_D->SetFireTime(BossParts_D->GetIntervalTime());
+	BossParts_L->SetFireTime(BossParts_L->GetIntervalTime());
 }
 
 void GameScene::EnemyUpdate(XMFLOAT3 enemyPos)
@@ -1195,6 +1457,12 @@ void GameScene::UpdateEnemyPopCommands()
 
 			//敵を発生させる
 			Boss = Boss::Create(model_Boss, camera, EnemyPos);
+			BossCore = Object3d::Create(model_reticle, camera);
+			BossParts_U = BossParts::Create(model_BossCore, camera, {0.0f , 0.0f , 0.0f});
+			BossParts_R = BossParts::Create(model_BossCore, camera, { 0.0f , 0.0f , 0.0f });
+			BossParts_D = BossParts::Create(model_BossCore, camera, { 0.0f , 0.0f , 0.0f });
+			BossParts_L = BossParts::Create(model_BossCore, camera, { 0.0f , 0.0f , 0.0f });
+			//BossParts->SetParent(BossCore);
 			
 		}
 
@@ -1612,7 +1880,7 @@ void GameScene::DrawSprite()
 		}
 
 		//ルールUI
-		Rule->Draw();
+		//Rule->Draw();
 	}
 
 	//ボス演出UI
@@ -1841,42 +2109,42 @@ void GameScene::MoveTitle()
 	Force->SetPosition(ForcePos);
 }
 
-void GameScene::DebagText()
+void GameScene::DrawDebugText()
 {
 		//プレイヤーの座標
-		std::ostringstream PlayerPosition;
-		PlayerPosition << "PlayerPosition("
+		std::ostringstream BossPosition;
+		BossPosition << "BossPosition("
 			<< std::fixed << std::setprecision(5)
-			<< PlayerPos.x << ","
-			<< PlayerPos.y << ","
-			<< PlayerPos.z << ")";
+			<< BossPos.x << ","
+			<< BossPos.y << ","
+			<< BossPos.z << ")";
 
-		DebugText::GetInstance()->Print(PlayerPosition.str(), 0, 0, 2.0f);
+		DebugText::GetInstance()->Print(BossPosition.str(), 0, 0, 2.0f);
 
-		//Old
-			std::ostringstream PlayerNowstr;
-			PlayerNowstr << "PlayerNowHp("
+			std::ostringstream PartsNowstr;
+			PartsNowstr << "PartsPos("
 				<< std::fixed << std::setprecision(5)
-				<< PlayerNowHP.x << ","
-				<< PlayerNowHP.y << ")";
+				<< PartsPos_U.x << ","
+				<< PartsPos_U.y << ","
+				<< PartsPos_U.z << ")";
 
-			DebugText::GetInstance()->Print(PlayerNowstr.str(), 0, 50, 2.0f);
+			DebugText::GetInstance()->Print(PartsNowstr.str(), 0, 50, 2.0f);
 
-			//Old
-			std::ostringstream divstr;
-			divstr << "hpdiv("
+			////Old
+			std::ostringstream BossPartsFirestr;
+			BossPartsFirestr << "BossPartsFire("
 				<< std::fixed << std::setprecision(5)
-				<< HPdiv << ")";
+				<< BossPartsFire << ")";
 
-			DebugText::GetInstance()->Print(divstr.str(), 0, 100, 2.0f);
+			DebugText::GetInstance()->Print(BossPartsFirestr.str(), 0, 100, 2.0f);
 
-			//delay
-			std::ostringstream delaystr;
-			delaystr << "delaytime("
-				<< std::fixed << std::setprecision(5)
-				<< DelayTime << ")";
+			////delay
+			//std::ostringstream delaystr;
+			//delaystr << "delaytime("
+			//	<< std::fixed << std::setprecision(5)
+			//	<< DelayTime << ")";
 
-			DebugText::GetInstance()->Print(delaystr.str(), 0, 150, 2.0f);
+			//DebugText::GetInstance()->Print(delaystr.str(), 0, 150, 2.0f);
 }
 
 void GameScene::HpBarMove()

@@ -12,6 +12,7 @@
 #include "EnemyBullet.h"
 #include "Enemy.h"
 #include "Boss.h"
+#include "BossParts.h"
 #include "BossBullet.h"
 #include "ObjectManager.h"
 #include "PostEffect.h"
@@ -20,10 +21,13 @@
 #include "DefenceObject.h"
 #include "ImGuiManager.h"
 
+#include "Math.h"
+
 #include <list>
 #include <sstream>
 #include <fstream>
 
+class BossParts;
 
 /// <summary>
 /// ゲームプレイシーン
@@ -123,7 +127,7 @@ public:
 	void MoveTitle();
 
 	//デバッグテキスト描画用関数
-	void DebagText();
+	void DrawDebugText();
 
 	void HpBarMove();
 
@@ -156,6 +160,7 @@ private:
 	Model* model_Enemy = nullptr;
 	Model* model_DefenceEnemy = nullptr;
 	Model* model_Boss = nullptr;
+	Model* model_BossCore = nullptr;
 	Model* model_sphere = nullptr;
 	Model* model_Moon = nullptr;
 	Model* model_Mars = nullptr;
@@ -237,11 +242,16 @@ private:
 	Player* CoreL = nullptr;
 
 	//ボス
-	Boss* BossCore = nullptr;
+	Object3d* BossCore = nullptr;
 	Boss* Boss = nullptr;
 
+	BossParts* BossParts_U, *BossParts_R, *BossParts_L, *BossParts_D;
+
+	
 
 	int BossFire = 0;
+
+	int BossPartsFire = 0;
 	
 	//パーティクル
 	Particle* particle = nullptr;
@@ -512,6 +522,7 @@ private:
 
 	//オーディオ音量
 	float Attack_Volume = 0.5f;
+	float Reflect_Volume = 0.3f;
 	float GameBGM_Volume = 0.1f;
 
 	//ゲームスタートフラグ
@@ -585,5 +596,14 @@ private:
 	XMFLOAT3 PlayerMoveVec = { 0.0f, 0.0f, 0.0f };
 
 	bool PlayerMoveFlag = false;
+
+	int TestVal = 0;
+
+	XMFLOAT3 PartsPos_U = {};
+	XMFLOAT3 PartsPos_D = {};
+	XMFLOAT3 PartsPos_R = {};
+	XMFLOAT3 PartsPos_L = {};
+
+	XMFLOAT4 EnemyBulletColor = { 1.0, 0.1, 1.0, 1.0 };
 };
 

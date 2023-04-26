@@ -9,6 +9,7 @@
 #include "EnemyBullet.h"
 #include "Boss.h"
 #include "BossBullet.h"
+#include "BossParts.h"
 #include "FbxLoader.h"
 #include "Sprite.h"
 #include "DebugText.h"

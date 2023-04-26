@@ -18,14 +18,11 @@ public:
 
 //ここにメンバ関数の宣言を記述
 
-	DebugText();
-	~DebugText();
-
 	void Initialize(UINT texnumber);
+	void Finalize();
 	void Print(const std::string& text, const float& x, const float& y, const float& scale = 1.0f);
 	void DrawAll();
 
-	/*void Finalize();*/
 private:
 	//ここにメンバ変数の宣言を記述
 

@@ -158,10 +158,37 @@ void Enemy::DefenceEnemyUpdate()
 {
 	Object3d::Update();
 
-	//ˆÚ“®
-	Object3d::position_.z -= Speed;
+	if (Object3d::position_.z > 30)
+	{	
+		//ˆÚ“®
+		Object3d::position_.z -= DefenceSpeed;
+		//‰ñ“]
+		Object3d::rotation_.x -= EnemyRotSpeed;
+	}
 
-	//‰ñ“]
-	Object3d::rotation_.x -= EnemyRotSpeed;
+	if (Object3d::position_.z < 30)
+	{
+		if (Object3d::position_.x > 0)
+		{
+			Object3d::position_.x += DefenceSpeed;
+			Object3d::rotation_.x = 0.0f;
+			Object3d::rotation_.y += EnemyRotSpeed;
+		}
+
+		if (Object3d::position_.x < 0)
+		{
+			Object3d::position_.x -= Speed;
+			Object3d::rotation_.x = 0.0f;
+			Object3d::rotation_.y -= EnemyRotSpeed;
+		}
+
+		if (Object3d::position_.x == 0)
+		{
+			Object3d::position_.z -= Speed;
+			//‰ñ“]
+			Object3d::rotation_.x -= EnemyRotSpeed;
+		}
+	}
+
 }
 

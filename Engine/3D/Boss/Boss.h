@@ -59,7 +59,7 @@ private:
 
 	bool DeathEffect = false;
 
-	int IntervalTime = 70;
+	int IntervalTime = 45;
 
 	float Shake = 0.5f;
 
@@ -68,10 +68,10 @@ private:
 	int DownTimer = 0;
 
 	//ボスの体力
-	float HP = 15;
+	float HP = 70;
 
 	//ボスの体力上限値
-	float MAXHP = 15;
+	float MAXHP = 70;
 
 	//死亡時のパーティクルの色
 	XMFLOAT4 BossParticleColor = { 0.988f, 0.443f, 0.180f, 1.0f };

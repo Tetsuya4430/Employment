@@ -62,20 +62,22 @@ void Player::Update()
 
 	Mag = 0.0f;
 
-	if (Level == 1)
-	{
-		Speed = 0.5f;
-	}
 
-	else if (Level == 2)
-	{
-		Speed = 0.75f;
-	}
 
-	else if (Level == 3)
-	{
-		Speed = 1.0f;
-	}
+	//if (Level == 1)
+	//{
+	//	Speed = 0.5f;
+	//}
+
+	//else if (Level == 2)
+	//{
+	//	Speed = 0.75f;
+	//}
+
+	//else if (Level == 3)
+	//{
+	//	Speed = 1.0f;
+	//}
 
 
 
@@ -573,27 +575,27 @@ void Player::Update()
 
 			if (AvoidanceTimer_X == 0)
 			{
-				//‰E‰ñ”ð
-				if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_D) && Avoidanceflag_X == false)
-				{
-					Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
-					PointPos = Object3d::position_.x + AvoidDistance_X;
-					RolePos = -360/*Object3d::rotation_.z - RoleDistance*/;
-					RotFlag_R = true;
+				////‰E‰ñ”ð
+				//if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_D) && Avoidanceflag_X == false)
+				//{
+				//	Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
+				//	PointPos = Object3d::position_.x + AvoidDistance_X;
+				//	RolePos = -360/*Object3d::rotation_.z - RoleDistance*/;
+				//	RotFlag_R = true;
 
-					Avoidanceflag_X = true;
-				}
+				//	Avoidanceflag_X = true;
+				//}
 
-				//¶‰ñ”ð
-				if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_A) && Avoidanceflag_X == false)
-				{
-					Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
-					PointPos = Object3d::position_.x - AvoidDistance_X;
-					RolePos = 360;/*Object3d::rotation_.z + RoleDistance;*/
-					RotFlag_L = true;
+				////¶‰ñ”ð
+				//if (Input::GetInstance()->TriggerKey(DIK_E) && Input::GetInstance()->PushKey(DIK_A) && Avoidanceflag_X == false)
+				//{
+				//	Audio::GetInstance()->PlayWave("Avoid.wav", 0.3f, false);
+				//	PointPos = Object3d::position_.x - AvoidDistance_X;
+				//	RolePos = 360;/*Object3d::rotation_.z + RoleDistance;*/
+				//	RotFlag_L = true;
 
-					Avoidanceflag_X = true;
-				}
+				//	Avoidanceflag_X = true;
+				//}
 			}
 
 			if (AvoidanceTimer_Y == 0)

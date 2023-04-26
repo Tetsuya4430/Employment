@@ -79,6 +79,9 @@ void FrameWork::Initialize()
 	//ステージ1のボスオブジェクトの静的初期化
 	Boss::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
+	//ボスのパーツの静的初期化
+	BossParts::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
+
 	//ボス弾
 	BossBullet::StaticInitialize(dxCommon->GetDev(), dxCommon->GetCmdList(), WinApp::window_width, WinApp::window_height);
 
@@ -97,7 +100,7 @@ void FrameWork::Finalize()
 	delete sceneFactory_;
 
 	//デバッグテキスト解放
-	//debugText->Finalize();
+	DebugText::GetInstance()->Finalize();
 	
 	//シーンマネージャーの解放
 	SceneManager::GetInstance()->Finalize();
@@ -117,9 +120,6 @@ void FrameWork::Finalize()
 
 	//WindowsのAPIの終了処理
 	winApp->Finalie();
-
-	//WindowsAPIの解放
-	//delete winApp;
 }
 
 void FrameWork::Update()
