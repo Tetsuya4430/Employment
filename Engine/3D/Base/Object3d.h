@@ -33,6 +33,7 @@ public: // サブクラス
 	// 定数バッファ用データ構造体B0
 	struct ConstBufferDataB0
 	{
+		XMFLOAT4 color;
 		XMMATRIX mat;	// ３Ｄ変換行列
 	};
 
@@ -134,6 +135,9 @@ public: // メンバ関数
 	/// <returns>座標</returns>
 	const XMFLOAT3& GetRotation() { return rotation_; }
 
+	//色の取得
+	const XMFLOAT4& GetColor() { return Color; }
+
 	/// <summary>
 	/// 座標の設定
 	/// </summary>
@@ -153,6 +157,8 @@ public: // メンバ関数
 
 	void SetParent(Object3d* parent) { parent_ = parent; }
 
+	void SetColor(XMFLOAT4 color) { Color = color; }
+
 
 	//getter
 	//デバイスの取得
@@ -171,6 +177,10 @@ protected: // メンバ変数
 	XMFLOAT3 rotation_ = { 0,0,0 };
 	// ローカル座標
 	XMFLOAT3 position_ = { 0,0,0 };
+	//色
+	XMFLOAT4 Color = {1,1,1,1};
+	//基本色
+	XMFLOAT4 BaseColor = { 1,1,1,1 };
 	// ローカルワールド変換行列
 	XMMATRIX matWorld_;
 	// 親オブジェクト

@@ -21,7 +21,7 @@
 #include "DefenceObject.h"
 #include "ImGuiManager.h"
 
-#include "Math.h"
+#include "MyMath.h"
 
 #include <list>
 #include <sstream>
@@ -605,5 +605,7 @@ private:
 	XMFLOAT3 PartsPos_L = {};
 
 	XMFLOAT4 EnemyBulletColor = { 1.0, 0.1, 1.0, 1.0 };
+
+	int RandTime = 0;
 };
 

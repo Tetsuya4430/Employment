@@ -4,7 +4,7 @@
 #include <DirectXMath.h>
 #include <d3dx12.h>
 
-class Math
+class MyMath
 {
 	// Microsoft::WRL::‚ğÈ—ª
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;

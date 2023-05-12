@@ -45,6 +45,7 @@ public:
 	const bool& GetDeathFlag() { return DeathFlag; }
 	const bool& GetDeathEffect() { return DeathEffect; }
 	const int& GetIntervalTime() { return IntervalTime; }
+	const int& GetLastIntervalTime() { return LastIntervalTime; }
 	const int& GetFireTime() { return FireTime; }
 	const float& GetMAXHP() { return MAXHP; }
 	const XMFLOAT4& GetBossParticleColor() { return BossParticleColor; }
@@ -62,6 +63,8 @@ private:
 
 	int IntervalTime = 45;
 
+	int LastIntervalTime = 10;
+
 	float Shake = 0.5f;
 
 	int FireTime = 0;
@@ -69,10 +72,10 @@ private:
 	int DownTimer = 0;
 
 	//ボスの体力
-	float HP = 15;
+	float HP = 10;
 
 	//ボスの体力上限値
-	float MAXHP = 15;
+	float MAXHP = 10;
 
 	//死亡時のパーティクルの色
 	XMFLOAT4 BossParticleColor = { 0.988f, 0.443f, 0.180f, 1.0f };

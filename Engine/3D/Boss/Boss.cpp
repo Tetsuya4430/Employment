@@ -68,12 +68,19 @@ void Boss::Update()
 	}
 
 	//XVˆ—
-
-	if (HP <= 8)
+	if (DamegeFlag == true)
 	{
-		IntervalTime = 20;
-		Speed = 1.5f;
+		DamegeTimer++;
+		Object3d::Color = DamegeColor;
+
+		if (DamegeTimer >= 20)
+		{
+			Object3d::Color = BaseColor;
+			DamegeTimer = 0;
+			DamegeFlag = false;
+		}
 	}
+	
 
 	if (HP <= 0)
 	{
@@ -105,6 +112,13 @@ void Boss::Update()
 		{
 			phase_ = Phase::MoveL;
 		}
+
+		/*if (HP <= 30 && HP > 0)
+		{
+			LastTimer++;
+
+			
+		}*/
 
 		break;
 
@@ -139,5 +153,27 @@ void Boss::Update()
 
 
 		break;
+
+	/*case Phase::Last:
+
+		LastTimer++;
+
+		LastTimer
+
+		break;*/
 	}
+}
+
+void Boss::Damage()
+{
+	/*int Time;
+
+	Time++;*/
+
+	SetColor(DamegeColor);
+
+	/*if (Time >= 20)
+	{
+		SetColor(Object3d::BaseColor);
+	}*/
 }

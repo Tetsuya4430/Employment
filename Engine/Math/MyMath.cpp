@@ -1,8 +1,7 @@
-#include "Math.h"
-
+#include "MyMath.h"
 using namespace DirectX;
 
-const XMFLOAT3 Math::lerp(const XMFLOAT3& start, const XMFLOAT3& end, const float t)
+const XMFLOAT3 MyMath::lerp(const XMFLOAT3& start, const XMFLOAT3& end, const float t)
 {
     XMFLOAT3 A, B;
     A = XMFLOAT3(start.x * (1.0f - t), start.y * (1.0f - t), start.z * (1.0f - t));
@@ -13,7 +12,7 @@ const XMFLOAT3 Math::lerp(const XMFLOAT3& start, const XMFLOAT3& end, const floa
     return ReturnPos;
 }
 
-const XMFLOAT2 Math::lerp_2(const XMFLOAT2& start, const XMFLOAT2& end, const float t)
+const XMFLOAT2 MyMath::lerp_2(const XMFLOAT2& start, const XMFLOAT2& end, const float t)
 {
     XMFLOAT2 A, B;
     A = XMFLOAT2(start.x * (1.0f - t), start.y * (1.0f - t));

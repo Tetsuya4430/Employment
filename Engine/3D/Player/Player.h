@@ -46,6 +46,7 @@ public:
 	//スタート演出目標座標のセッター
 	void SetStartPointPos(XMFLOAT3 startPointPos) { this->StartPointPos = startPointPos; }
 
+
 	//レベルフラグのゲッター
 	const bool& GetLelelflag() { return  LevelFlag; }
 
@@ -60,6 +61,9 @@ public:
 
 	//スタート演出目標座標のゲッター
 	const XMFLOAT3& GetStartPointPos() { return StartPointPos; }
+
+	//初期座標のゲッター
+	const XMFLOAT3& GetFirstPos() { return FirstPos; }
 
 	const XMFLOAT3& GetVec() { return Vec; }
 
@@ -135,6 +139,9 @@ private:
 
 	//スタート演出時の目標座標
 	XMFLOAT3 StartPointPos = { 0, -10, -50 };
+
+	//プレイヤーの初期位置
+	XMFLOAT3 FirstPos = { 0.0f, -10.0f, 0.0f };
 
 	XMFLOAT3 Vec = {};
 

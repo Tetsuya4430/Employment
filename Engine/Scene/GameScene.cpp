@@ -220,9 +220,6 @@ void GameScene::Update()
 
 	particle->JettParticle(2, { PlayerPos.x, PlayerPos.y , PlayerPos.z - 12 }, PartVel, 20, 1.0f, Value_Zero, PartSpeed, { 1.0, 0.654, 0.1, 1.0 });
 
-	//EnemyBulletColor.x = (float)rand() / RAND_MAX;
-	//EnemyBulletColor.y = (float)rand() / RAND_MAX;
-	//EnemyBulletColor.z = (float)rand() / RAND_MAX;
 	
 	if (!LoadBG->color_.w <= Value_Zero)
 	{
@@ -556,7 +553,7 @@ void GameScene::Update()
 
 				if (BossFire <= Value_Zero)
 				{
-					//BossAttack(Boss->GetPosition());
+					BossAttack(Boss->GetPosition());
 
 					//発射タイマーを初期化
 					BossFire = Boss->GetIntervalTime();
@@ -881,14 +878,22 @@ void GameScene::Update()
 		{
 			if (Boss->GetHP() < 30)
 			{
-				BossParts_U->SetIntervalTime(10);
-				BossParts_R->SetIntervalTime(10);
-				BossParts_D->SetIntervalTime(10);
-				BossParts_L->SetIntervalTime(10);
+				BossParts_U->SetIntervalTime(BossParts_U->GetLastIntervalTime());
+				BossParts_R->SetIntervalTime(BossParts_R->GetLastIntervalTime());
+				BossParts_D->SetIntervalTime(BossParts_D->GetLastIntervalTime());
+				BossParts_L->SetIntervalTime(BossParts_L->GetLastIntervalTime());
 
-				EnemyBulletColor.x = (float)rand() / RAND_MAX;
-				EnemyBulletColor.y = (float)rand() / RAND_MAX;
-				EnemyBulletColor.z = (float)rand() / RAND_MAX;
+				RandTime++;
+
+
+				if (RandTime >= 60)
+				{
+					EnemyBulletColor.x = (float)rand() / RAND_MAX;
+					EnemyBulletColor.y = (float)rand() / RAND_MAX;
+					EnemyBulletColor.z = (float)rand() / RAND_MAX;
+
+					RandTime = 0;
+				}
 			}
 
 			if (Boss->GetDeathFlag() == false)
@@ -898,7 +903,9 @@ void GameScene::Update()
 					if (CheckCollision(bullet->GetPosition(), Boss->GetPosition(), 7.0f, 7.0f) == true)
 					{
 						//パーティクルを生成
-						particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 30, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+						particle->CreateParticleInfo(10, Boss->GetPosition(), 2.0f, 50, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+						//ボスのカラーを変更
+						Boss->SetDamegeFlag(true);
 						Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 						Boss->SetHP(Boss->GetHP() - 1);
 						if (Boss->GetHP() <= Value_Zero)
@@ -920,7 +927,7 @@ void GameScene::Update()
 						if (CheckCollision(bullet->GetPosition(), PartsPos_U, 3.0f, 3.0f) == true)
 						{
 							//パーティクルを生成
-							particle->CreateParticleInfo(10, PartsPos_U, 2.0f, 30, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							particle->CreateParticleInfo(10, PartsPos_U, 2.0f, 50, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
 							Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 							BossParts_U->SetHP(BossParts_U->GetHP() - 1);
 							bullet->SetDeathFlag(true);
@@ -944,7 +951,7 @@ void GameScene::Update()
 						if (CheckCollision(bullet->GetPosition(), PartsPos_U, 3.0f, 3.0f) == true)
 						{
 							//パーティクルを生成
-							particle->CreateParticleInfo(10, PartsPos_U, 2.0f, 30, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							particle->CreateParticleInfo(10, PartsPos_R, 2.0f, 50, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
 							Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 							BossParts_R->SetHP(BossParts_R->GetHP() - 1);
 							bullet->SetDeathFlag(true);
@@ -968,7 +975,7 @@ void GameScene::Update()
 						if (CheckCollision(bullet->GetPosition(), PartsPos_D, 3.0f, 3.0f) == true)
 						{
 							//パーティクルを生成
-							particle->CreateParticleInfo(10, PartsPos_D, 2.0f, 30, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							particle->CreateParticleInfo(10, PartsPos_D, 2.0f, 50, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
 							Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 							BossParts_D->SetHP(BossParts_D->GetHP() - 1);
 							bullet->SetDeathFlag(true);
@@ -992,7 +999,7 @@ void GameScene::Update()
 						if (CheckCollision(bullet->GetPosition(), PartsPos_L, 3.0f, 3.0f) == true)
 						{
 							//パーティクルを生成
-							particle->CreateParticleInfo(10, PartsPos_L, 2.0f, 30, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
+							particle->CreateParticleInfo(10, PartsPos_L, 2.0f, 50, 3.0f, Value_Zero, { 1.0, 0.654, 0.1, 1.0 });
 							Audio::GetInstance()->PlayWave("EnemyDown.wav", 0.1f, false);
 							BossParts_L->SetHP(BossParts_L->GetHP() - 1);
 							bullet->SetDeathFlag(true);
@@ -1254,7 +1261,7 @@ void GameScene::Draw()
 	////スプライトの共通コマンド
 	SpriteCommon::GetInstance()->PreDraw();
 
-	DrawDebugText();
+	//DrawDebugText();
 
 	Stage_1->Draw();
 	Go->Draw();
@@ -1992,8 +1999,7 @@ void GameScene::Start()
 		Go->position_.y += Go->Vec.y;
 		Go->ComFlag = true;
 
-		//PlayerMoveFlag = true;
-		player->SetStartPointPos({0.0f, -10.0f, 0.0f});
+		player->SetStartPointPos(player->GetFirstPos());
 	}
 
 	if (Go->ComFlag == true)
