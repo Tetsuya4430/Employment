@@ -19,7 +19,7 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static BossParts* Create(Model* model, Camera* camera, XMFLOAT3 pos);
+	static std::unique_ptr<BossParts>Create(Model* model, Camera* camera, XMFLOAT3 pos);
 
 
 	/// <summary>

@@ -245,8 +245,13 @@ private:
 	Object3d* BossCore = nullptr;
 	std::unique_ptr<Boss> Boss;
 
-	BossParts* BossParts_U, *BossParts_R, *BossParts_L, *BossParts_D;
+	//BossParts* BossParts_U, *BossParts_R, *BossParts_L, *BossParts_D;
 
+	//ボスのコア
+	std::unique_ptr<BossParts> BossParts_U;
+	std::unique_ptr<BossParts> BossParts_R;
+	std::unique_ptr<BossParts> BossParts_L;
+	std::unique_ptr<BossParts> BossParts_D;
 	
 
 	int BossFire = 0;

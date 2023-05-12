@@ -1,6 +1,6 @@
 #include "BossParts.h"
 
-BossParts* BossParts::Create(Model* model, Camera* camera, XMFLOAT3 pos)
+std::unique_ptr<BossParts> BossParts::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 {
 	// 3Dオブジェクトのインスタンスを生成
 	BossParts * instance = new BossParts();
@@ -28,7 +28,8 @@ BossParts* BossParts::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 		instance->SetCamera(camera);
 	}
 
-	return instance;
+	//ユニークポインタを生成して返す
+	return std::unique_ptr<BossParts>(instance);
 }
 
 bool BossParts::Initialize(XMFLOAT3 pos)

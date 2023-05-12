@@ -1468,8 +1468,6 @@ void GameScene::UpdateEnemyPopCommands()
 			BossParts_R = BossParts::Create(model_BossCore, camera, { 0.0f , 0.0f , 0.0f });
 			BossParts_D = BossParts::Create(model_BossCore, camera, { 0.0f , 0.0f , 0.0f });
 			BossParts_L = BossParts::Create(model_BossCore, camera, { 0.0f , 0.0f , 0.0f });
-			//BossParts->SetParent(BossCore);
-			
 		}
 
 		//POPƒRƒ}ƒ“ƒh
