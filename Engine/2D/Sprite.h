@@ -6,6 +6,8 @@
 #include <d3d12.h>
 #include <DirectXMath.h>
 
+#include <memory>
+
 /// <summary>
 /// スプライト1枚分を表すクラス
 /// </summary>
@@ -47,7 +49,7 @@ public:
 	/// <param name="anchorpoint">アンカーポイント</param>
 	/// <param name="isFlipX">X反転するか</param>
 	/// <param name="isFlipY">Y反転するか</param>
-	static Sprite* Create(UINT texNumber, XMFLOAT4 color, DirectX::XMFLOAT2 anchorpoint = {1.0f, 1.0f}, bool isFlipX = false, bool isFlipY = false);
+	static std::unique_ptr <Sprite> Create(UINT texNumber, XMFLOAT4 color, DirectX::XMFLOAT2 anchorpoint = {1.0f, 1.0f}, bool isFlipX = false, bool isFlipY = false);
 
 	/// <summary>
 	/// 初期化

@@ -26,10 +26,10 @@ public:
 
 private:
 	DirectXCommon* dxCommon = nullptr;
-	Sprite* sprite = nullptr;
 
-
-	Sprite* LoadBG = nullptr;
+	//スプライト
+	std::unique_ptr <Sprite> sprite;
+	std::unique_ptr <Sprite> LoadBG;
 
 
 	Audio* audio = Audio::GetInstance();

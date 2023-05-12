@@ -32,10 +32,6 @@ void TitleScene::Initialize(/*DirectXCommon* dxCommon*/)
 
 void TitleScene::Finalize()
 {
-	//スプライト解放
-	delete sprite;
-
-	
 }
 
 void TitleScene::Update()

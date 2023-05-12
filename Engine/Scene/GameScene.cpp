@@ -194,11 +194,6 @@ void GameScene::Initialize()
 
 void GameScene::Finalize()
 {
-	//スプライト解放
-	delete sprite;
-	delete UI;
-	
-
 	//モデルの解放
 	delete model_1;
 	delete model_2;

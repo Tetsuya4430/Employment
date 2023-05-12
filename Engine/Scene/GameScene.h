@@ -217,15 +217,15 @@ private:
 	std::list<std::unique_ptr<BossBullet>> bossbullets;
 
 	//3Dオブジェクト
-	std::unique_ptr <Object3d> CelestialSphere = nullptr;
-	std::unique_ptr <Object3d> Moon = nullptr;
-	std::unique_ptr <Object3d> Mars = nullptr;
-	std::unique_ptr <Object3d> Neptune = nullptr;
-	std::unique_ptr <Object3d> Station = nullptr;
-	std::unique_ptr <Object3d> SpaceStation = nullptr;
-	std::unique_ptr <Object3d> Shooting = nullptr;
-	std::unique_ptr <Object3d> Force = nullptr;
-	std::unique_ptr <Object3d> CameraObject = nullptr;
+	std::unique_ptr <Object3d> CelestialSphere;
+	std::unique_ptr <Object3d> Moon;
+	std::unique_ptr <Object3d> Mars;
+	std::unique_ptr <Object3d> Neptune;
+	std::unique_ptr <Object3d> Station ;
+	std::unique_ptr <Object3d> SpaceStation;
+	std::unique_ptr <Object3d> Shooting;
+	std::unique_ptr <Object3d> Force;
+	std::unique_ptr <Object3d> CameraObject;
 
 	//プレイヤー
 	std::unique_ptr<Player> player;
@@ -236,7 +236,7 @@ private:
 	XMFLOAT3 SatelliteRange = { 6.0, 1.0, 0.0 };
 
 	//ボス
-	std::unique_ptr <Object3d> BossCore = nullptr;
+	std::unique_ptr <Object3d> BossCore;
 	std::unique_ptr<Boss> Boss;
 
 	//ボスのコア
@@ -255,39 +255,39 @@ private:
 	std::unique_ptr <Particle> particle_Red;
 
 	//UI
-	Sprite* sprite = nullptr;
-	Sprite* UI = nullptr;
-	Sprite* Stage_1 = nullptr;
-	Sprite* Go = nullptr;
-	Sprite* Rule = nullptr;
-	Sprite* LoadBG = nullptr;
-	Sprite* DamageEffect = nullptr;
-	Sprite* StartUI = nullptr;
-	Sprite* HPBar = nullptr;
-	Sprite* EmpBar = nullptr;
-	Sprite* BossHPBar = nullptr;
-	Sprite* PlayerFrame = nullptr;
-	Sprite* BossFrame = nullptr;
-	Sprite* EmpBossBar = nullptr;
+	std::unique_ptr <Sprite> sprite;
+	std::unique_ptr <Sprite> UI;
+	std::unique_ptr <Sprite> Stage_1;
+	std::unique_ptr <Sprite> Go;
+	std::unique_ptr <Sprite> Rule;
+	std::unique_ptr <Sprite> LoadBG;
+	std::unique_ptr <Sprite> DamageEffect;
+	std::unique_ptr <Sprite> StartUI;
+	std::unique_ptr <Sprite> HPBar;
+	std::unique_ptr <Sprite> EmpBar;
+	std::unique_ptr <Sprite> BossHPBar;
+	std::unique_ptr <Sprite> PlayerFrame;
+	std::unique_ptr <Sprite> BossFrame;
+	std::unique_ptr <Sprite> EmpBossBar;
 
 	//プレイヤー経験値スプライト
-	Sprite* ExpBar_0 = nullptr;
-	Sprite* ExpBar_1 = nullptr;
-	Sprite* ExpBar_2 = nullptr;
-	Sprite* ExpBar_3 = nullptr;
-	Sprite* ExpBar_4 = nullptr;
-	Sprite* ExpBar_5 = nullptr;
-	Sprite* Level_1 = nullptr;
-	Sprite* Level_2 = nullptr;
-	Sprite* Level_3 = nullptr;
+	std::unique_ptr <Sprite> ExpBar_0;
+	std::unique_ptr <Sprite> ExpBar_1;
+	std::unique_ptr <Sprite> ExpBar_2;
+	std::unique_ptr <Sprite> ExpBar_3;
+	std::unique_ptr <Sprite> ExpBar_4;
+	std::unique_ptr <Sprite> ExpBar_5;
+	std::unique_ptr <Sprite> Level_1;
+	std::unique_ptr <Sprite>Level_2;
+	std::unique_ptr <Sprite> Level_3;
 	
 
 	//ボス登場演出UI
-	Sprite* BossUI_U = nullptr;
-	Sprite* BossUI_U_2 = nullptr;
-	Sprite* BossUI_D = nullptr;
-	Sprite* BossUI_D_2 = nullptr;
-	Sprite* Warning = nullptr;
+	std::unique_ptr <Sprite> BossUI_U;
+	std::unique_ptr <Sprite> BossUI_U_2;
+	std::unique_ptr <Sprite> BossUI_D;
+	std::unique_ptr <Sprite> BossUI_D_2;
+	std::unique_ptr <Sprite> Warning;
 
 	//ImGui
 	ImGuiManager* Imgui = nullptr;

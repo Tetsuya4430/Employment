@@ -14,14 +14,15 @@ Sprite::Sprite(UINT texNumber, XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
 	this->isFlipY_ = isFlipY;
 }
 
-Sprite* Sprite::Create( UINT texNumber, XMFLOAT4 color, DirectX::XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
+std::unique_ptr <Sprite>Sprite::Create( UINT texNumber, XMFLOAT4 color, DirectX::XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
 {
 	//メモリ確保
 	Sprite* instance = new Sprite(texNumber, anchorpoint, isFlipX, isFlipY);
 	//インスタンス初期化
 	instance->Initialize( texNumber, color, anchorpoint, isFlipX, isFlipY);
 
-	return instance;
+	//ユニークポインタを生成して返す
+	return std::unique_ptr <Sprite>(instance);
 }
 
 void Sprite::Initialize(UINT texNumber,XMFLOAT4 color_, DirectX::XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)

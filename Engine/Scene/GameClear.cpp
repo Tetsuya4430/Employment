@@ -29,10 +29,6 @@ void GameClear::Initialize(/*DirectXCommon* dxCommon*/)
 
 void GameClear::Finalize()
 {
-	//スプライト解放
-	delete sprite;
-
-
 }
 
 void GameClear::Update()

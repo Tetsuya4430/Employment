@@ -29,7 +29,7 @@ private:
 		//スプライト共通部分(借りてくる)
 	SpriteCommon* spriteCommon_ = nullptr;
 	//スプライトの配列
-	Sprite* sprites_[maxCharCount];
+	std::unique_ptr <Sprite> sprites_[maxCharCount];
 	//スプライト配列の添え字番号
 	int spriteIndex_ = 0;
 };

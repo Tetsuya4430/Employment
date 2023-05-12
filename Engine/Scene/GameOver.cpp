@@ -28,10 +28,6 @@ void GameOver::Initialize(/*DirectXCommon* dxCommon*/)
 
 void GameOver::Finalize()
 {
-	//スプライト解放
-	delete sprite;
-
-
 }
 
 void GameOver::Update()

@@ -19,9 +19,6 @@ void DebugText::Initialize(UINT texnumber)
 
 void DebugText::Finalize()
 {
-	for (int i = 0; i < _countof(sprites_); i++) {
-		delete sprites_[i];
-	}
 }
 
 void DebugText::Print(const std::string& text, const float& x, const float& y, const float& scale)
