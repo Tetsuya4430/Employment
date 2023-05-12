@@ -112,7 +112,7 @@ public: // 静的メンバ関数
 	/// 3Dオブジェクト生成
 	/// </summary>
 	/// <returns></returns>
-	static Particle* Create(UINT texnumber, Camera* camera);
+	static std::unique_ptr <Particle> Create(UINT texnumber, Camera* camera);
 
 	/// <summary>
 	/// ルートデスクリプタテーブルの設定

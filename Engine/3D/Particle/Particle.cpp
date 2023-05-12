@@ -87,7 +87,7 @@ void Particle::PostDraw()
 	//Particle::cmdList = nullptr;
 }
 
-Particle* Particle::Create(UINT texnumber, Camera* camera)
+std::unique_ptr <Particle> Particle::Create(UINT texnumber, Camera* camera)
 {
 	// 3Dオブジェクトのインスタンスを生成
 	Particle* particle = new Particle();
@@ -107,7 +107,8 @@ Particle* Particle::Create(UINT texnumber, Camera* camera)
 		particle->SetCamera(camera);
 	}
 
-	return particle;
+	//ユニークポインタを生成して返す
+	return std::unique_ptr <Particle>(particle);
 }
 
 void Particle::SetGraphicsRootDescriptorTable(UINT rootParameterIndex, UINT texnumber)

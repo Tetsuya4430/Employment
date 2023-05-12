@@ -251,10 +251,10 @@ private:
 	int BossPartsFire = 0;
 	
 	//パーティクル
-	Particle* particle = nullptr;
-	Particle* particle_Red = nullptr;
+	std::unique_ptr <Particle> particle;
+	std::unique_ptr <Particle> particle_Red;
 
-	Particle* Testpart = nullptr;
+	//Particle* Testpart = nullptr;
 
 	//UI
 	Sprite* sprite = nullptr;
