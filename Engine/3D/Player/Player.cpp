@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player* Player::Create(Model* model, Camera* camera)
+std::unique_ptr<Player> Player::Create(Model* model, Camera* camera)
 {
     //3Dオブジェクトのインスタンスを生成
     Player* instance = new Player();
@@ -28,7 +28,8 @@ Player* Player::Create(Model* model, Camera* camera)
         instance->SetCamera(camera);
     }
 
-    return instance;
+	//ユニークポインタを生成して返す
+	return std::unique_ptr <Player>(instance);
 }
 
 

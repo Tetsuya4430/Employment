@@ -22,7 +22,6 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
-	delete(player);
 }
 
 void GameScene::Initialize()
@@ -79,10 +78,6 @@ void GameScene::Initialize()
 	//ゲームスタート判定フラグのリセット
 	player->SetGameStart(false);
 	PlayerMoveFlag = false;
-
-	test = Object3d::Create(model_reticle, camera);
-
-	TestPos = test->GetPosition();
 
 	//天球生成
 	CelestialSphere = Object3d::Create(model_sphere, camera);
@@ -1113,9 +1108,6 @@ void GameScene::Update()
 
 		CameraObject->Update();
 
-		test->SetPosition(TestPos);
-
-		test->Update();
 
 		//スプライトの更新
 

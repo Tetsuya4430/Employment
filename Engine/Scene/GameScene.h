@@ -129,6 +129,7 @@ public:
 	//デバッグテキスト描画用関数
 	void DrawDebugText();
 
+	//HPバーの移動用関数
 	void HpBarMove();
 
 	void EnemyDown(XMFLOAT3 EnemyPos);
@@ -146,9 +147,6 @@ private:
 
 private:
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
-
-	//WindowsAPI
-	//WinApp* winApp =  nullptr;
 
 	//デバッグテキスト
 	DebugText debugText;
@@ -174,7 +172,6 @@ private:
 	Model* model_Force = nullptr;
 
 	FbxModel* model1 = nullptr;
-	Fbx3d* object1 = nullptr;
 
 	Input* input = nullptr;
 
@@ -187,9 +184,6 @@ private:
 	XMFLOAT3 Shake = { 2.0f, 0.0f, 0.0f };
 
 	int ShakeTimer = 0;
-
-
-	PostEffect* postEffect = nullptr;
 
 	Audio* audio = Audio::GetInstance();
 
@@ -227,25 +221,23 @@ private:
 	Object3d* Moon = nullptr;
 	Object3d* Mars = nullptr;
 	Object3d* Neptune = nullptr;
-	Object3d* Wall = nullptr;
 	Object3d* Station = nullptr;
 	Object3d* SpaceStation = nullptr;
 	Object3d* Shooting = nullptr;
 	Object3d* Force = nullptr;
 	Object3d* CameraObject = nullptr;
 
-	Object3d* test = nullptr;
-
 	//プレイヤー
-	Player* P = nullptr;
-	Player* CoreR = nullptr;
-	Player* CoreL = nullptr;
+	std::unique_ptr<Player> player;
+	std::unique_ptr <Player> Satellite_R;
+	std::unique_ptr<Player> Satellite_L;
+
+	XMFLOAT3 PlayerScale = { 0.5f, 0.5f, 0.5f };
+	XMFLOAT3 SatelliteRange = { 6.0, 1.0, 0.0 };
 
 	//ボス
 	Object3d* BossCore = nullptr;
 	std::unique_ptr<Boss> Boss;
-
-	//BossParts* BossParts_U, *BossParts_R, *BossParts_L, *BossParts_D;
 
 	//ボスのコア
 	std::unique_ptr<BossParts> BossParts_U;
@@ -263,15 +255,6 @@ private:
 	Particle* particle_Red = nullptr;
 
 	Particle* Testpart = nullptr;
-
-
-	//Player
-	Player* player = nullptr;
-	Player* Satellite_R = nullptr;
-	Player* Satellite_L = nullptr;
-
-	XMFLOAT3 PlayerScale = { 0.5f, 0.5f, 0.5f };
-	XMFLOAT3 SatelliteRange = { 6.0, 1.0, 0.0 };
 
 	//UI
 	Sprite* sprite = nullptr;

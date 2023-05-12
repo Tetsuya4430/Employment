@@ -18,7 +18,7 @@ public:
 	/// <param name="model"></param>
 	/// <param name="camera"></param>
 	/// <returns></returns>
-	static Player* Create(Model* model, Camera* camera);
+	static std::unique_ptr<Player> Create(Model* model, Camera* camera);
 
 	/// <summary>
 	/// ‰Šú‰»
