@@ -23,7 +23,6 @@ GameScene::GameScene()
 GameScene::~GameScene()
 {
 	delete(player);
-	delete(Boss);
 }
 
 void GameScene::Initialize()

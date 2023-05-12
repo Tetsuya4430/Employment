@@ -8,8 +8,8 @@ void MyGame::Initialize()
 
 	//シーンの初期化処理
 	//シーンファクトリを生成し、マネージャーにセット
-	sceneFactory_ = new SceneFactory();
-	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_);
+	sceneFactory_ = std::make_unique<SceneFactory>();
+	SceneManager::GetInstance()->SetSceneFactory(sceneFactory_.get());
 
 	//シーンマネージャに最初のシーンをセット
 	SceneManager::GetInstance()->ChangeScene("GAMEPLAY");

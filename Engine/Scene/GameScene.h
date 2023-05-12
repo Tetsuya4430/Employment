@@ -243,7 +243,7 @@ private:
 
 	//É{ÉX
 	Object3d* BossCore = nullptr;
-	Boss* Boss = nullptr;
+	std::unique_ptr<Boss> Boss;
 
 	BossParts* BossParts_U, *BossParts_R, *BossParts_L, *BossParts_D;
 

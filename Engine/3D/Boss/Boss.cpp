@@ -2,7 +2,7 @@
 
 #include "Input.h"
 
-Boss* Boss::Create(Model* model, Camera* camera, XMFLOAT3 pos)
+std::unique_ptr<Boss> Boss::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 {
 	//3Dオブジェクトのインスタンスを生成
 	Boss* instance = new Boss();
@@ -30,7 +30,8 @@ Boss* Boss::Create(Model* model, Camera* camera, XMFLOAT3 pos)
 		instance->SetCamera(camera);
 	}
 
-	return instance;
+	//ユニークポインタを生成して返す
+	return std::unique_ptr<Boss>(instance);
 }
 
 bool Boss::Initialize(XMFLOAT3 pos)

@@ -96,9 +96,6 @@ void FrameWork::Initialize()
 
 void FrameWork::Finalize()
 {
-	//シーンファクトリ解放
-	delete sceneFactory_;
-
 	//デバッグテキスト解放
 	DebugText::GetInstance()->Finalize();
 	

@@ -19,7 +19,8 @@
 #include "Particle.h"
 #include "DefenceObject.h"
 #include "ImGuiManager.h"
-//#include "Test.h"
+
+#include <memory>
 
 /// <summary>
 /// フレームワーク
@@ -64,7 +65,8 @@ protected:
 	Audio* audio = nullptr;
 	DebugText* debugText = nullptr;
 	SpriteCommon* spriteCommon = nullptr;
-	AbstractSceneFactory* sceneFactory_ = nullptr;
+	//所有者
+	std::unique_ptr<AbstractSceneFactory> sceneFactory_;
 	ImGuiManager* ImGui = nullptr;
 };
 
