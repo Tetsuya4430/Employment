@@ -217,15 +217,15 @@ private:
 	std::list<std::unique_ptr<BossBullet>> bossbullets;
 
 	//3Dオブジェクト
-	Object3d* CelestialSphere = nullptr;
-	Object3d* Moon = nullptr;
-	Object3d* Mars = nullptr;
-	Object3d* Neptune = nullptr;
-	Object3d* Station = nullptr;
-	Object3d* SpaceStation = nullptr;
-	Object3d* Shooting = nullptr;
-	Object3d* Force = nullptr;
-	Object3d* CameraObject = nullptr;
+	std::unique_ptr <Object3d> CelestialSphere = nullptr;
+	std::unique_ptr <Object3d> Moon = nullptr;
+	std::unique_ptr <Object3d> Mars = nullptr;
+	std::unique_ptr <Object3d> Neptune = nullptr;
+	std::unique_ptr <Object3d> Station = nullptr;
+	std::unique_ptr <Object3d> SpaceStation = nullptr;
+	std::unique_ptr <Object3d> Shooting = nullptr;
+	std::unique_ptr <Object3d> Force = nullptr;
+	std::unique_ptr <Object3d> CameraObject = nullptr;
 
 	//プレイヤー
 	std::unique_ptr<Player> player;
@@ -236,7 +236,7 @@ private:
 	XMFLOAT3 SatelliteRange = { 6.0, 1.0, 0.0 };
 
 	//ボス
-	Object3d* BossCore = nullptr;
+	std::unique_ptr <Object3d> BossCore = nullptr;
 	std::unique_ptr<Boss> Boss;
 
 	//ボスのコア
@@ -253,8 +253,6 @@ private:
 	//パーティクル
 	std::unique_ptr <Particle> particle;
 	std::unique_ptr <Particle> particle_Red;
-
-	//Particle* Testpart = nullptr;
 
 	//UI
 	Sprite* sprite = nullptr;

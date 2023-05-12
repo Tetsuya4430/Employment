@@ -69,7 +69,7 @@ void Object3d::PostDraw()
 	//Object3d::cmdList = nullptr;
 }
 
-Object3d * Object3d::Create(Model* model, Camera* camera)
+std::unique_ptr <Object3d> Object3d::Create(Model* model, Camera* camera)
 {
 	// 3Dオブジェクトのインスタンスを生成
 	Object3d* object3d = new Object3d();
@@ -94,8 +94,8 @@ Object3d * Object3d::Create(Model* model, Camera* camera)
 		object3d->SetCamera(camera);
 	}
 
-	////シェアドポインタを生成してreturn
-	return object3d;
+	//ユニークポインタを生成して返す
+	return std::unique_ptr <Object3d>(object3d);
 }
 
 bool Object3d::InitializeGraphicsPipeline()

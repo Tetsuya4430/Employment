@@ -71,7 +71,7 @@ public: // 静的メンバ関数
 	/// 3Dオブジェクト生成
 	/// </summary>
 	/// <returns></returns>
-	static Object3d* Create(Model* model, Camera* camera);
+	static std::unique_ptr <Object3d> Create(Model* model, Camera* camera);
 
 
 private: // 静的メンバ変数
